@@ -1,50 +1,28 @@
-import { Button, Stack, TextField } from '@mui/material';
-import { useRouter } from 'next/router';
-import { useContext, useState } from 'react';
+import { Stack } from '@mui/material';
 
-import { DbContext } from '@/context/dbContext';
-import { useAppDispatch } from '@/store/hooks';
-import { createUser } from '@/store/user/actions';
-import { useDebounce } from '@/utils/hooks';
-import { paths } from '@/utils/paths';
-import { validateUsername } from '@/utils/validation';
+import LineSchedulor from '@/components/Schedulor/LineSchedulor';
 
 const Index = () => {
-  // Hooks
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-
-  const { login } = useContext(DbContext);
-
-  // Local states
-  const [username, setUsername] = useState('');
-  const [isUsernameValid, setIsUsernameValid] = useState(false);
-
-  const updateUsername = (newUsername: string) => {
-    setUsername(newUsername);
-    setIsUsernameValid(validateUsername(newUsername));
+  const onChange = (thing: any) => {
+    console.log(thing);
   };
 
-  const updateUsernameDebounced = useDebounce(updateUsername, 150);
-
-  const onUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newUsername = event.target.value;
-    // Debounce change updates
-    updateUsernameDebounced(newUsername);
-  };
-
-  const onStart = async () => {
-    await login(username);
-    dispatch(createUser(username));
-    router.push(paths.lobby);
-  };
+  const startDate = new Date('2022-12-08');
+  const endDate = new Date('2022-12-21');
+  const minTime = 17;
+  const maxTime = 23;
+  const intervalSize = 1;
 
   return (
     <Stack sx={{ gap: 4 }}>
-      <TextField onChange={onUsernameChange} placeholder={'test-user'} />
-      <Button variant="outlined" onClick={onStart} disabled={!isUsernameValid}>
-        Get started
-      </Button>
+      <LineSchedulor
+        onChange={onChange}
+        startDate={startDate}
+        endDate={endDate}
+        minTime={minTime}
+        maxTime={maxTime}
+        intervalSize={intervalSize}
+      />
     </Stack>
   );
 };

@@ -29,6 +29,8 @@
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/realtime-js": "^2.1.0",
     "@supabase/supabase-js": "^2.1.0",
+    "@types/date-fns": "^2.6.0",
+    "date-fns": "^2.29.3",
     "lodash": "^4.17.21",
     "next": "^13.0.0",
     "next-seo": "^5.8.0",
