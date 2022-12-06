@@ -1,5 +1,6 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
+import { checkSupabaseErrorResponse } from '../error';
 import type { UserSchema } from '../schemas/types';
 import { usersSchema } from '../schemas/users';
 
@@ -11,18 +12,17 @@ import { usersSchema } from '../schemas/users';
 export const insertUserIntoDB = async (
   supabase: Supabase,
   username: string,
-  eventId: string,
+  eventId: string
 ): Promise<UserSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.users.channel)
-      .insert([{ [usersSchema.username]: username }])
+      .insert([
+        { [usersSchema.username]: username, [usersSchema.event_id]: eventId },
+      ])
       .select();
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     return data?.[0] as UserSchema;
   } catch (error) {

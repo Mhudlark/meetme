@@ -1,5 +1,6 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
+import { checkSupabaseErrorResponse } from '../error';
 import { usersSchema } from '../schemas/users';
 
 /**
@@ -12,12 +13,9 @@ export const deleteUserFromDB = async (supabase: Supabase, userId: string) => {
     const { data, error } = await supabase
       .from(dbConfig.channels.users.channel)
       .delete()
-      .match({ [usersSchema.user_id]: userId });
+      .match({ [usersSchema.id]: userId });
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     return data;
   } catch (error) {
