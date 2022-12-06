@@ -1,4 +1,5 @@
 import type { Supabase } from '../../types';
+import { checkSupabaseErrorResponse } from '../error';
 import type { PreferenceSchema } from '../schemas/types';
 
 /**
@@ -20,10 +21,7 @@ export const insertMessageIntoDB = async (
       .insert([{ room_id: roomId, message, author: userId }])
       .select();
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     return data?.[0] as PreferenceSchema;
   } catch (error) {

@@ -1,5 +1,6 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
+import { checkSupabaseErrorResponse } from '../error';
 import { eventsSchema } from '../schemas/events';
 
 /**
@@ -14,10 +15,7 @@ export const deleteRoomFromDB = async (supabase: Supabase, roomId: string) => {
       .delete()
       .match({ [eventsSchema.room_id]: roomId });
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     return data;
   } catch (error) {

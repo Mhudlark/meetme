@@ -6,8 +6,8 @@ import { deleteRoomFromDB } from '@/backend/db/database/event/delete';
 import { selectRoomFromDB } from '@/backend/db/database/event/select';
 import { useMessagesListener } from '@/backend/db/database/hooks/useMessagesListener';
 import { useRoomListener } from '@/backend/db/database/hooks/useRoomListener';
-import { deleteMessagesForRoomFromDB } from '@/backend/db/database/preferences/delete';
-import { insertMessageIntoDB } from '@/backend/db/database/preferences/insert';
+import { deleteMessagesForRoomFromDB } from '@/backend/db/database/preference/delete';
+import { insertMessageIntoDB } from '@/backend/db/database/preference/insert';
 import type {
   PreferenceSchema,
   UserSchema,

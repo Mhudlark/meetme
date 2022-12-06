@@ -1,5 +1,6 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
+import { checkSupabaseErrorResponse } from '../error';
 import { eventsSchema } from '../schemas/events';
 import type { BaseEventSchema, EventSchema } from '../schemas/types';
 
@@ -18,10 +19,7 @@ export const selectBaseRoomFromDB = async (
       .select(`*`)
       .eq(eventsSchema.room_id, roomId);
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     const room = data?.[0];
     return room as BaseEventSchema;

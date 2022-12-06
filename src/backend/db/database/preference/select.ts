@@ -1,5 +1,6 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
+import { checkSupabaseErrorResponse } from '../error';
 import { preferencesSchema } from '../schemas/preferences';
 import type { PreferenceSchema } from '../schemas/types';
 
@@ -20,10 +21,7 @@ export const selectMessagesFromDB = async (
       .eq(preferencesSchema.room_id, roomId)
       .order(preferencesSchema.created_at, { ascending: true });
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     return data as PreferenceSchema[];
   } catch (error) {

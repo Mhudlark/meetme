@@ -1,5 +1,6 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
+import { checkSupabaseErrorResponse } from '../error';
 import { preferencesSchema } from '../schemas/preferences';
 
 /**
@@ -17,10 +18,7 @@ export const deleteMessagesForRoomFromDB = async (
       .delete()
       .match({ [preferencesSchema.room_id]: roomId });
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     return data;
   } catch (error) {

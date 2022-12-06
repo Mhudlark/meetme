@@ -1,5 +1,6 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
+import { checkSupabaseErrorResponse } from '../error';
 import { eventsSchema } from '../schemas/events';
 import type { EventSchema } from '../schemas/types';
 
@@ -18,10 +19,7 @@ export const insertRoomIntoDB = async (
       .insert([{ [eventsSchema.room_name]: roomName }])
       .select();
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     return data?.[0] as EventSchema;
   } catch (error) {
