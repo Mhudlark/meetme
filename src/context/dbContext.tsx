@@ -2,15 +2,14 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useState } from 'react';
 
+import { deleteRoomFromDB } from '@/backend/db/database/event/delete';
+import { selectRoomFromDB } from '@/backend/db/database/event/select';
 import { useMessagesListener } from '@/backend/db/database/hooks/useMessagesListener';
 import { useRoomListener } from '@/backend/db/database/hooks/useRoomListener';
-import { deleteMessagesForRoomFromDB } from '@/backend/db/database/messages/delete';
-import { insertMessageIntoDB } from '@/backend/db/database/messages/insert';
-import { deleteRoomFromDB } from '@/backend/db/database/room/delete';
-import { insertRoomIntoDB } from '@/backend/db/database/room/insert';
-import { selectRoomFromDB } from '@/backend/db/database/room/select';
+import { deleteMessagesForRoomFromDB } from '@/backend/db/database/preferences/delete';
+import { insertMessageIntoDB } from '@/backend/db/database/preferences/insert';
 import type {
-  MessageSchema,
+  PreferenceSchema,
   UserSchema,
 } from '@/backend/db/database/schemas/types';
 import { deleteUserFromDB } from '@/backend/db/database/user/delete';
@@ -81,13 +80,13 @@ const DbProvider = ({ children }: DbProviderProps) => {
 
     console.log('userInfo', userInfo);
 
-    if (userInfo?.user_id) dispatch(setUserId(userInfo.user_id));
+    if (userInfo?.id) dispatch(setUserId(userInfo.id));
   };
 
   const createRoom = async () => {
     console.log('createRoom');
 
-    const newRoom = createRoom
+    const newRoom = createRoom;
 
     dispatch(
       setRoom({
@@ -111,14 +110,14 @@ const DbProvider = ({ children }: DbProviderProps) => {
     );
     console.log('userInfo', userInfo);
 
-    const roomInfo = await selectRoomFromDB(supabase, userInfo.room_id);
+    const roomInfo = await selectRoomFromDB(supabase, userInfo.event_id);
     console.log('roomInfo', roomInfo);
 
     const roomUsers = roomInfo.users.map((roomUser) =>
-      initUser(roomUser.user_id, roomUser.username)
+      initUser(roomUser.id, roomUser.username)
     );
 
-    const roomJoined = initRoom(roomInfo.room_id, roomInfo.room_id, roomUsers);
+    const roomJoined = initRoom(roomInfo.id, roomInfo.id, roomUsers);
 
     dispatch(setRoom(roomJoined));
   };
@@ -159,7 +158,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
       console.log('newUserInfo', newUserInfo);
 
       const newUser: User = {
-        userId: newUserInfo.user_id,
+        userId: newUserInfo.id,
         username: newUserInfo.username,
       };
 
@@ -178,7 +177,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
   );
 
   const handleMessagesUpdate = useCallback(
-    (newMessageInfo: MessageSchema) => {
+    (newMessageInfo: PreferenceSchema) => {
       console.log('handleMessagesUpdate');
       console.log('newMessageInfo', newMessageInfo);
 

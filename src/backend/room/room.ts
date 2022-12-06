@@ -1,7 +1,7 @@
 import type { Room, User } from '@/sharedTypes';
 import { initRoom } from '@/sharedUtils/room';
 
-import { insertRoomIntoDB } from '../db/database/room/insert';
+import { insertRoomIntoDB } from '../db/database/event/insert';
 import { updateUserRoomIdInDB } from '../db/database/user/update';
 import type { Supabase } from '../db/types';
 import { generateRoomName } from './util';
@@ -22,11 +22,11 @@ export const createRoom = async (
   const userInfo = await updateUserRoomIdInDB(
     supabase,
     user.userId,
-    roomInfo.room_id
+    roomInfo.id
   );
 
-  if (roomInfo.room_id !== userInfo.room_id)
+  if (roomInfo.id !== userInfo.event_id)
     throw new Error('Room ID mismatch');
 
-  return initRoom(roomInfo.room_id, roomInfo.room_name);
+  return initRoom(roomInfo.id, roomInfo.room_name);
 };

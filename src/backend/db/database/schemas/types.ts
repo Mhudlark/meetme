@@ -1,25 +1,25 @@
-export interface MessageSchema {
-  message_id: string;
+export interface PreferenceSchema {
+  id: string;
   created_at: string;
-  room_id: string;
-  message: string;
-  author: string;
+  event_id: string;
+  user_id: string;
+  selections: string;
 }
 
 export interface UserSchema {
-  user_id: string;
+  id: string;
   created_at: string;
   username: string;
-  room_id: string;
+  event_id: string;
 }
 
-export interface BaseRoomSchema {
-  room_id: string;
+export interface BaseEventSchema {
+  id: string;
   created_at: string;
-  room_name: string;
+  name: string;
 }
 
-export interface RoomSchema extends BaseRoomSchema {
+export interface EventSchema extends BaseEventSchema {
   users: UserSchema[];
-  messages: MessageSchema[];
+  preferences: PreferenceSchema[];
 }

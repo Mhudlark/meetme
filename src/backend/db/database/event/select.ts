@@ -1,7 +1,7 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
-import { roomsSchema } from '../schemas/rooms';
-import type { BaseRoomSchema, RoomSchema } from '../schemas/types';
+import { eventsSchema } from '../schemas/events';
+import type { BaseEventSchema, EventSchema } from '../schemas/types';
 
 /**
  * Fetch a room with the given roomId
@@ -11,12 +11,12 @@ import type { BaseRoomSchema, RoomSchema } from '../schemas/types';
 export const selectBaseRoomFromDB = async (
   supabase: Supabase,
   roomId: string
-): Promise<BaseRoomSchema> => {
+): Promise<BaseEventSchema> => {
   try {
     const { data, error } = await supabase
-      .from(dbConfig.channels.rooms.channel)
+      .from(dbConfig.channels.events.channel)
       .select(`*`)
-      .eq(roomsSchema.room_id, roomId);
+      .eq(eventsSchema.room_id, roomId);
 
     if (error)
       throw new Error(
@@ -24,7 +24,7 @@ export const selectBaseRoomFromDB = async (
       );
 
     const room = data?.[0];
-    return room as BaseRoomSchema;
+    return room as BaseEventSchema;
   } catch (error) {
     console.log('error', error);
     throw new Error('Error fetching users');
@@ -39,22 +39,22 @@ export const selectBaseRoomFromDB = async (
 export const selectRoomFromDB = async (
   supabase: Supabase,
   roomId: string
-): Promise<RoomSchema> => {
+): Promise<EventSchema> => {
   try {
     const { data, error } = await supabase
-      .from(dbConfig.channels.rooms.channel)
+      .from(dbConfig.channels.events.channel)
       .select(
         `
       *,
       ${dbConfig.channels.users.table} (
         *
       ),
-      ${dbConfig.channels.messages.table} (
+      ${dbConfig.channels.preferences.table} (
         *
       )
     `
       )
-      .eq(roomsSchema.room_id, roomId);
+      .eq(eventsSchema.room_id, roomId);
 
     if (error)
       throw new Error(
@@ -62,7 +62,7 @@ export const selectRoomFromDB = async (
       );
 
     const room = data?.[0];
-    return room as unknown as RoomSchema;
+    return room as unknown as EventSchema;
   } catch (error) {
     console.log('error', error);
     throw new Error('Error fetching users');

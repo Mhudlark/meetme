@@ -1,7 +1,7 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
-import { roomsSchema } from '../schemas/rooms';
-import type { RoomSchema } from '../schemas/types';
+import { eventsSchema } from '../schemas/events';
+import type { EventSchema } from '../schemas/types';
 
 /**
  * Insert a new room into the DB
@@ -11,11 +11,11 @@ import type { RoomSchema } from '../schemas/types';
 export const insertRoomIntoDB = async (
   supabase: Supabase,
   roomName: string
-): Promise<RoomSchema> => {
+): Promise<EventSchema> => {
   try {
     const { data, error } = await supabase
-      .from(dbConfig.channels.rooms.channel)
-      .insert([{ [roomsSchema.room_name]: roomName }])
+      .from(dbConfig.channels.events.channel)
+      .insert([{ [eventsSchema.room_name]: roomName }])
       .select();
 
     if (error)
@@ -23,7 +23,7 @@ export const insertRoomIntoDB = async (
         `${error.message} ============= ${error.hint} ============= ${error.details}`
       );
 
-    return data?.[0] as RoomSchema;
+    return data?.[0] as EventSchema;
   } catch (error) {
     console.log('error', error);
     throw new Error('Error adding room');

@@ -1,5 +1,5 @@
 import type { Supabase } from '../../types';
-import type { MessageSchema } from '../schemas/types';
+import type { PreferenceSchema } from '../schemas/types';
 
 /**
  * Insert a new message into the DB
@@ -13,7 +13,7 @@ export const insertMessageIntoDB = async (
   message: string,
   roomId: string,
   userId: string
-): Promise<MessageSchema> => {
+): Promise<PreferenceSchema> => {
   try {
     const { data, error } = await supabase
       .from('messages')
@@ -25,7 +25,7 @@ export const insertMessageIntoDB = async (
         `${error.message} ============= ${error.hint} ============= ${error.details}`
       );
 
-    return data?.[0] as MessageSchema;
+    return data?.[0] as PreferenceSchema;
   } catch (error) {
     console.log('error', error);
     throw new Error('Error adding message');

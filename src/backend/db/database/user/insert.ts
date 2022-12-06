@@ -10,7 +10,8 @@ import { usersSchema } from '../schemas/users';
  */
 export const insertUserIntoDB = async (
   supabase: Supabase,
-  username: string
+  username: string,
+  eventId: string,
 ): Promise<UserSchema> => {
   try {
     const { data, error } = await supabase

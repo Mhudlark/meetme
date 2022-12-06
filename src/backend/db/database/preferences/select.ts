@@ -1,7 +1,7 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
-import { messagesSchema } from '../schemas/messages';
-import type { MessageSchema } from '../schemas/types';
+import { preferencesSchema } from '../schemas/preferences';
+import type { PreferenceSchema } from '../schemas/types';
 
 /**
  * Fetch all messages and their authors for a given room
@@ -11,21 +11,21 @@ import type { MessageSchema } from '../schemas/types';
 export const selectMessagesFromDB = async (
   supabase: Supabase,
   roomId: string
-): Promise<MessageSchema[]> => {
+): Promise<PreferenceSchema[]> => {
   try {
     const { data, error } = await supabase
-      .from(dbConfig.channels.messages.channel)
+      .from(dbConfig.channels.preferences.channel)
       // .select(`*, author:user_id(*)`)
       .select(`*`)
-      .eq(messagesSchema.room_id, roomId)
-      .order(messagesSchema.created_at, { ascending: true });
+      .eq(preferencesSchema.room_id, roomId)
+      .order(preferencesSchema.created_at, { ascending: true });
 
     if (error)
       throw new Error(
         `${error.message} ============= ${error.hint} ============= ${error.details}`
       );
 
-    return data as MessageSchema[];
+    return data as PreferenceSchema[];
   } catch (error) {
     console.log('error', error);
     throw new Error('Error fetching messages');

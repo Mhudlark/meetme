@@ -8,20 +8,20 @@ export const dbConfig = {
     },
   },
   channels: {
-    rooms: {
+    events: {
       schema: 'public',
-      table: 'rooms',
-      channel: 'rooms',
+      table: 'Events',
+      channel: 'Events',
     },
     users: {
       schema: 'public',
-      table: 'users',
-      channel: 'users',
+      table: 'EventUsers',
+      channel: 'EventUsers',
     },
-    messages: {
+    preferences: {
       schema: 'public',
-      table: 'messages',
-      channel: 'messages',
+      table: 'Preferences',
+      channel: 'Preferences',
     },
   },
 };

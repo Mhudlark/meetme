@@ -1,21 +1,18 @@
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
-import { messagesSchema } from '../schemas/messages';
+import { eventsSchema } from '../schemas/events';
 
 /**
- * Delete all messages for a given room from the DB
+ * Delete a room from the DB
  * @param {Supabase} supabase The Supabase client
  * @param {string} roomId The room id
  */
-export const deleteMessagesForRoomFromDB = async (
-  supabase: Supabase,
-  roomId: string
-) => {
+export const deleteRoomFromDB = async (supabase: Supabase, roomId: string) => {
   try {
     const { data, error } = await supabase
-      .from(dbConfig.channels.messages.channel)
+      .from(dbConfig.channels.events.channel)
       .delete()
-      .match({ [messagesSchema.room_id]: roomId });
+      .match({ [eventsSchema.room_id]: roomId });
 
     if (error)
       throw new Error(
@@ -25,6 +22,6 @@ export const deleteMessagesForRoomFromDB = async (
     return data;
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error deleting message');
+    throw new Error('Error deleting room');
   }
 };

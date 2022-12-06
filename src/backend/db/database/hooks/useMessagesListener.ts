@@ -3,17 +3,17 @@ import { useEffect, useRef, useState } from 'react';
 
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
-import { messagesSchema } from '../schemas/messages';
-import type { MessageSchema } from '../schemas/types';
+import { preferencesSchema } from '../schemas/preferences';
+import type { PreferenceSchema } from '../schemas/types';
 import { PostGresEventType } from '../types';
 
 export const useMessagesListener = (
   supabase: Supabase,
   isInRoom: boolean,
   roomId?: string,
-  onSync?: (newMessage: MessageSchema) => void
+  onSync?: (newMessage: PreferenceSchema) => void
 ) => {
-  const savedOnSync = useRef<(newMessage: MessageSchema) => void>();
+  const savedOnSync = useRef<(newMessage: PreferenceSchema) => void>();
 
   // Update ref.current value if handler changes.
   // This allows our effect below to always get latest handler
@@ -28,7 +28,7 @@ export const useMessagesListener = (
 
   useEffect(() => {
     if (isInRoom && roomId) {
-      const messagesConfig = dbConfig.channels.messages;
+      const messagesConfig = dbConfig.channels.preferences;
 
       const channel = supabase
         .channel(messagesConfig.channel)
@@ -38,9 +38,9 @@ export const useMessagesListener = (
             event: PostGresEventType.INSERT,
             schema: messagesConfig.schema,
             table: messagesConfig.table,
-            filter: `${messagesSchema.room_id}=eq.${roomId}`,
+            filter: `${preferencesSchema.room_id}=eq.${roomId}`,
           },
-          (payload) => savedOnSync.current?.(payload.new as MessageSchema)
+          (payload) => savedOnSync.current?.(payload.new as PreferenceSchema)
         )
         .subscribe();
 
