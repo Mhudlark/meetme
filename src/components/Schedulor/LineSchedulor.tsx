@@ -1,20 +1,18 @@
 import { Box, Stack, Typography } from '@mui/material';
-import { range } from 'lodash';
 import { useMemo } from 'react';
 
 import { formatDateToFriendlyString, getDateRange } from '@/utils/date';
 
-import type { SliderMark } from './RangeSlider';
-import RangeSlider from './RangeSlider';
+import DateSlider from './DateSlider';
 
-const formatTimeValue = (value: number) => {
-  if (value < 0 || value > 24) throw new Error(`Invalid time value: ${value}`);
-  if (value % 0.5 !== 0) throw new Error(`Invalid time value: ${value}`);
-  return `${value - (value % 1)}:${value % 1 === 0.5 ? '30' : '00'}`;
-};
+export interface SchedulorSelection {
+  startDate: Date;
+  endDate: Date;
+}
 
 export interface LineSchedulorProps {
-  onChange: (thing: any) => void;
+  selections: SchedulorSelection[];
+  onChange: (selections: SchedulorSelection[]) => void;
   startDate: Date;
   endDate: Date;
   minTime: number;
@@ -23,6 +21,7 @@ export interface LineSchedulorProps {
 }
 
 export default function LineSchedulor({
+  selections,
   onChange,
   startDate,
   endDate,
@@ -35,22 +34,25 @@ export default function LineSchedulor({
     [startDate, endDate]
   );
 
-  const marks: SliderMark[] = useMemo(() => {
-    const newMarks: SliderMark[] = range(minTime, maxTime, intervalSize).map(
-      (timeNum) => {
-        return {
-          value: timeNum,
-          label: formatTimeValue(timeNum),
+  const handleChange = (day: Date, newDates: Date[]) => {
+    const newSelections = selections.map((selection) => {
+      if (selection.startDate.getDate() === day.getDate()) {
+        const newSelection: SchedulorSelection = {
+          startDate: newDates[0] as Date,
+          endDate: newDates[1] as Date,
         };
+        return newSelection;
       }
-    );
 
-    return newMarks;
-  }, []);
+      return selection;
+    });
+
+    onChange(newSelections);
+  };
 
   return (
     <Stack sx={{ gap: 3 }}>
-      {days.map((day) => (
+      {days.map((day, index) => (
         <Stack key={day.toISOString()} sx={{ gap: 1 }}>
           <Typography variant="h6">
             {formatDateToFriendlyString(day)}
@@ -67,13 +69,15 @@ export default function LineSchedulor({
                 px: 2,
               }}
             >
-              <RangeSlider
-                minRange={0}
-                marks={marks}
-                defaultValue={[minTime, maxTime]}
-                onChange={onChange}
-                ariaLabel={`${formatDateToFriendlyString(day)} range slider`}
-                ariaValueFormat={formatTimeValue}
+              <DateSlider
+                value={[
+                  selections?.[index]?.startDate as Date,
+                  selections?.[index]?.endDate as Date,
+                ]}
+                onChange={(newTimes) => handleChange(day, newTimes)}
+                minTime={minTime}
+                maxTime={maxTime}
+                intervalSize={intervalSize}
               />
             </Box>
           </Box>

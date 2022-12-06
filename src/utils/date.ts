@@ -3,6 +3,8 @@ import {
   differenceInDays,
   format,
   isAfter,
+  setHours,
+  setMinutes,
   startOfDay,
 } from 'date-fns';
 
@@ -61,4 +63,15 @@ export const getDateRange = (
 
 export const formatDateToFriendlyString = (date: Date): string => {
   return format(date, 'EEEE do MMM, yyyy');
+};
+
+/**
+ * Sets the time of a date
+ * @param date A date
+ * @param time A number between 0 and 24 (inclusive)
+ * @returns A modified date
+ */
+export const setDateTimeWithBase24Number = (date: Date, time: number): Date => {
+  const newDate = setHours(date, time - (time % 1));
+  return setMinutes(newDate, time % 1 === 0.5 ? 30 : 0);
 };

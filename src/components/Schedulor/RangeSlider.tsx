@@ -1,5 +1,4 @@
 import Slider from '@mui/material/Slider';
-import { useState } from 'react';
 
 export type SliderMark = {
   value: number;
@@ -9,7 +8,7 @@ export type SliderMark = {
 export interface RangeSliderProps {
   minRange: number;
   marks: SliderMark[];
-  defaultValue: number[];
+  value: number[];
   onChange: (value: number[]) => void;
   ariaLabel?: string;
   ariaValueFormat?: (value: number) => string;
@@ -18,16 +17,11 @@ export interface RangeSliderProps {
 export default function RangeSlider({
   minRange,
   marks,
-  defaultValue,
+  value,
   onChange,
   ariaLabel,
   ariaValueFormat,
 }: RangeSliderProps) {
-  const [currentRange, setCurrentRange] = useState<number[]>([
-    marks[0]?.value as number,
-    marks[marks.length - 1]?.value as number,
-  ]);
-
   const handleChange = (
     _: Event,
     newValue: number | number[],
@@ -36,15 +30,15 @@ export default function RangeSlider({
     if (!(Array.isArray(newValue) && newValue.length >= 2)) return;
 
     // Current values
-    const lowerCurrentValue = currentRange?.[0] as number;
-    const upperCurrentValue = currentRange?.[1] as number;
+    const lowerCurrentValue = value?.[0] as number;
+    const upperCurrentValue = value?.[1] as number;
 
     // New values
     const newValues = newValue as number[];
     const lowerNewValue = newValues?.[0] ?? lowerCurrentValue;
     const upperNewValue = newValues?.[1] ?? upperCurrentValue;
 
-    let newRange = currentRange;
+    let newRange = [...value];
     // First thumb slider
     if (activeThumb === 0) {
       newRange = [
@@ -60,14 +54,12 @@ export default function RangeSlider({
       ];
     }
 
-    setCurrentRange(newRange);
     onChange(newRange);
   };
 
   return (
     <Slider
-      defaultValue={defaultValue}
-      value={currentRange}
+      value={value}
       onChange={handleChange}
       step={null}
       marks={marks}
