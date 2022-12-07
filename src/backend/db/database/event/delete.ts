@@ -4,16 +4,19 @@ import { checkSupabaseErrorResponse } from '../error';
 import { eventsSchema } from '../schemas/events';
 
 /**
- * Delete a room from the DB
+ * Delete an event from the DB
  * @param {Supabase} supabase The Supabase client
- * @param {string} roomId The room id
+ * @param {string} eventId The event id
  */
-export const deleteRoomFromDB = async (supabase: Supabase, roomId: string) => {
+export const deleteEventFromDB = async (
+  supabase: Supabase,
+  eventId: string
+) => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.events.channel)
       .delete()
-      .match({ [eventsSchema.room_id]: roomId });
+      .match({ [eventsSchema.id]: eventId });
 
     checkSupabaseErrorResponse(error);
 

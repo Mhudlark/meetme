@@ -5,19 +5,19 @@ import { eventsSchema } from '../schemas/events';
 import type { BaseEventSchema, EventSchema } from '../schemas/types';
 
 /**
- * Fetch a room with the given roomId
+ * Fetch an event with the given eventId
  * @param {Supabase} supabase The Supabase client
- * @param {string} roomId The room id
+ * @param {string} eventId The event id
  */
-export const selectBaseRoomFromDB = async (
+export const selectBaseEventFromDB = async (
   supabase: Supabase,
-  roomId: string
+  eventId: string
 ): Promise<BaseEventSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.events.channel)
       .select(`*`)
-      .eq(eventsSchema.room_id, roomId);
+      .match({ [eventsSchema.id]: eventId });
 
     checkSupabaseErrorResponse(error);
 
@@ -30,13 +30,13 @@ export const selectBaseRoomFromDB = async (
 };
 
 /**
- * Fetch a given room
+ * Fetch a given event with all user and preference information
  * @param {Supabase} supabase The Supabase client
- * @param {string} roomId The room id
+ * @param {string} eventId The event id
  */
-export const selectRoomFromDB = async (
+export const selectEventFromDB = async (
   supabase: Supabase,
-  roomId: string
+  eventId: string
 ): Promise<EventSchema> => {
   try {
     const { data, error } = await supabase
@@ -52,12 +52,9 @@ export const selectRoomFromDB = async (
       )
     `
       )
-      .eq(eventsSchema.room_id, roomId);
+      .match({ [eventsSchema.id]: eventId });
 
-    if (error)
-      throw new Error(
-        `${error.message} ============= ${error.hint} ============= ${error.details}`
-      );
+    checkSupabaseErrorResponse(error);
 
     const room = data?.[0];
     return room as unknown as EventSchema;

@@ -5,18 +5,18 @@ import { eventsSchema } from '../schemas/events';
 import type { EventSchema } from '../schemas/types';
 
 /**
- * Insert a new room into the DB
+ * Insert a new event into the DB
  * @param {Supabase} supabase The Supabase client
- * @param {string} roomName The name of the room
+ * @param {string} eventName The event name
  */
 export const insertRoomIntoDB = async (
   supabase: Supabase,
-  roomName: string
+  eventName: string
 ): Promise<EventSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.events.channel)
-      .insert([{ [eventsSchema.room_name]: roomName }])
+      .insert([{ [eventsSchema.name]: eventName }])
       .select();
 
     checkSupabaseErrorResponse(error);
