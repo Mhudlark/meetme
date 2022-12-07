@@ -7,7 +7,7 @@ import { selectRoomFromDB } from '@/backend/db/database/event/select';
 import { useMessagesListener } from '@/backend/db/database/hooks/useMessagesListener';
 import { useRoomListener } from '@/backend/db/database/hooks/useRoomListener';
 import { deleteMessagesForRoomFromDB } from '@/backend/db/database/preference/delete';
-import { insertMessageIntoDB } from '@/backend/db/database/preference/insert';
+import { insertPreferenceIntoDB } from '@/backend/db/database/preference/insert';
 import type {
   PreferenceSchema,
   UserSchema,
@@ -142,7 +142,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
   const sendChatMessage = async (message: string) => {
     console.log('sendChatMessage');
 
-    const out = await insertMessageIntoDB(
+    const out = await insertPreferenceIntoDB(
       supabase,
       message,
       room.roomId,

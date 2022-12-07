@@ -7,28 +7,26 @@ import { preferencesSchema } from '../schemas/preferences';
 import type { PreferenceSchema } from '../schemas/types';
 
 /**
- * Insert a new user preference / selection into the DB
+ * Update a user's preferences / selections in the DB
  * @param {Supabase} supabase The Supabase client
- * @param {string} selections The user preferences / selections
  * @param {string} eventId The event id
  * @param {string} userId The user id
+ * @param {SchedulorSelection} selections The user preferences / selections
  */
-export const insertPreferenceIntoDB = async (
+export const updatePreferenceInDB = async (
   supabase: Supabase,
-  selections: SchedulorSelection,
   eventId: string,
-  userId: string
+  userId: string,
+  selections: SchedulorSelection
 ): Promise<PreferenceSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.preferences.channel)
-      .insert([
-        {
-          [preferencesSchema.event_id]: eventId,
-          [preferencesSchema.user_id]: userId,
-          [preferencesSchema.selections]: selections,
-        },
-      ])
+      .update({ [preferencesSchema.selections]: selections })
+      .match({
+        [preferencesSchema.event_id]: eventId,
+        [preferencesSchema.user_id]: userId,
+      })
       .select();
 
     checkSupabaseErrorResponse(error);
@@ -36,6 +34,6 @@ export const insertPreferenceIntoDB = async (
     return data?.[0] as PreferenceSchema;
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error adding message');
+    throw new Error('Error adding user to room');
   }
 };

@@ -4,19 +4,48 @@ import { checkSupabaseErrorResponse } from '../error';
 import { preferencesSchema } from '../schemas/preferences';
 
 /**
- * Delete all messages for a given room from the DB
+ * Delete preferences / selections for a given user from a given event from the DB
  * @param {Supabase} supabase The Supabase client
- * @param {string} roomId The room id
+ * @param {string} eventId The event id
+ * @param {string} userId The user id
  */
-export const deleteMessagesForRoomFromDB = async (
+export const deletePreferencesFromDB = async (
   supabase: Supabase,
-  roomId: string
+  eventId: string,
+  userId: string
 ) => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.preferences.channel)
       .delete()
-      .match({ [preferencesSchema.room_id]: roomId });
+      .match({
+        [preferencesSchema.event_id]: eventId,
+        [preferencesSchema.user_id]: userId,
+      });
+
+    checkSupabaseErrorResponse(error);
+
+    return data;
+  } catch (error) {
+    console.log('error', error);
+    throw new Error('Error deleting message');
+  }
+};
+
+/**
+ * Delete all preferences / selections for a given event from the DB
+ * @param {Supabase} supabase The Supabase client
+ * @param {string} eventId The event id
+ */
+export const deletePreferencesForEventFromDB = async (
+  supabase: Supabase,
+  eventId: string
+) => {
+  try {
+    const { data, error } = await supabase
+      .from(dbConfig.channels.preferences.channel)
+      .delete()
+      .match({ [preferencesSchema.event_id]: eventId });
 
     checkSupabaseErrorResponse(error);
 
