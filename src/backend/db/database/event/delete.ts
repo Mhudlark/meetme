@@ -1,7 +1,10 @@
+import { getArrElement } from '@/utils/array';
+
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
 import { eventsSchema } from '../schemas/events';
+import type { BaseEventSchema } from '../schemas/types';
 
 /**
  * Delete an event from the DB
@@ -11,18 +14,19 @@ import { eventsSchema } from '../schemas/events';
 export const deleteEventFromDB = async (
   supabase: Supabase,
   eventId: string
-) => {
+): Promise<BaseEventSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.events.channel)
       .delete()
-      .match({ [eventsSchema.id]: eventId });
+      .match({ [eventsSchema.id]: eventId })
+      .select();
 
     checkSupabaseErrorResponse(error);
 
-    return data;
+    return getArrElement<BaseEventSchema>(data);
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error deleting room');
+    throw new Error('Error deleting event from DB');
   }
 };

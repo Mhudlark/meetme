@@ -1,3 +1,5 @@
+import { getArrElement } from '@/utils/array';
+
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
@@ -9,23 +11,23 @@ import type { PreferenceSchema } from '../schemas/types';
  * @param {Supabase} supabase The Supabase client
  * @param {string} eventId The event id
  */
-export const selectPreferencesFromDB = async (
+export const selectPreferenceFromDB = async (
   supabase: Supabase,
   eventId: string
-): Promise<PreferenceSchema[]> => {
+): Promise<PreferenceSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.preferences.channel)
       // .select(`*, author:user_id(*)`)
       .select(`*`)
-      .eq(preferencesSchema.event_id, eventId)
+      .match({ [preferencesSchema.event_id]: eventId })
       .order(preferencesSchema.created_at, { ascending: true });
 
     checkSupabaseErrorResponse(error);
 
-    return data as PreferenceSchema[];
+    return getArrElement<PreferenceSchema>(data);
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error fetching messages');
+    throw new Error('Error selecting preference from DB');
   }
 };

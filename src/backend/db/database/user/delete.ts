@@ -1,6 +1,9 @@
+import { getArrElement } from '@/utils/array';
+
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
+import type { UserSchema } from '../schemas/types';
 import { usersSchema } from '../schemas/users';
 
 /**
@@ -8,18 +11,22 @@ import { usersSchema } from '../schemas/users';
  * @param {Supabase} supabase The Supabase client
  * @param {string} userId The user id
  */
-export const deleteUserFromDB = async (supabase: Supabase, userId: string) => {
+export const deleteUserFromDB = async (
+  supabase: Supabase,
+  userId: string
+): Promise<UserSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.users.channel)
       .delete()
-      .match({ [usersSchema.id]: userId });
+      .match({ [usersSchema.id]: userId })
+      .select();
 
     checkSupabaseErrorResponse(error);
 
-    return data;
+    return getArrElement<UserSchema>(data);
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error deleting user');
+    throw new Error('Error deleting user from DB');
   }
 };

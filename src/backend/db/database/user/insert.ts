@@ -1,3 +1,5 @@
+import { getArrElement } from '@/utils/array';
+
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
@@ -24,9 +26,9 @@ export const insertUserIntoDB = async (
 
     checkSupabaseErrorResponse(error);
 
-    return data?.[0] as UserSchema;
+    return getArrElement<UserSchema>(data);
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error adding user');
+    throw new Error('Error inserting user into DB');
   }
 };

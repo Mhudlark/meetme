@@ -1,4 +1,5 @@
 import type { SchedulorSelection } from '@/components/Schedulor/DateSlider';
+import { getArrElement } from '@/utils/array';
 
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
@@ -31,9 +32,9 @@ export const updatePreferenceInDB = async (
 
     checkSupabaseErrorResponse(error);
 
-    return data?.[0] as PreferenceSchema;
+    return getArrElement<PreferenceSchema>(data);
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error adding user to room');
+    throw new Error('Error updating preference in DB');
   }
 };

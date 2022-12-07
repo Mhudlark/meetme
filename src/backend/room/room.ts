@@ -1,7 +1,7 @@
 import type { Room, User } from '@/sharedTypes';
 import { initRoom } from '@/sharedUtils/room';
 
-import { insertRoomIntoDB } from '../db/database/event/insert';
+import { insertEventIntoDB } from '../db/database/event/insert';
 import { updateUserRoomIdInDB } from '../db/database/user/update';
 import type { Supabase } from '../db/types';
 import { generateRoomName } from './util';
@@ -17,7 +17,7 @@ export const createRoom = async (
 ): Promise<Room> => {
   const roomName = generateRoomName();
 
-  const roomInfo = await insertRoomIntoDB(supabase, roomName);
+  const roomInfo = await insertEventIntoDB(supabase, roomName);
 
   const userInfo = await updateUserRoomIdInDB(
     supabase,

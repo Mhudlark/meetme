@@ -1,3 +1,5 @@
+import { getArrElement } from '@/utils/array';
+
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
@@ -21,11 +23,10 @@ export const selectBaseEventFromDB = async (
 
     checkSupabaseErrorResponse(error);
 
-    const room = data?.[0];
-    return room as BaseEventSchema;
+    return getArrElement<BaseEventSchema>(data);
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error fetching users');
+    throw new Error('Error selecting base event from DB');
   }
 };
 
@@ -56,10 +57,10 @@ export const selectEventFromDB = async (
 
     checkSupabaseErrorResponse(error);
 
-    const room = data?.[0];
-    return room as unknown as EventSchema;
+    const event = data?.[0];
+    return event as unknown as EventSchema;
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error fetching users');
+    throw new Error('Error selecting event from DB');
   }
 };

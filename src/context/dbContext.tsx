@@ -2,8 +2,8 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useState } from 'react';
 
-import { deleteRoomFromDB } from '@/backend/db/database/event/delete';
-import { selectRoomFromDB } from '@/backend/db/database/event/select';
+import { deleteEventFromDB } from '@/backend/db/database/event/delete';
+import { selectEventFromDB } from '@/backend/db/database/event/select';
 import { useMessagesListener } from '@/backend/db/database/hooks/useMessagesListener';
 import { useRoomListener } from '@/backend/db/database/hooks/useRoomListener';
 import { deleteMessagesForRoomFromDB } from '@/backend/db/database/preference/delete';
@@ -110,7 +110,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
     );
     console.log('userInfo', userInfo);
 
-    const roomInfo = await selectRoomFromDB(supabase, userInfo.event_id);
+    const roomInfo = await selectEventFromDB(supabase, userInfo.event_id);
     console.log('roomInfo', roomInfo);
 
     const roomUsers = roomInfo.users.map((roomUser) =>
@@ -132,7 +132,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
     if (isRoomEmpty) {
       await deleteMessagesForRoomFromDB(supabase, room.roomId);
       // Delete room last - foreign key
-      await deleteRoomFromDB(supabase, room.roomId);
+      await deleteEventFromDB(supabase, room.roomId);
     }
 
     dispatch(resetRoom());
