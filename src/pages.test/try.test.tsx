@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 
-import Test from '@/pages/test';
+import Try from '@/pages/try';
 import store from '@/store/store';
 
 // The easiest solution to mock `next/router`: https://github.com/vercel/next.js/issues/7479
@@ -12,7 +12,7 @@ describe('Index page', () => {
     it('Test page renders without error', () => {
       render(
         <Provider store={store}>
-          <Test />
+          <Try />
         </Provider>
       );
 
