@@ -1,5 +1,5 @@
 import type { PreferenceSchema } from '@/backend/db/database/schemas/types';
-import type { SchedulorSelection } from '@/components/Schedulor/DateSlider';
+import type { SchedulorSelection } from '@/sharedTypes';
 
 export class Preference {
   constructor(

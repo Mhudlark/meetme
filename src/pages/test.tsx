@@ -3,8 +3,8 @@ import { addDays, setHours } from 'date-fns';
 import { range } from 'lodash';
 import { useState } from 'react';
 
-import type { SchedulorSelection } from '@/components/Schedulor/LineSchedulor';
 import LineSchedulor from '@/components/Schedulor/LineSchedulor';
+import type { SchedulorSelection } from '@/sharedTypes';
 
 const Index = () => {
   const numDays = 5;
@@ -28,7 +28,6 @@ const Index = () => {
   );
 
   const onChange = (newSelections: SchedulorSelection[]) => {
-    console.log(newSelections);
     setSelections(newSelections);
   };
 

@@ -1,14 +1,10 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
+import type { SchedulorSelection } from '@/sharedTypes';
 import { formatDateToFriendlyString, getDateRange } from '@/utils/date';
 
 import DateSlider from './DateSlider';
-
-export interface SchedulorSelection {
-  startDate: Date;
-  endDate: Date;
-}
 
 export interface LineSchedulorProps {
   selections: SchedulorSelection[];

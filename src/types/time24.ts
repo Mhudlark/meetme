@@ -1,17 +1,25 @@
 import { getHours, getMinutes, isDate } from 'date-fns';
 
+const isNumberValidTime24 = (num: number): boolean => {
+  if (num < 0 || num > 24) throw new Error(`Invalid time value: ${num}`);
+  if (num % 0.5 !== 0) throw new Error(`Invalid time value: ${num}`);
+  return true;
+};
+
 /**
  * A number between 0 and 24 (inclusive)
  * Represent 24 hr time
  */
 export class Time24 {
-  public value: number = 0;
+  private value: number = 0;
 
   constructor(time24: number);
   constructor(time: Date);
   constructor(...args: Array<any>) {
     if (typeof args[0] === 'number') {
-      [this.value] = args;
+      const num = args[0] as number;
+      isNumberValidTime24(num);
+      this.value = num;
     } else if (isDate(args[0])) {
       const date = args[0] as Date;
       const hours = getHours(date);

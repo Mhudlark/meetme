@@ -1,24 +1,18 @@
-import { getHours, getMinutes } from 'date-fns';
 import { range } from 'lodash';
 import { useMemo } from 'react';
 
+import { Time24 } from '@/types/time24';
 import {
   formatDateToFriendlyString,
-  setDateTimeWithBase24Number,
+  setDateTimeWithTime24,
 } from '@/utils/date';
 
 import type { SliderMark } from './RangeSlider';
 import RangeSlider from './RangeSlider';
 
-export interface SchedulorSelection {
-  startDate: Date;
-  endDate: Date;
-}
-
 const formatTimeValue = (value: number) => {
-  if (value < 0 || value > 24) throw new Error(`Invalid time value: ${value}`);
-  if (value % 0.5 !== 0) throw new Error(`Invalid time value: ${value}`);
-  return `${value - (value % 1)}:${value % 1 === 0.5 ? '30' : '00'}`;
+  const time24 = new Time24(value);
+  return time24.toString();
 };
 
 export interface DateSliderProps {
@@ -50,20 +44,20 @@ export default function DateSlider({
   }, []);
 
   const sliderValue = useMemo(() => {
-    return [
-      getHours(value[0] as Date) + getMinutes(value[0] as Date) / 60,
-      getHours(value[1] as Date) + getMinutes(value[1] as Date) / 60,
-    ];
+    return value.map((date) => new Time24(date).valueOf());
   }, [value]);
 
   const handleChange = (newTimeVals: number[]) => {
     const startDate = new Date(value[0] as Date);
     const startTimeNum = newTimeVals[0] as number;
-    const newStartDate = setDateTimeWithBase24Number(startDate, startTimeNum);
+    const newStartDate = setDateTimeWithTime24(
+      startDate,
+      new Time24(startTimeNum)
+    );
 
     const endDate = new Date(value[1] as Date);
     const endTimeNum = newTimeVals[1] as number;
-    const newEndDate = setDateTimeWithBase24Number(endDate, endTimeNum);
+    const newEndDate = setDateTimeWithTime24(endDate, new Time24(endTimeNum));
 
     onChange([newStartDate, newEndDate]);
   };

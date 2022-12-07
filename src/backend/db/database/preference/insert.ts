@@ -1,4 +1,4 @@
-import type { SchedulorSelection } from '@/components/Schedulor/DateSlider';
+import type { SchedulorSelection } from '@/sharedTypes';
 import { getArrElement } from '@/utils/array';
 
 import { dbConfig } from '../../dbConfig';

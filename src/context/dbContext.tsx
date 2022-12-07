@@ -6,7 +6,7 @@ import { insertMeetingIntoDB } from '@/backend/db/database/meeting/insert';
 import { selectMeetingFromDB } from '@/backend/db/database/meeting/select';
 import { insertPreferenceIntoDB } from '@/backend/db/database/preference/insert';
 import { insertUserIntoDB } from '@/backend/db/database/user/insert';
-import type { SchedulorSelection } from '@/components/Schedulor/DateSlider';
+import type { SchedulorSelection } from '@/sharedTypes';
 import type { Meeting } from '@/types/meeting';
 import { createMeetingFromMeetingSchema } from '@/types/meeting';
 import type { Preference } from '@/types/preference';

@@ -1,4 +1,4 @@
-import type { SchedulorSelection } from '@/components/Schedulor/DateSlider';
+import type { SchedulorSelection } from '@/sharedTypes';
 import { getArrElement } from '@/utils/array';
 
 import { dbConfig } from '../../dbConfig';
@@ -18,12 +18,12 @@ export const updatePreferenceInDB = async (
   supabase: Supabase,
   meetingId: string,
   userId: string,
-  selections: SchedulorSelection
+  selections: SchedulorSelection[]
 ): Promise<PreferenceSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.preferences.channel)
-      .update({ [preferencesSchema.selections]: selections })
+      .update({ [preferencesSchema.selections]: JSON.stringify(selections) })
       .match({
         [preferencesSchema.meeting_id]: meetingId,
         [preferencesSchema.user_id]: userId,
