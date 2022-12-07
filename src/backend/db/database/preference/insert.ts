@@ -11,13 +11,13 @@ import type { PreferenceSchema } from '../schemas/types';
  * Insert a new user preference / selection into the DB
  * @param {Supabase} supabase The Supabase client
  * @param {string} selections The user preferences / selections
- * @param {string} eventId The event id
+ * @param {string} meetingId The meeting id
  * @param {string} userId The user id
  */
 export const insertPreferenceIntoDB = async (
   supabase: Supabase,
   selections: SchedulorSelection,
-  eventId: string,
+  meetingId: string,
   userId: string
 ): Promise<PreferenceSchema> => {
   try {
@@ -25,7 +25,7 @@ export const insertPreferenceIntoDB = async (
       .from(dbConfig.channels.preferences.channel)
       .insert([
         {
-          [preferencesSchema.event_id]: eventId,
+          [preferencesSchema.meeting_id]: meetingId,
           [preferencesSchema.user_id]: userId,
           [preferencesSchema.selections]: selections,
         },

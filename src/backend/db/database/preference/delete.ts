@@ -7,14 +7,14 @@ import { preferencesSchema } from '../schemas/preferences';
 import type { PreferenceSchema } from '../schemas/types';
 
 /**
- * Delete preference / selections for a given user from a given event from the DB
+ * Delete preference for a given user from a given meeting from the DB
  * @param {Supabase} supabase The Supabase client
- * @param {string} eventId The event id
+ * @param {string} meetingId The meeting id
  * @param {string} userId The user id
  */
 export const deletePreferenceFromDB = async (
   supabase: Supabase,
-  eventId: string,
+  meetingId: string,
   userId: string
 ) => {
   try {
@@ -22,7 +22,7 @@ export const deletePreferenceFromDB = async (
       .from(dbConfig.channels.preferences.channel)
       .delete()
       .match({
-        [preferencesSchema.event_id]: eventId,
+        [preferencesSchema.meeting_id]: meetingId,
         [preferencesSchema.user_id]: userId,
       })
       .select();
@@ -37,19 +37,19 @@ export const deletePreferenceFromDB = async (
 };
 
 /**
- * Delete all preference / selections for a given event from the DB
+ * Delete all preference / selections for a given meeting from the DB
  * @param {Supabase} supabase The Supabase client
- * @param {string} eventId The event id
+ * @param {string} meetingId The meeting id
  */
-export const deleteAllPreferencesForEventFromDB = async (
+export const deleteAllPreferencesForMeetingFromDB = async (
   supabase: Supabase,
-  eventId: string
+  meetingId: string
 ): Promise<PreferenceSchema[]> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.preferences.channel)
       .delete()
-      .match({ [preferencesSchema.event_id]: eventId })
+      .match({ [preferencesSchema.meeting_id]: meetingId })
       .select();
 
     checkSupabaseErrorResponse(error);
@@ -57,6 +57,6 @@ export const deleteAllPreferencesForEventFromDB = async (
     return data as PreferenceSchema[];
   } catch (error) {
     console.log('error', error);
-    throw new Error('Error deleting all preferences for event from DB');
+    throw new Error('Error deleting all preferences for meeting from DB');
   }
 };

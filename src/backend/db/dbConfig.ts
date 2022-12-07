@@ -8,7 +8,7 @@ export const dbConfig = {
     },
   },
   channels: {
-    events: {
+    meetings: {
       schema: 'public',
       table: 'Events',
       channel: 'Events',

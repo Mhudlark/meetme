@@ -8,15 +8,15 @@ import { preferencesSchema } from '../schemas/preferences';
 import type { PreferenceSchema } from '../schemas/types';
 
 /**
- * Update a user's preferences / selections in the DB
+ * Update a user's preference in the DB
  * @param {Supabase} supabase The Supabase client
- * @param {string} eventId The event id
+ * @param {string} meetingId The meeting id
  * @param {string} userId The user id
  * @param {SchedulorSelection} selections The user preferences / selections
  */
 export const updatePreferenceInDB = async (
   supabase: Supabase,
-  eventId: string,
+  meetingId: string,
   userId: string,
   selections: SchedulorSelection
 ): Promise<PreferenceSchema> => {
@@ -25,7 +25,7 @@ export const updatePreferenceInDB = async (
       .from(dbConfig.channels.preferences.channel)
       .update({ [preferencesSchema.selections]: selections })
       .match({
-        [preferencesSchema.event_id]: eventId,
+        [preferencesSchema.meeting_id]: meetingId,
         [preferencesSchema.user_id]: userId,
       })
       .select();

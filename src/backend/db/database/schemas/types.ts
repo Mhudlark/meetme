@@ -1,7 +1,7 @@
 export interface PreferenceSchema {
   id: string;
   created_at: string;
-  event_id: string;
+  meeting_id: string;
   user_id: string;
   selections: string;
 }
@@ -10,16 +10,16 @@ export interface UserSchema {
   id: string;
   created_at: string;
   username: string;
-  event_id: string;
+  meeting_id: string;
 }
 
-export interface BaseEventSchema {
+export interface BaseMeetingSchema {
   id: string;
   created_at: string;
   name: string;
 }
 
-export interface EventSchema extends BaseEventSchema {
+export interface MeetingSchema extends BaseMeetingSchema {
   users: UserSchema[];
   preferences: PreferenceSchema[];
 }

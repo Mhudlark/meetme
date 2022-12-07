@@ -8,6 +8,8 @@ import {
   startOfDay,
 } from 'date-fns';
 
+import type { Time24 } from '@/types/time24';
+
 // Helper function that uses date-fns methods to determine if a date is between two other dates
 export const dateHourIsBetween = (
   start: Date,
@@ -68,10 +70,10 @@ export const formatDateToFriendlyString = (date: Date): string => {
 /**
  * Sets the time of a date
  * @param date A date
- * @param time A number between 0 and 24 (inclusive)
+ * @param time A time of the day
  * @returns A modified date
  */
-export const setDateTimeWithBase24Number = (date: Date, time: number): Date => {
-  const newDate = setHours(date, time - (time % 1));
-  return setMinutes(newDate, time % 1 === 0.5 ? 30 : 0);
+export const setDateTimeWithTime24 = (date: Date, time: Time24): Date => {
+  const newDate = setHours(date, time.getHours());
+  return setMinutes(newDate, time.getMinutes());
 };

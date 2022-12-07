@@ -10,17 +10,21 @@ import { usersSchema } from '../schemas/users';
  * Insert a new user into the DB
  * @param {Supabase} supabase The Supabase client
  * @param {string} username The username of the user
+ * @param {string} meetingId The meeting id
  */
 export const insertUserIntoDB = async (
   supabase: Supabase,
   username: string,
-  eventId: string
+  meetingId: string
 ): Promise<UserSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.users.channel)
       .insert([
-        { [usersSchema.username]: username, [usersSchema.event_id]: eventId },
+        {
+          [usersSchema.username]: username,
+          [usersSchema.meeting_id]: meetingId,
+        },
       ])
       .select();
 

@@ -7,20 +7,20 @@ import { preferencesSchema } from '../schemas/preferences';
 import type { PreferenceSchema } from '../schemas/types';
 
 /**
- * Fetch all user preferences for an event
+ * Fetch all user preferences for an meeting
  * @param {Supabase} supabase The Supabase client
- * @param {string} eventId The event id
+ * @param {string} meetingId The meeting id
  */
 export const selectPreferenceFromDB = async (
   supabase: Supabase,
-  eventId: string
+  meetingId: string
 ): Promise<PreferenceSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.preferences.channel)
       // .select(`*, author:user_id(*)`)
       .select(`*`)
-      .match({ [preferencesSchema.event_id]: eventId })
+      .match({ [preferencesSchema.meeting_id]: meetingId })
       .order(preferencesSchema.created_at, { ascending: true });
 
     checkSupabaseErrorResponse(error);

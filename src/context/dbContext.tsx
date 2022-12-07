@@ -2,8 +2,8 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useState } from 'react';
 
-import { deleteEventFromDB } from '@/backend/db/database/event/delete';
-import { selectEventFromDB } from '@/backend/db/database/event/select';
+import { deleteMeetingFromDB } from '@/backend/db/database/meeting/delete';
+import { selectMeetingFromDB } from '@/backend/db/database/meeting/select';
 import { useMessagesListener } from '@/backend/db/database/hooks/useMessagesListener';
 import { useRoomListener } from '@/backend/db/database/hooks/useRoomListener';
 import { deleteMessagesForRoomFromDB } from '@/backend/db/database/preference/delete';
@@ -17,7 +17,7 @@ import { insertUserIntoDB } from '@/backend/db/database/user/insert';
 import { updateUserRoomIdInDB } from '@/backend/db/database/user/update';
 import type { ChatMessage, User } from '@/sharedTypes';
 import { initChatMessageFromAuthorId } from '@/sharedUtils/chatMessage';
-import { initRoom } from '@/sharedUtils/room';
+import { initEvent } from '@/sharedUtils/room';
 import { initUser } from '@/sharedUtils/user';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -110,14 +110,14 @@ const DbProvider = ({ children }: DbProviderProps) => {
     );
     console.log('userInfo', userInfo);
 
-    const roomInfo = await selectEventFromDB(supabase, userInfo.event_id);
+    const roomInfo = await selectMeetingFromDB(supabase, userInfo.event_id);
     console.log('roomInfo', roomInfo);
 
     const roomUsers = roomInfo.users.map((roomUser) =>
       initUser(roomUser.id, roomUser.username)
     );
 
-    const roomJoined = initRoom(roomInfo.id, roomInfo.id, roomUsers);
+    const roomJoined = initEvent(roomInfo.id, roomInfo.id, roomUsers);
 
     dispatch(setRoom(roomJoined));
   };
@@ -132,7 +132,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
     if (isRoomEmpty) {
       await deleteMessagesForRoomFromDB(supabase, room.roomId);
       // Delete room last - foreign key
-      await deleteEventFromDB(supabase, room.roomId);
+      await deleteMeetingFromDB(supabase, room.roomId);
     }
 
     dispatch(resetRoom());
