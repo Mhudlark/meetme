@@ -1,48 +1,20 @@
-import { Stack } from '@mui/material';
-import { addDays, setHours } from 'date-fns';
-import { range } from 'lodash';
-import { useState } from 'react';
+import { Button, Stack } from '@mui/material';
+import { useContext } from 'react';
 
-import type { SchedulorSelection } from '@/components/Schedulor/LineSchedulor';
-import LineSchedulor from '@/components/Schedulor/LineSchedulor';
+import { DbContext } from '@/context/dbContext';
 
 const Index = () => {
-  const numDays = 5;
-  const schedulorStartDate = new Date('2022-12-08');
-  const schedulorEndDate = addDays(schedulorStartDate, numDays);
-  const minTime = 17;
-  const maxTime = 23;
-  const intervalSize = 1;
+  const { createRoom } = useContext(DbContext);
 
-  const [selections, setSelections] = useState<SchedulorSelection[]>(
-    range(0, numDays).map((i) => {
-      const day = addDays(schedulorStartDate, i);
-      const startDate = setHours(day, minTime);
-      const endDate = setHours(startDate, maxTime);
-      const selection: SchedulorSelection = {
-        startDate,
-        endDate,
-      };
-      return selection;
-    })
-  );
-
-  const onChange = (newSelections: SchedulorSelection[]) => {
-    console.log(newSelections);
-    setSelections(newSelections);
+  const onCreateEventClicked = async () => {
+    await createRoom();
   };
 
   return (
-    <Stack sx={{ gap: 4 }}>
-      <LineSchedulor
-        selections={selections}
-        onChange={onChange}
-        startDate={schedulorStartDate}
-        endDate={schedulorEndDate}
-        minTime={minTime}
-        maxTime={maxTime}
-        intervalSize={intervalSize}
-      />
+    <Stack sx={{ gap: 4, width: '100%', height: '100%' }}>
+      <Button variant="contained" onClick={onCreateEventClicked}>
+        Create Event
+      </Button>
     </Stack>
   );
 };

@@ -16,9 +16,9 @@ import type { PreferenceSchema } from '../schemas/types';
  */
 export const insertPreferenceIntoDB = async (
   supabase: Supabase,
-  selections: SchedulorSelection,
   meetingId: string,
-  userId: string
+  userId: string,
+  selections: SchedulorSelection[]
 ): Promise<PreferenceSchema> => {
   try {
     const { data, error } = await supabase
@@ -27,7 +27,7 @@ export const insertPreferenceIntoDB = async (
         {
           [preferencesSchema.meeting_id]: meetingId,
           [preferencesSchema.user_id]: userId,
-          [preferencesSchema.selections]: selections,
+          [preferencesSchema.selections]: JSON.stringify(selections),
         },
       ])
       .select();
