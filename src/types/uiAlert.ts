@@ -8,7 +8,7 @@ export class UIAlert {
   constructor(
     public type: AlertType,
     public message: string,
-    public open: false
+    public open: boolean = true
   ) {}
 
   public asClosed = (): UIAlert => {
