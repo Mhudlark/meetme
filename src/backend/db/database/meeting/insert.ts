@@ -4,7 +4,7 @@ import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
 import { meetingsSchema } from '../schemas/meetings';
-import type { MeetingSchema } from '../schemas/types';
+import type { BaseMeetingSchema } from '../schemas/types';
 
 /**
  * Insert a new meeting into the DB
@@ -14,7 +14,7 @@ import type { MeetingSchema } from '../schemas/types';
 export const insertMeetingIntoDB = async (
   supabase: Supabase,
   meetingName: string
-): Promise<MeetingSchema> => {
+): Promise<BaseMeetingSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.meetings.channel)
@@ -23,7 +23,7 @@ export const insertMeetingIntoDB = async (
 
     checkSupabaseErrorResponse(error);
 
-    return getArrElement<MeetingSchema>(data);
+    return getArrElement<BaseMeetingSchema>(data);
   } catch (error) {
     console.log('error', error);
     throw new Error('Error inserting meeting into DB');

@@ -6,6 +6,10 @@ export class Preference {
     public preferenceId: string,
     public scheduleSelections: SchedulorSelection[]
   ) {}
+
+  public toString(): string {
+    return JSON.stringify(this.scheduleSelections);
+  }
 }
 
 export const parseSelectionsString = (

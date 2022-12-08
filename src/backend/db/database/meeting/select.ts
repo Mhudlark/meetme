@@ -57,8 +57,12 @@ export const selectMeetingFromDB = async (
 
     checkSupabaseErrorResponse(error);
 
-    const meeting = data?.[0];
-    return meeting as unknown as MeetingSchema;
+    const meeting = getArrElement<MeetingSchema>(data);
+
+    if (!meeting.Preferences) meeting.Preferences = [];
+    if (!meeting.Users) meeting.Users = [];
+
+    return meeting;
   } catch (error) {
     console.log('error', error);
     throw new Error('Error selecting meeting from DB');

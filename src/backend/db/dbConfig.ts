@@ -10,13 +10,13 @@ export const dbConfig = {
   channels: {
     meetings: {
       schema: 'public',
-      table: 'Events',
-      channel: 'Events',
+      table: 'Meetings',
+      channel: 'Meetings',
     },
     users: {
       schema: 'public',
-      table: 'EventUsers',
-      channel: 'EventUsers',
+      table: 'Users',
+      channel: 'Users',
     },
     preferences: {
       schema: 'public',

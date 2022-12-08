@@ -1,4 +1,7 @@
-import type { MeetingSchema } from '@/backend/db/database/schemas/types';
+import type {
+  BaseMeetingSchema,
+  MeetingSchema,
+} from '@/backend/db/database/schemas/types';
 
 import type { Preference } from './preference';
 import { createPreferenceFromPreferenceSchema } from './preference';
@@ -17,11 +20,18 @@ export class Meeting {
 export const createMeetingFromMeetingSchema = (
   schema: MeetingSchema
 ): Meeting => {
-  const users = schema.users.map((schemaUser) =>
+  const users = schema.Users.map((schemaUser) =>
     createUserFromUserSchema(schemaUser)
   );
-  const preferences = schema.preferences.map((schemaPreference) =>
+
+  const preferences = schema.Preferences.map((schemaPreference) =>
     createPreferenceFromPreferenceSchema(schemaPreference)
   );
   return new Meeting(schema.id, schema.name, users, preferences);
+};
+
+export const createMeetingFromBaseMeetingSchema = (
+  schema: BaseMeetingSchema
+): Meeting => {
+  return new Meeting(schema.id, schema.name, [], []);
 };

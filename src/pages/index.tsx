@@ -1,9 +1,12 @@
 import { Button, Stack, TextField } from '@mui/material';
+import { useRouter } from 'next/router';
 import { useContext, useState } from 'react';
 
 import { DbContext } from '@/context/dbContext';
+import { paths } from '@/utils/paths';
 
 const Index = () => {
+  const router = useRouter();
   const { createMeeting } = useContext(DbContext);
 
   const [meetingName, setMeetingName] = useState<string>('');
@@ -13,13 +16,14 @@ const Index = () => {
   };
 
   const onCreateEventClicked = async () => {
-    await createMeeting(meetingName);
+    const meetingId = await createMeeting(meetingName);
+    router.push(`${paths.meeting}/${meetingId}`);
   };
 
   return (
     <Stack sx={{ gap: 4, width: '100%', height: '100%' }}>
-      <TextField onChange={onMeetingNameChange} />
-      <Button variant="contained" onClick={onCreateEventClicked}>
+      <TextField placeholder={'Meeting name'} onChange={onMeetingNameChange} />
+      <Button variant="outlined" onClick={onCreateEventClicked}>
         Create Event
       </Button>
     </Stack>

@@ -20,6 +20,6 @@ export interface BaseMeetingSchema {
 }
 
 export interface MeetingSchema extends BaseMeetingSchema {
-  users: UserSchema[];
-  preferences: PreferenceSchema[];
+  Users: UserSchema[];
+  Preferences: PreferenceSchema[];
 }
