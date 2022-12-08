@@ -6,12 +6,10 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
-import { Provider } from 'react-redux';
 
+import UIAlertProvider from '@/context/Alert/alertContext';
 import DbProvider from '@/context/dbContext';
 import App from '@/layouts/App';
-
-import store from '../store/store';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -28,11 +26,11 @@ const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
 
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
-      <Provider store={store}>
+      <UIAlertProvider>
         <DbProvider>
           <App>{getLayout(<Component {...pageProps} />)}</App>
         </DbProvider>
-      </Provider>
+      </UIAlertProvider>
     </SessionContextProvider>
   );
 };

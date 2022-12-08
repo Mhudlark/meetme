@@ -24,7 +24,6 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/material": "^5.10.13",
-    "@reduxjs/toolkit": "^1.9.0",
     "@supabase/auth-helpers-nextjs": "^0.5.2",
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/realtime-js": "^2.1.0",
@@ -35,10 +34,7 @@
     "next": "^13.0.0",
     "next-seo": "^5.8.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-redux": "^8.0.5",
-    "redux": "^4.2.0",
-    "redux-thunk": "^2.4.2"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
@@ -53,8 +49,6 @@
     "@types/lodash": "^4.14.189",
     "@types/node": "^18.11.5",
     "@types/react": "^18.0.23",
-    "@types/react-redux": "^7.1.24",
-    "@types/redux-thunk": "^2.1.0",
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "@typescript-eslint/parser": "^5.41.0",
     "autoprefixer": "^10.4.12",

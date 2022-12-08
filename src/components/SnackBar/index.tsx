@@ -1,15 +1,14 @@
 import type { AlertColor } from '@mui/material';
 import { Alert, Snackbar } from '@mui/material';
+import { useContext } from 'react';
 
-import { closeAlert } from '@/store/alerts/actions';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { UIAlertContext } from '@/context/Alert/alertContext';
 
 const SnackBar = () => {
-  const alert = useAppSelector((state) => state.alert);
-  const dispatch = useAppDispatch();
+  const { alert, closeAlert } = useContext(UIAlertContext);
 
   const closeSnackBar = () => {
-    dispatch(closeAlert());
+    closeAlert();
   };
 
   return (
