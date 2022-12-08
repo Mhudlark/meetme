@@ -1,4 +1,4 @@
-import { Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { addDays, setHours } from 'date-fns';
 import { range } from 'lodash';
 import { useRouter } from 'next/router';
@@ -25,6 +25,7 @@ const Meeting = () => {
     signOut,
     leaveMeeting,
     meeting,
+    user,
     preference,
     isSignedIn,
     isExistingUser,
@@ -143,10 +144,24 @@ const Meeting = () => {
       >
         <Stack sx={{ gap: 1 }}>
           <Typography variant="h3">{meeting?.name}</Typography>
+          {/* {isSignedIn && <Typography variant="h6">{username}</Typography>} */}
           <Typography variant="caption">{meeting?.id}</Typography>
-          <Typography variant="body1">{`Users: ${meeting?.users
-            ?.map?.((user) => user.username)
-            ?.join(', ')}`}</Typography>
+          <Stack sx={{ flexDirection: 'row', flexWrap: 'wrap', gap: 0.5 }}>
+            {meeting?.users
+              ?.filter((meetingUser) => meetingUser.username !== user?.username)
+              .map((meetingUser) => (
+                <Box
+                  key={meetingUser.username}
+                  sx={{
+                    backgroundColor: '#f2f2f288',
+                    borderRadius: 1,
+                    p: 0.5,
+                  }}
+                >
+                  {meetingUser.username}
+                </Box>
+              ))}
+          </Stack>
         </Stack>
         {isSignedIn && isUsernameValid && (
           <Stack sx={{ gap: 2 }}>
