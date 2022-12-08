@@ -1,4 +1,5 @@
 export const testWithParams = (a: string, b: string, c: number) => {
+  // eslint-disable-next-line no-console
   console.log(a, b, c);
 };
 
