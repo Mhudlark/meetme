@@ -30,6 +30,7 @@ const Meeting = () => {
   } = useContext(DbContext);
 
   const [username, setUsername] = useState<string | null>(null);
+  const [haveSelectionsChanged, setHaveSelectionsChanged] = useState(false);
 
   const isUsernameValid = useMemo(() => {
     return username !== null && validateUsername(username);
@@ -64,6 +65,11 @@ const Meeting = () => {
     await signIn(username);
   };
 
+  const onSelectionsChanged = (newSelections: SchedulorSelection[]) => {
+    setSelections(newSelections);
+    setHaveSelectionsChanged(true);
+  };
+
   const onAddPreferencesClicked = async () => {
     if (!selections || !username) return;
 
@@ -72,12 +78,16 @@ const Meeting = () => {
       username,
       selections
     );
+
+    setHaveSelectionsChanged(false);
   };
 
   const onUpdatePreferencesClicked = async () => {
     if (!selections || !username) return;
 
     await updatePreferences(selections);
+
+    setHaveSelectionsChanged(false);
   };
 
   const onLeaveMeetingClicked = async () => {
@@ -92,8 +102,10 @@ const Meeting = () => {
   }, [meetingId]);
 
   useEffect(() => {
-    if (isExistingUser && preference)
+    if (isExistingUser && preference) {
       setSelections(preference.scheduleSelections);
+      setHaveSelectionsChanged(false);
+    }
   }, [isExistingUser]);
 
   const preferencesOverlap = useMemo(() => {
@@ -128,7 +140,7 @@ const Meeting = () => {
             ?.map?.((user) => user.username)
             ?.join(', ')}`}</Typography>
         </Stack>
-        {isSignedIn && (
+        {isSignedIn && isUsernameValid && (
           <Button
             color="error"
             variant="outlined"
@@ -155,7 +167,7 @@ const Meeting = () => {
         <>
           <LineSchedulor
             selections={selections}
-            onChange={setSelections}
+            onChange={onSelectionsChanged}
             startDate={schedulorStartDate}
             endDate={schedulorEndDate}
             minTime={minTime}
@@ -171,14 +183,18 @@ const Meeting = () => {
         <>
           <LineSchedulor
             selections={selections}
-            onChange={setSelections}
+            onChange={onSelectionsChanged}
             startDate={schedulorStartDate}
             endDate={schedulorEndDate}
             minTime={minTime}
             maxTime={maxTime}
             intervalSize={intervalSize}
           />
-          <Button variant="outlined" onClick={onUpdatePreferencesClicked}>
+          <Button
+            variant="outlined"
+            onClick={onUpdatePreferencesClicked}
+            disabled={!haveSelectionsChanged}
+          >
             Update preferences
           </Button>
         </>
