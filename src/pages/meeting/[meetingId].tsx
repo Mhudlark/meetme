@@ -1,12 +1,19 @@
-import { Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { addDays, setHours } from 'date-fns';
 import { range } from 'lodash';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
 import LineSchedulor from '@/components/Schedulor/LineSchedulor';
+import CustomTooltip from '@/components/Styled/Tooltip';
 import { DbContext } from '@/context/dbContext';
 import type { SchedulorSelection } from '@/sharedTypes';
+import { Time24 } from '@/types/time24';
+import { formatDateToFriendlyString } from '@/utils/date';
+import {
+  calculateOverlappingPreferences,
+  getOverlapColour,
+} from '@/utils/preferences';
 
 const Meeting = () => {
   const router = useRouter();
@@ -72,6 +79,22 @@ const Meeting = () => {
     }
   }, [meetingId]);
 
+  const preferencesOverlap = useMemo(() => {
+    if (meeting?.preferences) {
+      const userIds = meeting.users.map((user) => user.username);
+      return calculateOverlappingPreferences(
+        meeting.preferences,
+        userIds,
+        schedulorStartDate,
+        schedulorEndDate,
+        new Time24(minTime),
+        new Time24(maxTime),
+        intervalSize
+      );
+    }
+    return null;
+  }, [meeting]);
+
   return (
     <Stack sx={{ gap: 4, width: '100%', height: '100%' }}>
       <Stack sx={{ gap: 1 }}>
@@ -109,12 +132,49 @@ const Meeting = () => {
           </Button>
         </>
       )}
-      {isSignedIn && haveEnteredPreferences && (
-        <>
-          {meeting?.preferences?.map?.((preference, index) => (
-            <div key={index}>{preference.toString()}</div>
+      <Typography variant="h5">Preferences</Typography>
+      {meeting?.preferences && (
+        <Stack
+          sx={{ backgroundColor: '#f2f2f2', borderRadius: 2, p: 1, gap: 2 }}
+        >
+          {preferencesOverlap?.map((row, rowIndex) => (
+            <Stack key={rowIndex}>
+              {row?.[0]?.start && (
+                <Typography variant="body1">
+                  {formatDateToFriendlyString(row[0].start)}
+                </Typography>
+              )}
+              <Stack
+                sx={{
+                  flexDirection: 'row',
+                  justifyContent: 'stretch',
+                  gap: 0.5,
+                }}
+              >
+                {row?.map((interval, intervalIndex) => (
+                  <CustomTooltip
+                    key={`${rowIndex}-${intervalIndex}`}
+                    title={interval.availability.ids.join(', ')}
+                    placement="top"
+                  >
+                    <Box
+                      sx={{
+                        backgroundColor: getOverlapColour(
+                          interval.availability.count
+                        ),
+                        p: 1,
+                        flexGrow: 1,
+                        borderRadius: '4px',
+                      }}
+                    >
+                      {new Time24(interval.start).toString()}
+                    </Box>
+                  </CustomTooltip>
+                ))}
+              </Stack>
+            </Stack>
           ))}
-        </>
+        </Stack>
       )}
     </Stack>
   );

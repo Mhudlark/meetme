@@ -12,10 +12,20 @@ export class Preference {
   }
 }
 
+export const parseSelection = (selection: {
+  startDate: string;
+  endDate: string;
+}): SchedulorSelection => {
+  return {
+    startDate: new Date(selection.startDate),
+    endDate: new Date(selection.endDate),
+  };
+};
+
 export const parseSelectionsString = (
   selections: string
 ): SchedulorSelection[] => {
-  return JSON.parse(selections);
+  return JSON.parse(selections).map(parseSelection);
 };
 
 export const createPreferenceFromPreferenceSchema = (

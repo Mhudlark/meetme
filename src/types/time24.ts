@@ -46,6 +46,8 @@ export class Time24 {
   public toString(twelveHour: boolean = false): string {
     const hours = this.getHours(twelveHour);
     const minutes = this.getMinutes();
-    return `${hours}:${minutes}`;
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}`;
   }
 }
