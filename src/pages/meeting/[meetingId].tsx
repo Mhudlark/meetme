@@ -9,11 +9,13 @@ import LineSchedulor from '@/components/Schedulor/LineSchedulor';
 import { DbContext } from '@/context/dbContext';
 import type { SchedulorSelection } from '@/sharedTypes';
 import { Time24 } from '@/types/time24';
+import { useWindowUrl } from '@/utils/hooks';
 import { paths } from '@/utils/paths';
 import { calculateOverlappingPreferences } from '@/utils/preferences';
 import { validateUsername } from '@/utils/validation';
 
 const Meeting = () => {
+  const windowUrl = useWindowUrl();
   const router = useRouter();
   const meetingId = router.query.meetingId as string;
 
@@ -106,6 +108,10 @@ const Meeting = () => {
     router.push(paths.home);
   };
 
+  const copyLinkToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+  };
+
   useEffect(() => {
     if (meetingId) getMeeting(meetingId);
   }, [meetingId]);
@@ -145,7 +151,20 @@ const Meeting = () => {
         <Stack sx={{ gap: 1 }}>
           <Typography variant="h3">{meeting?.name}</Typography>
           {/* {isSignedIn && <Typography variant="h6">{username}</Typography>} */}
-          <Typography variant="caption">{meeting?.id}</Typography>
+          <Button
+            color="info"
+            variant="outlined"
+            onClick={copyLinkToClipboard}
+            sx={{ height: 'fit-content' }}
+          >
+            Copy link to share this with meet with others
+          </Button>
+          <Stack sx={{ gap: 0.5 }}>
+            <Typography variant="caption">
+              {'Or, share this link with others:'}
+            </Typography>
+            <Typography variant="caption">{windowUrl}</Typography>
+          </Stack>
           <Stack sx={{ flexDirection: 'row', flexWrap: 'wrap', gap: 0.5 }}>
             {meeting?.users
               ?.filter((meetingUser) => meetingUser.username !== user?.username)

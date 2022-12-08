@@ -108,3 +108,13 @@ export const useStateWithCallback = <T>(
 
   return [state, handleSetState];
 };
+
+export const useWindowUrl = () => {
+  const [windowUrl, setWindowUrl] = useState('');
+
+  useEffect(() => {
+    setWindowUrl(window.location.href);
+  }, []);
+
+  return windowUrl;
+};
