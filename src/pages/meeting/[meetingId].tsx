@@ -9,6 +9,7 @@ import LineSchedulor from '@/components/Schedulor/LineSchedulor';
 import { DbContext } from '@/context/dbContext';
 import type { SchedulorSelection } from '@/sharedTypes';
 import { Time24 } from '@/types/time24';
+import { paths } from '@/utils/paths';
 import { calculateOverlappingPreferences } from '@/utils/preferences';
 import { validateUsername } from '@/utils/validation';
 
@@ -21,6 +22,7 @@ const Meeting = () => {
     getMeeting,
     addPreferences,
     updatePreferences,
+    leaveMeeting,
     meeting,
     preference,
     isSignedIn,
@@ -78,6 +80,13 @@ const Meeting = () => {
     await updatePreferences(selections);
   };
 
+  const onLeaveMeetingClicked = async () => {
+    if (!username) return;
+
+    await leaveMeeting(username);
+    router.push(paths.home);
+  };
+
   useEffect(() => {
     if (meetingId) getMeeting(meetingId);
   }, [meetingId]);
@@ -104,12 +113,31 @@ const Meeting = () => {
 
   return (
     <Stack sx={{ gap: 4, width: '100%', height: '100%' }}>
-      <Stack sx={{ gap: 1 }}>
-        <Typography variant="h3">{meeting?.name}</Typography>
-        <Typography variant="caption">{meeting?.id}</Typography>
-        <Typography variant="body1">{`Users: ${meeting?.users
-          ?.map?.((user) => user.username)
-          ?.join(', ')}`}</Typography>
+      <Stack
+        sx={{
+          flexDirection: { xs: 'column', md: 'row' },
+          justifyContent: 'space-between',
+          alignItems: { xs: 'start', md: 'center' },
+          gap: 2,
+        }}
+      >
+        <Stack sx={{ gap: 1 }}>
+          <Typography variant="h3">{meeting?.name}</Typography>
+          <Typography variant="caption">{meeting?.id}</Typography>
+          <Typography variant="body1">{`Users: ${meeting?.users
+            ?.map?.((user) => user.username)
+            ?.join(', ')}`}</Typography>
+        </Stack>
+        {isSignedIn && (
+          <Button
+            color="error"
+            variant="outlined"
+            onClick={onLeaveMeetingClicked}
+            sx={{ height: 'fit-content' }}
+          >
+            Leave Meeting
+          </Button>
+        )}
       </Stack>
       {!isSignedIn && (
         <>

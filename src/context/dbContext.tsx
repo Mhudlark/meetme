@@ -4,8 +4,10 @@ import { createContext, useContext, useMemo, useState } from 'react';
 
 import { insertMeetingIntoDB } from '@/backend/db/database/meeting/insert';
 import { selectMeetingFromDB } from '@/backend/db/database/meeting/select';
+import { deletePreferenceFromDB } from '@/backend/db/database/preference/delete';
 import { insertPreferenceIntoDB } from '@/backend/db/database/preference/insert';
 import { updatePreferenceInDB } from '@/backend/db/database/preference/update';
+import { deleteUserFromDB } from '@/backend/db/database/user/delete';
 import { insertUserIntoDB } from '@/backend/db/database/user/insert';
 import type { SchedulorSelection } from '@/sharedTypes';
 import type { Meeting } from '@/types/meeting';
@@ -29,6 +31,7 @@ export type DbContextType = {
     selections: SchedulorSelection[]
   ) => Promise<void>;
   updatePreferences: (selections: SchedulorSelection[]) => Promise<void>;
+  leaveMeeting: (username: string) => Promise<void>;
   user: User | null;
   meeting: Meeting | null;
   preference: Preference | null;
@@ -42,6 +45,7 @@ const DbContextInitialValue: DbContextType = {
   signIn: (_) => Promise.resolve(),
   addPreferences: (_, __, ___) => Promise.resolve(),
   updatePreferences: (_) => Promise.resolve(),
+  leaveMeeting: (_) => Promise.resolve(),
   user: null,
   meeting: null,
   preference: null,
@@ -136,6 +140,27 @@ const DbProvider = ({ children }: DbProviderProps) => {
     if (meeting) await getMeeting(meeting.id);
   };
 
+  const leaveMeeting = async (username: string) => {
+    if (!meeting) throw new Error('User is not in a meeting');
+
+    const existingUser = meeting.users.filter(
+      (meetingUser) => meetingUser.username === username
+    )?.[0];
+
+    if (existingUser) {
+      if (!user) throw new Error('User is not signed in already');
+      if (!preference) throw new Error('User has no existing preferences');
+
+      await deletePreferenceFromDB(supabase, meeting.id, user.userId);
+      await deleteUserFromDB(supabase, user.userId);
+
+      setUser(null);
+      setPreference(null);
+    }
+    setMeeting(null);
+    setIsSignedIn(false);
+  };
+
   return (
     <DbContext.Provider
       value={{
@@ -144,6 +169,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
         signIn,
         addPreferences,
         updatePreferences,
+        leaveMeeting,
         user,
         meeting,
         preference,
