@@ -2,6 +2,7 @@ import { addDays, differenceInDays } from 'date-fns';
 
 import type { Preference } from '@/types/preference';
 import { Time24 } from '@/types/time24';
+import type { User } from '@/types/user';
 
 import { setDateTimeWithTime24 } from './date';
 
@@ -28,7 +29,7 @@ const createIntervals = (
 ) => {
   const numDays = differenceInDays(endDate, startDate);
   const lengthOfDay = maxTime.valueOf() - minTime.valueOf();
-  const numIntervalsPerDay = lengthOfDay / intervalSize;
+  const numIntervalsPerDay = lengthOfDay / intervalSize - 1;
 
   const totalIntervals: Overlap = [];
 
@@ -52,12 +53,13 @@ const createIntervals = (
     }
     totalIntervals.push(dayIntervals);
   }
+
   return totalIntervals;
 };
 
 export const calculateOverlappingPreferences = (
   preferences: Preference[],
-  userIds: string[],
+  users: User[],
   startDate: Date,
   endDate: Date,
   minTime: Time24,
@@ -72,7 +74,7 @@ export const calculateOverlappingPreferences = (
     intervalSize
   );
 
-  preferences.forEach((preference, preferenceIndex) => {
+  preferences.forEach((preference) => {
     preference.scheduleSelections.forEach((selection) => {
       const dayIndex = differenceInDays(selection.startDate, startDate);
       const dayIntervals = allIntervals[dayIndex] as Day;
@@ -83,20 +85,28 @@ export const calculateOverlappingPreferences = (
         (startTime.valueOf() - minTime.valueOf()) / intervalSize
       );
       const endTime = new Time24(selection.endDate);
-      const endInterval = Math.floor(
-        (endTime.valueOf() - minTime.valueOf()) / intervalSize
+      const endInterval = Math.min(
+        Math.floor((endTime.valueOf() - minTime.valueOf()) / intervalSize),
+        intevalsInDay - 1
       );
 
-      if (startInterval < 0 || startInterval >= intevalsInDay)
+      if (startInterval < 0 || startInterval > intevalsInDay)
         throw new Error('Start interval is out of bounds');
 
       if (endInterval < 0 || endInterval > intevalsInDay)
         throw new Error('End interval is out of bounds');
 
-      for (let i = startInterval; i < endInterval; i += 1) {
+      if (startInterval === endInterval) return;
+
+      for (let i = startInterval; i <= endInterval; i += 1) {
         const interval = dayIntervals[i] as Interval;
+
+        const preferenceUser = users.find(
+          (user) => user.userId === preference.userId
+        ) as User;
+
         interval.availability.count += 1;
-        interval.availability.ids.push(userIds[preferenceIndex] as string);
+        interval.availability.ids.push(preferenceUser.username);
       }
     });
   });

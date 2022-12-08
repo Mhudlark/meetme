@@ -5,6 +5,7 @@ import { createContext, useContext, useMemo, useState } from 'react';
 import { insertMeetingIntoDB } from '@/backend/db/database/meeting/insert';
 import { selectMeetingFromDB } from '@/backend/db/database/meeting/select';
 import { insertPreferenceIntoDB } from '@/backend/db/database/preference/insert';
+import { updatePreferenceInDB } from '@/backend/db/database/preference/update';
 import { insertUserIntoDB } from '@/backend/db/database/user/insert';
 import type { SchedulorSelection } from '@/sharedTypes';
 import type { Meeting } from '@/types/meeting';
@@ -27,6 +28,7 @@ export type DbContextType = {
     username: string,
     selections: SchedulorSelection[]
   ) => Promise<void>;
+  updatePreferences: (selections: SchedulorSelection[]) => Promise<void>;
   user: User | null;
   meeting: Meeting | null;
   preference: Preference | null;
@@ -39,6 +41,7 @@ const DbContextInitialValue: DbContextType = {
   getMeeting: (_) => Promise.resolve(),
   signIn: (_) => Promise.resolve(),
   addPreferences: (_, __, ___) => Promise.resolve(),
+  updatePreferences: (_) => Promise.resolve(),
   user: null,
   meeting: null,
   preference: null,
@@ -121,21 +124,17 @@ const DbProvider = ({ children }: DbProviderProps) => {
     if (meeting) await getMeeting(meeting.id);
   };
 
-  // const updatePreferences = async (
-  //   meetingId: string,
-  //   selections: SchedulorSelection[]
-  // ) => {
-  //   const preferenceInfo = await insertPreferenceIntoDB(
-  //     supabase,
-  //     meetingId,
-  //     user.userId,
-  //     selections
-  //   );
+  const updatePreferences = async (selections: SchedulorSelection[]) => {
+    if (!user) throw new Error('User is not signed in already');
+    if (!meeting) throw new Error('User is not in a meeting');
+    if (!preference) throw new Error('User has no existing preferences');
 
-  //   setPreference(createPreferenceFromPreferenceSchema(preferenceInfo));
+    await updatePreferenceInDB(supabase, meeting.id, user.userId, selections);
 
-  //   if (meeting) await getMeeting(meeting.id);
-  // };
+    setPreference(preference.copyWithNewSelections(selections));
+
+    if (meeting) await getMeeting(meeting.id);
+  };
 
   return (
     <DbContext.Provider
@@ -144,6 +143,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
         getMeeting,
         signIn,
         addPreferences,
+        updatePreferences,
         user,
         meeting,
         preference,

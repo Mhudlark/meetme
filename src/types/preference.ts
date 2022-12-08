@@ -12,6 +12,15 @@ export class Preference {
   public toString(): string {
     return JSON.stringify(this.scheduleSelections);
   }
+
+  public copyWithNewSelections(selections: SchedulorSelection[]): Preference {
+    return new Preference(
+      this.preferenceId,
+      this.meetingId,
+      this.userId,
+      selections
+    );
+  }
 }
 
 export const parseSelection = (selection: {

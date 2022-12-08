@@ -17,10 +17,12 @@ const Meeting = () => {
   const meetingId = router.query.meetingId as string;
 
   const {
-    addPreferences,
     signIn,
     getMeeting,
+    addPreferences,
+    updatePreferences,
     meeting,
+    preference,
     isSignedIn,
     isExistingUser,
   } = useContext(DbContext);
@@ -70,16 +72,26 @@ const Meeting = () => {
     );
   };
 
+  const onUpdatePreferencesClicked = async () => {
+    if (!selections || !username) return;
+
+    await updatePreferences(selections);
+  };
+
   useEffect(() => {
     if (meetingId) getMeeting(meetingId);
   }, [meetingId]);
 
+  useEffect(() => {
+    if (isExistingUser && preference)
+      setSelections(preference.scheduleSelections);
+  }, [isExistingUser]);
+
   const preferencesOverlap = useMemo(() => {
     if (meeting?.preferences) {
-      const userIds = meeting.users.map((user) => user.username);
       return calculateOverlappingPreferences(
         meeting.preferences,
-        userIds,
+        meeting.users,
         schedulorStartDate,
         schedulorEndDate,
         new Time24(minTime),
@@ -124,6 +136,22 @@ const Meeting = () => {
           />
           <Button variant="outlined" onClick={onAddPreferencesClicked}>
             Add preferences
+          </Button>
+        </>
+      )}
+      {isSignedIn && isExistingUser && (
+        <>
+          <LineSchedulor
+            selections={selections}
+            onChange={setSelections}
+            startDate={schedulorStartDate}
+            endDate={schedulorEndDate}
+            minTime={minTime}
+            maxTime={maxTime}
+            intervalSize={intervalSize}
+          />
+          <Button variant="outlined" onClick={onUpdatePreferencesClicked}>
+            Update preferences
           </Button>
         </>
       )}
