@@ -4,16 +4,12 @@ import { range } from 'lodash';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
+import PreferencesOverlapPreview from '@/components/PreferenceOverlapPreview';
 import LineSchedulor from '@/components/Schedulor/LineSchedulor';
-import CustomTooltip from '@/components/Styled/Tooltip';
 import { DbContext } from '@/context/dbContext';
 import type { SchedulorSelection } from '@/sharedTypes';
 import { Time24 } from '@/types/time24';
-import { formatDateToFriendlyString } from '@/utils/date';
-import {
-  calculateOverlappingPreferences,
-  getOverlapColour,
-} from '@/utils/preferences';
+import { calculateOverlappingPreferences } from '@/utils/preferences';
 
 const Meeting = () => {
   const router = useRouter();
@@ -54,17 +50,14 @@ const Meeting = () => {
   };
 
   const onAddPreferencesClicked = async () => {
-    if (!selections || !username) {
-      console.log('selections', selections);
-      console.log('username', username);
-      return;
-    }
+    if (!selections || !username) return;
 
     await addPreferences(
       router.query.meetingId as string,
       username,
       selections
     );
+
     setHaveEnteredPreferences(true);
   };
 
@@ -134,47 +127,7 @@ const Meeting = () => {
       )}
       <Typography variant="h5">Preferences</Typography>
       {meeting?.preferences && (
-        <Stack
-          sx={{ backgroundColor: '#f2f2f2', borderRadius: 2, p: 1, gap: 2 }}
-        >
-          {preferencesOverlap?.map((row, rowIndex) => (
-            <Stack key={rowIndex}>
-              {row?.[0]?.start && (
-                <Typography variant="body1">
-                  {formatDateToFriendlyString(row[0].start)}
-                </Typography>
-              )}
-              <Stack
-                sx={{
-                  flexDirection: 'row',
-                  justifyContent: 'stretch',
-                  gap: 0.5,
-                }}
-              >
-                {row?.map((interval, intervalIndex) => (
-                  <CustomTooltip
-                    key={`${rowIndex}-${intervalIndex}`}
-                    title={interval.availability.ids.join(', ')}
-                    placement="top"
-                  >
-                    <Box
-                      sx={{
-                        backgroundColor: getOverlapColour(
-                          interval.availability.count
-                        ),
-                        p: 1,
-                        flexGrow: 1,
-                        borderRadius: '4px',
-                      }}
-                    >
-                      {new Time24(interval.start).toString()}
-                    </Box>
-                  </CustomTooltip>
-                ))}
-              </Stack>
-            </Stack>
-          ))}
-        </Stack>
+        <PreferencesOverlapPreview preferencesOverlap={preferencesOverlap} />
       )}
     </Stack>
   );

@@ -17,7 +17,7 @@ type Interval = {
 
 type Day = Interval[];
 
-type Overlap = Day[];
+export type Overlap = Day[];
 
 const createIntervals = (
   startDate: Date,
@@ -86,8 +86,6 @@ export const calculateOverlappingPreferences = (
       const endInterval = Math.floor(
         (endTime.valueOf() - minTime.valueOf()) / intervalSize
       );
-
-      console.log('endInterval', endInterval, 'intevalsInDay', intevalsInDay);
 
       if (startInterval < 0 || startInterval >= intevalsInDay)
         throw new Error('Start interval is out of bounds');

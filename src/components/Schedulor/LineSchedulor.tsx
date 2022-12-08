@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import type { SchedulorSelection } from '@/sharedTypes';
 import { formatDateToFriendlyString, getDateRange } from '@/utils/date';
 
-import DateSlider from './DateSlider';
+import DateSlider from '../DateSlider';
 
 export interface LineSchedulorProps {
   selections: SchedulorSelection[];

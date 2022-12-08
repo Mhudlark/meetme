@@ -7,8 +7,8 @@ import {
   setDateTimeWithTime24,
 } from '@/utils/date';
 
-import type { SliderMark } from './RangeSlider';
-import RangeSlider from './RangeSlider';
+import type { SliderMark } from '../RangeSlider';
+import RangeSlider from '../RangeSlider';
 
 const formatTimeValue = (value: number) => {
   const time24 = new Time24(value);
