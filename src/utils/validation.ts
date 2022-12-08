@@ -1,4 +1,4 @@
-export const isUsernameValid = (username: string) => {
+export const validateUsername = (username: string) => {
   // TODO: username validity function
   return username !== '';
 };

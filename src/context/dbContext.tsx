@@ -1,6 +1,6 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 
 import { insertMeetingIntoDB } from '@/backend/db/database/meeting/insert';
 import { selectMeetingFromDB } from '@/backend/db/database/meeting/select';
@@ -16,10 +16,12 @@ import type { Preference } from '@/types/preference';
 import { createPreferenceFromPreferenceSchema } from '@/types/preference';
 import type { User } from '@/types/user';
 import { createUserFromUserSchema } from '@/types/user';
+import { validateUsername } from '@/utils/validation';
 
 export type DbContextType = {
   createMeeting: (meetingName: string) => Promise<string>;
   getMeeting: (meetingId: string) => Promise<void>;
+  signIn: (username: string) => Promise<void>;
   addPreferences: (
     meetingId: string,
     username: string,
@@ -28,15 +30,20 @@ export type DbContextType = {
   user: User | null;
   meeting: Meeting | null;
   preference: Preference | null;
+  isSignedIn: boolean;
+  isExistingUser: boolean;
 };
 
 const DbContextInitialValue: DbContextType = {
   createMeeting: (_) => Promise.resolve(''),
   getMeeting: (_) => Promise.resolve(),
+  signIn: (_) => Promise.resolve(),
   addPreferences: (_, __, ___) => Promise.resolve(),
   user: null,
   meeting: null,
   preference: null,
+  isSignedIn: false,
+  isExistingUser: false,
 };
 
 export const DbContext = createContext<DbContextType>(DbContextInitialValue);
@@ -49,6 +56,10 @@ const DbProvider = ({ children }: DbProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [preference, setPreference] = useState<Preference | null>(null);
+
+  // A user can be signed in locally without being in the database (yet)
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const isExistingUser = useMemo(() => !!preference, [preference]);
 
   const createMeeting = async (meetingName: string) => {
     const baseMeetingInfo = await insertMeetingIntoDB(supabase, meetingName);
@@ -64,12 +75,35 @@ const DbProvider = ({ children }: DbProviderProps) => {
     setMeeting(createMeetingFromMeetingSchema(meetingInfo));
   };
 
+  const signIn = async (username: string) => {
+    if (!meeting) throw new Error('Not in a meeting');
+
+    const existingUser = meeting.users.filter(
+      (meetingUser) => meetingUser.username === username
+    )?.[0];
+
+    if (existingUser) {
+      const existingUserPreference = meeting?.preferences.filter(
+        (meetingPreference) => meetingPreference.userId === existingUser.userId
+      )?.[0];
+
+      if (!existingUserPreference)
+        throw new Error('Existing user has no preferences');
+
+      setUser(existingUser as User);
+      setPreference(existingUserPreference as Preference);
+    }
+
+    setIsSignedIn(true);
+  };
+
   const addPreferences = async (
     meetingId: string,
     username: string,
     selections: SchedulorSelection[]
   ) => {
-    if (!username) throw new Error('Username is null');
+    if (!username || !validateUsername(username))
+      throw new Error('Username is invalid');
 
     const userInfo = await insertUserIntoDB(supabase, username, meetingId);
 
@@ -87,15 +121,34 @@ const DbProvider = ({ children }: DbProviderProps) => {
     if (meeting) await getMeeting(meeting.id);
   };
 
+  // const updatePreferences = async (
+  //   meetingId: string,
+  //   selections: SchedulorSelection[]
+  // ) => {
+  //   const preferenceInfo = await insertPreferenceIntoDB(
+  //     supabase,
+  //     meetingId,
+  //     user.userId,
+  //     selections
+  //   );
+
+  //   setPreference(createPreferenceFromPreferenceSchema(preferenceInfo));
+
+  //   if (meeting) await getMeeting(meeting.id);
+  // };
+
   return (
     <DbContext.Provider
       value={{
         createMeeting,
         getMeeting,
+        signIn,
         addPreferences,
         user,
         meeting,
         preference,
+        isSignedIn,
+        isExistingUser,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Button, Stack, TextField, Typography } from '@mui/material';
 import { addDays, setHours } from 'date-fns';
 import { range } from 'lodash';
 import { useRouter } from 'next/router';
@@ -10,16 +10,26 @@ import { DbContext } from '@/context/dbContext';
 import type { SchedulorSelection } from '@/sharedTypes';
 import { Time24 } from '@/types/time24';
 import { calculateOverlappingPreferences } from '@/utils/preferences';
+import { validateUsername } from '@/utils/validation';
 
 const Meeting = () => {
   const router = useRouter();
   const meetingId = router.query.meetingId as string;
 
-  const { addPreferences, meeting, getMeeting } = useContext(DbContext);
+  const {
+    addPreferences,
+    signIn,
+    getMeeting,
+    meeting,
+    isSignedIn,
+    isExistingUser,
+  } = useContext(DbContext);
 
   const [username, setUsername] = useState<string | null>(null);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [haveEnteredPreferences, setHaveEnteredPreferences] = useState(false);
+
+  const isUsernameValid = useMemo(() => {
+    return username !== null && validateUsername(username);
+  }, [username]);
 
   const numDays = 5;
   const schedulorStartDate = new Date('2022-12-08');
@@ -46,7 +56,8 @@ const Meeting = () => {
   };
 
   const onSignInClicked = async () => {
-    setIsSignedIn(true);
+    if (!username || !isUsernameValid) return;
+    await signIn(username);
   };
 
   const onAddPreferencesClicked = async () => {
@@ -57,19 +68,10 @@ const Meeting = () => {
       username,
       selections
     );
-
-    setHaveEnteredPreferences(true);
   };
 
-  const isUsernameValid = useMemo(() => {
-    return username !== null && username !== '';
-  }, [username]);
-
   useEffect(() => {
-    if (meetingId) {
-      console.log('useEffect getMeeting', meetingId);
-      getMeeting(meetingId);
-    }
+    if (meetingId) getMeeting(meetingId);
   }, [meetingId]);
 
   const preferencesOverlap = useMemo(() => {
@@ -109,7 +111,7 @@ const Meeting = () => {
           </Button>
         </>
       )}
-      {isSignedIn && !haveEnteredPreferences && (
+      {isSignedIn && !isExistingUser && (
         <>
           <LineSchedulor
             selections={selections}

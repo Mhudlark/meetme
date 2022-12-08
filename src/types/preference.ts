@@ -4,6 +4,8 @@ import type { SchedulorSelection } from '@/sharedTypes';
 export class Preference {
   constructor(
     public preferenceId: string,
+    public meetingId: string,
+    public userId: string,
     public scheduleSelections: SchedulorSelection[]
   ) {}
 
@@ -31,5 +33,10 @@ export const parseSelectionsString = (
 export const createPreferenceFromPreferenceSchema = (
   schema: PreferenceSchema
 ): Preference => {
-  return new Preference(schema.id, parseSelectionsString(schema.selections));
+  return new Preference(
+    schema.id,
+    schema.meeting_id,
+    schema.user_id,
+    parseSelectionsString(schema.selections)
+  );
 };
