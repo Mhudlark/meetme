@@ -5,6 +5,7 @@ import { Time24 } from '@/types/time24';
 import type { User } from '@/types/user';
 
 import { setDateTimeWithTime24 } from './date';
+import { clampNumber } from './math';
 
 type Availability = {
   count: number;
@@ -57,6 +58,19 @@ const createIntervals = (
   return totalIntervals;
 };
 
+const calculateIntervalFromTime = (
+  time: Time24,
+  minTime: Time24,
+  intervalSize: number,
+  intervalsInDay: number
+) => {
+  return clampNumber(
+    Math.floor((time.valueOf() - minTime.valueOf()) / intervalSize),
+    0,
+    intervalsInDay
+  );
+};
+
 export const calculateOverlappingPreferences = (
   preferences: Preference[],
   users: User[],
@@ -78,27 +92,33 @@ export const calculateOverlappingPreferences = (
     preference.scheduleSelections.forEach((selection) => {
       const dayIndex = differenceInDays(selection.startDate, startDate);
       const dayIntervals = allIntervals[dayIndex] as Day;
-      const intevalsInDay = dayIntervals.length;
+      const intervalsInDay = dayIntervals.length;
 
       const startTime = new Time24(selection.startDate);
-      const startInterval = Math.floor(
-        (startTime.valueOf() - minTime.valueOf()) / intervalSize
-      );
-      const endTime = new Time24(selection.endDate);
-      const endInterval = Math.min(
-        Math.floor((endTime.valueOf() - minTime.valueOf()) / intervalSize),
-        intevalsInDay - 1
+      const startInterval = calculateIntervalFromTime(
+        startTime,
+        minTime,
+        intervalSize,
+        intervalsInDay
       );
 
-      if (startInterval < 0 || startInterval > intevalsInDay)
+      const endTime = new Time24(selection.endDate);
+      const endInterval = calculateIntervalFromTime(
+        endTime,
+        minTime,
+        intervalSize,
+        intervalsInDay
+      );
+
+      if (startInterval < 0 || startInterval > intervalsInDay)
         throw new Error('Start interval is out of bounds');
 
-      if (endInterval < 0 || endInterval > intevalsInDay)
+      if (endInterval < 0 || endInterval > intervalsInDay)
         throw new Error('End interval is out of bounds');
 
       if (startInterval === endInterval) return;
 
-      for (let i = startInterval; i <= endInterval; i += 1) {
+      for (let i = startInterval; i < endInterval; i += 1) {
         const interval = dayIntervals[i] as Interval;
 
         const preferenceUser = users.find(
