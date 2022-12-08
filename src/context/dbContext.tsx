@@ -31,6 +31,7 @@ export type DbContextType = {
     selections: SchedulorSelection[]
   ) => Promise<void>;
   updatePreferences: (selections: SchedulorSelection[]) => Promise<void>;
+  signOut: () => Promise<void>;
   leaveMeeting: (username: string) => Promise<void>;
   user: User | null;
   meeting: Meeting | null;
@@ -45,6 +46,7 @@ const DbContextInitialValue: DbContextType = {
   signIn: (_) => Promise.resolve(),
   addPreferences: (_, __, ___) => Promise.resolve(),
   updatePreferences: (_) => Promise.resolve(),
+  signOut: () => Promise.resolve(),
   leaveMeeting: (_) => Promise.resolve(),
   user: null,
   meeting: null,
@@ -140,6 +142,14 @@ const DbProvider = ({ children }: DbProviderProps) => {
     if (meeting) await getMeeting(meeting.id);
   };
 
+  const signOut = async () => {
+    if (!meeting) throw new Error('User is not in a meeting');
+
+    setUser(null);
+    setPreference(null);
+    setIsSignedIn(false);
+  };
+
   const leaveMeeting = async (username: string) => {
     if (!meeting) throw new Error('User is not in a meeting');
 
@@ -169,6 +179,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
         signIn,
         addPreferences,
         updatePreferences,
+        signOut,
         leaveMeeting,
         user,
         meeting,

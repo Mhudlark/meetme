@@ -22,6 +22,7 @@ const Meeting = () => {
     getMeeting,
     addPreferences,
     updatePreferences,
+    signOut,
     leaveMeeting,
     meeting,
     preference,
@@ -90,6 +91,13 @@ const Meeting = () => {
     setHaveSelectionsChanged(false);
   };
 
+  const onSignOutClicked = async () => {
+    if (!isSignedIn) return;
+
+    await signOut();
+    setUsername(null);
+  };
+
   const onLeaveMeetingClicked = async () => {
     if (!username) return;
 
@@ -141,14 +149,24 @@ const Meeting = () => {
             ?.join(', ')}`}</Typography>
         </Stack>
         {isSignedIn && isUsernameValid && (
-          <Button
-            color="error"
-            variant="outlined"
-            onClick={onLeaveMeetingClicked}
-            sx={{ height: 'fit-content' }}
-          >
-            Leave Meeting
-          </Button>
+          <Stack sx={{ gap: 2 }}>
+            <Button
+              color="error"
+              variant="outlined"
+              onClick={onLeaveMeetingClicked}
+              sx={{ height: 'fit-content' }}
+            >
+              Leave Meeting
+            </Button>
+            <Button
+              color="warning"
+              variant="outlined"
+              onClick={onSignOutClicked}
+              sx={{ height: 'fit-content' }}
+            >
+              Sign out
+            </Button>
+          </Stack>
         )}
       </Stack>
       {!isSignedIn && (
