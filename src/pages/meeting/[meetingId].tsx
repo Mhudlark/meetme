@@ -251,10 +251,22 @@ const Meeting = () => {
           </Button>
         </>
       )}
-      <Typography variant="h5">Preferences</Typography>
-      {meeting?.preferences && (
-        <PreferencesOverlapPreview preferencesOverlap={preferencesOverlap} />
-      )}
+      {meeting?.preferences &&
+        Array.isArray(meeting.preferences) &&
+        meeting.preferences.length > 0 && (
+          <Stack sx={{ gap: 2 }}>
+            <Typography
+              variant="h5"
+              sx={{ backgroundColor: '#e1e1e1', borderRadius: 1, p: 1 }}
+            >
+              Preferences
+            </Typography>
+
+            <PreferencesOverlapPreview
+              preferencesOverlap={preferencesOverlap}
+            />
+          </Stack>
+        )}
     </Stack>
   );
 };
