@@ -1,8 +1,8 @@
+import { Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useContext, useMemo, useState } from 'react';
 
 import Button from '@/components/Button';
-import Stack from '@/components/Stack';
 import TextField from '@/components/TextField';
 import { DbContext } from '@/context/dbContext';
 import { paths } from '@/utils/paths';
@@ -30,7 +30,7 @@ const Index = () => {
   return (
     <Stack
       sx={{
-        gap: '24px',
+        gap: 4,
         width: '100%',
         height: '100%',
       }}

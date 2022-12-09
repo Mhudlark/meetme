@@ -1,9 +1,10 @@
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Stack, TextField, Typography } from '@mui/material';
 import { addDays, setHours } from 'date-fns';
 import { range } from 'lodash';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
+import Button from '@/components/Button';
 import PreferencesOverlapPreview from '@/components/PreferenceOverlapPreview';
 import LineSchedulor from '@/components/Schedulor/LineSchedulor';
 import { DbContext } from '@/context/dbContext';
@@ -151,12 +152,7 @@ const Meeting = () => {
         <Stack sx={{ gap: 1 }}>
           <Typography variant="h3">{meeting?.name}</Typography>
           {/* {isSignedIn && <Typography variant="h6">{username}</Typography>} */}
-          <Button
-            color="info"
-            variant="outlined"
-            onClick={copyLinkToClipboard}
-            sx={{ height: 'fit-content' }}
-          >
+          <Button onClick={copyLinkToClipboard}>
             Copy link to share this with meet with others
           </Button>
           <Stack sx={{ gap: 0.5 }}>
@@ -184,20 +180,10 @@ const Meeting = () => {
         </Stack>
         {isSignedIn && isUsernameValid && (
           <Stack sx={{ gap: 2 }}>
-            <Button
-              color="error"
-              variant="outlined"
-              onClick={onLeaveMeetingClicked}
-              sx={{ height: 'fit-content' }}
-            >
+            <Button color="error" onClick={onLeaveMeetingClicked}>
               Leave Meeting
             </Button>
-            <Button
-              color="warning"
-              variant="outlined"
-              onClick={onSignOutClicked}
-              sx={{ height: 'fit-content' }}
-            >
+            <Button color="warning" onClick={onSignOutClicked}>
               Sign out
             </Button>
           </Stack>
@@ -206,11 +192,7 @@ const Meeting = () => {
       {!isSignedIn && (
         <>
           <TextField placeholder={'Username'} onChange={onUsernameChanged} />
-          <Button
-            variant="outlined"
-            onClick={onSignInClicked}
-            disabled={!isUsernameValid}
-          >
+          <Button onClick={onSignInClicked} disabled={!isUsernameValid}>
             Sign In
           </Button>
         </>
@@ -226,9 +208,7 @@ const Meeting = () => {
             maxTime={maxTime}
             intervalSize={intervalSize}
           />
-          <Button variant="outlined" onClick={onAddPreferencesClicked}>
-            Add preferences
-          </Button>
+          <Button onClick={onAddPreferencesClicked}>Add preferences</Button>
         </>
       )}
       {isSignedIn && isExistingUser && (
@@ -243,7 +223,6 @@ const Meeting = () => {
             intervalSize={intervalSize}
           />
           <Button
-            variant="outlined"
             onClick={onUpdatePreferencesClicked}
             disabled={!haveSelectionsChanged}
           >
