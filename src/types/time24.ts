@@ -6,6 +6,15 @@ const isNumberValidTime24 = (num: number): boolean => {
   return true;
 };
 
+const parseStringToTime24Number = (timeStr: string): number => {
+  const [hoursStr, minutesStr] = timeStr.split(':');
+
+  const hours = Number(hoursStr);
+  const minutes = Number(minutesStr);
+
+  return hours + minutes / 60;
+};
+
 /**
  * A number between 0 and 24 (inclusive)
  * Represent 24 hr time
@@ -15,6 +24,7 @@ export class Time24 {
 
   constructor(time24: number);
   constructor(time: Date);
+  constructor(time24: string);
   constructor(...args: Array<any>) {
     if (typeof args[0] === 'number') {
       const num = args[0] as number;
@@ -25,6 +35,11 @@ export class Time24 {
       const hours = getHours(date);
       const minutes = getMinutes(date) / 60;
       this.value = hours + minutes;
+    } else if (typeof args[0] === 'string') {
+      const str = args[0] as string;
+      const num = parseStringToTime24Number(str);
+      isNumberValidTime24(num);
+      this.value = num;
     }
   }
 
