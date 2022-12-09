@@ -1,7 +1,9 @@
-import { Button, Stack, TextField } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useContext, useMemo, useState } from 'react';
 
+import Button from '@/components/Button';
+import Stack from '@/components/Stack';
+import TextField from '@/components/TextField';
 import { DbContext } from '@/context/dbContext';
 import { paths } from '@/utils/paths';
 import { validateMeetingName } from '@/utils/validation';
@@ -26,12 +28,18 @@ const Index = () => {
   };
 
   return (
-    <Stack sx={{ gap: 4, width: '100%', height: '100%' }}>
+    <Stack
+      sx={{
+        gap: '24px',
+        width: '100%',
+        height: '100%',
+      }}
+    >
       <TextField placeholder={'Meeting name'} onChange={onMeetingNameChange} />
       <Button
-        variant="outlined"
         onClick={onCreateEventClicked}
         disabled={!isMeetingNameValid}
+        sx={{ width: 'fit-content' }}
       >
         Create Event
       </Button>
