@@ -1,51 +1,27 @@
 import {
   addDays,
-  differenceInDays,
+  differenceInCalendarDays,
   format,
-  isAfter,
   setHours,
   setMinutes,
-  startOfDay,
 } from 'date-fns';
+import { range } from 'lodash';
 
 import type { Time24 } from '@/types/time24';
 
-// Helper function that uses date-fns methods to determine if a date is between two other dates
-export const dateHourIsBetween = (
-  start: Date,
-  candidate: Date,
-  end: Date
-): boolean =>
-  (candidate.getTime() === start.getTime() || isAfter(candidate, start)) &&
-  (candidate.getTime() === end.getTime() || isAfter(end, candidate));
-
-export const dateIsBetween = (
-  start: Date,
-  candidate: Date,
-  end: Date
-): boolean => {
-  const startOfCandidate = startOfDay(candidate);
-  const startOfStart = startOfDay(start);
-  const startOfEnd = startOfDay(end);
-
-  return (
-    (startOfCandidate.getTime() === startOfStart.getTime() ||
-      isAfter(startOfCandidate, startOfStart)) &&
-    (startOfCandidate.getTime() === startOfEnd.getTime() ||
-      isAfter(startOfEnd, startOfCandidate))
-  );
-};
-
-export const timeIsBetween = (
-  start: Date,
-  candidate: Date,
-  end: Date
-): boolean => {
-  const candidateTime = candidate.getHours() * 60 + candidate.getMinutes();
-  const startTime = start.getHours() * 60 + start.getMinutes();
-  const endTime = end.getHours() * 60 + end.getMinutes();
-
-  return candidateTime >= startTime && candidateTime <= endTime;
+/**
+ * Calculates the number of days between two dates, including the start and end dates
+ * @param startDate The start date
+ * @param endDate The end date
+ * @returns The number of days between the two dates, inclusive
+ */
+export const calculateNumDaysBetweenDates = (
+  startDate: Date,
+  endDate: Date,
+  includeEndDate: boolean = false
+) => {
+  const diff = differenceInCalendarDays(endDate, startDate);
+  return includeEndDate ? diff + 1 : diff;
 };
 
 export const getDateRange = (
@@ -53,13 +29,10 @@ export const getDateRange = (
   end: Date,
   includeEndDate: boolean = false
 ): Date[] => {
-  const numDaysBetween = differenceInDays(end, start);
-  const numDays = includeEndDate ? numDaysBetween : numDaysBetween - 1;
+  const numDays = calculateNumDaysBetweenDates(start, end, includeEndDate);
 
-  const dates = [];
-  for (let d = 0; d <= numDays; d += 1) {
-    dates.push(addDays(start, d));
-  }
+  const dates = range(0, numDays).map((d) => addDays(start, d));
+
   return dates;
 };
 
@@ -76,17 +49,4 @@ export const formatDateToFriendlyString = (date: Date): string => {
 export const setDateTimeWithTime24 = (date: Date, time: Time24): Date => {
   const newDate = setHours(date, time.getHours());
   return setMinutes(newDate, time.getMinutes());
-};
-
-/**
- * Calculates the number of days between two dates, including the start and end dates
- * @param startDate The start date
- * @param endDate The end date
- * @returns The number of days between the two dates, inclusive
- */
-export const calculateNumDaysBetweenDates = (
-  startDate: Date,
-  endDate: Date
-) => {
-  return differenceInDays(endDate, startDate) + 1;
 };

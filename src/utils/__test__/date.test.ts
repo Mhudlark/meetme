@@ -1,13 +1,45 @@
 import { addDays } from 'date-fns';
 
-import { formatDateToFriendlyString, getDateRange } from '../date';
+import {
+  calculateNumDaysBetweenDates,
+  formatDateToFriendlyString,
+  getDateRange,
+} from '../date';
 
 describe('Date utils', () => {
-  describe('getDateRange', () => {
-    it('Generates the correct date range', () => {
+  describe('calculateNumDaysBetweenDates', () => {
+    it('Calculates the correct number of days - not including end date', () => {
       const numDays = 5;
 
-      const startDate = new Date(Date.UTC(2020, 0, 1));
+      const startDate = new Date();
+      const endDate = addDays(startDate, numDays);
+
+      const calculateNumDays = calculateNumDaysBetweenDates(startDate, endDate);
+
+      expect(calculateNumDays).toEqual(numDays);
+    });
+
+    it('Calculates the correct number of days - including end date', () => {
+      const numDays = 5;
+
+      const startDate = new Date();
+      const endDate = addDays(startDate, numDays);
+
+      const calculateNumDays = calculateNumDaysBetweenDates(
+        startDate,
+        endDate,
+        true
+      );
+
+      expect(calculateNumDays).toEqual(numDays + 1);
+    });
+  });
+
+  describe('getDateRange', () => {
+    it('Generates the correct date range - not including end date', () => {
+      const numDays = 5;
+
+      const startDate = new Date();
       const endDate = addDays(startDate, numDays);
 
       const dateRange = getDateRange(startDate, endDate);
@@ -17,7 +49,7 @@ describe('Date utils', () => {
       expect(dateRange[dateRange.length - 1]).toEqual(addDays(endDate, -1));
     });
 
-    it('Includes the end date in the date range', () => {
+    it('Includes the end date in the date range - including end date', () => {
       const numDays = 5;
 
       const startDate = new Date(Date.UTC(2020, 0, 1));
