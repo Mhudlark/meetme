@@ -31,8 +31,7 @@ export const deletePreferenceFromDB = async (
 
     return getArrElement<PreferenceSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error deleting preference from DB');
+    throw new Error(`Error deleting preference from DB: ${error}`);
   }
 };
 
@@ -56,7 +55,8 @@ export const deleteAllPreferencesForMeetingFromDB = async (
 
     return data as PreferenceSchema[];
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error deleting all preferences for meeting from DB');
+    throw new Error(
+      `Error deleting all preferences for meeting from DB: ${error}`
+    );
   }
 };

@@ -34,7 +34,6 @@ export const updatePreferenceInDB = async (
 
     return getArrElement<PreferenceSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error updating preference in DB');
+    throw new Error(`Error updating preference in DB: ${error}`);
   }
 };

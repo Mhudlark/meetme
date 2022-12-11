@@ -32,7 +32,6 @@ export const insertUserIntoDB = async (
 
     return getArrElement<UserSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error inserting user into DB');
+    throw new Error(`Error inserting user into DB: ${error}`);
   }
 };

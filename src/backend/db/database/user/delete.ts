@@ -26,7 +26,6 @@ export const deleteUserFromDB = async (
 
     return getArrElement<UserSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error deleting user from DB');
+    throw new Error(`Error deleting user from DB: ${error}`);
   }
 };

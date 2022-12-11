@@ -36,7 +36,6 @@ export const insertPreferenceIntoDB = async (
 
     return getArrElement<PreferenceSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error inserting preference into DB');
+    throw new Error(`Error inserting preference into DB: ${error}`);
   }
 };

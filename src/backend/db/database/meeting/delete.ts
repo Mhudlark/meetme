@@ -26,7 +26,6 @@ export const deleteMeetingFromDB = async (
 
     return getArrElement<BaseMeetingSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error deleting meeting from DB');
+    throw new Error(`Error deleting meeting from DB: ${error}`);
   }
 };

@@ -35,7 +35,6 @@ export const insertMeetingIntoDB = async (
 
     return getArrElement<BaseMeetingSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error inserting meeting into DB');
+    throw new Error(`Error inserting meeting into DB: ${error}`);
   }
 };

@@ -25,8 +25,7 @@ export const selectBaseMeetingFromDB = async (
 
     return getArrElement<BaseMeetingSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error selecting base meeting from DB');
+    throw new Error(`Error selecting base meeting from DB: ${error}`);
   }
 };
 
@@ -64,7 +63,6 @@ export const selectMeetingFromDB = async (
 
     return meeting;
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error selecting meeting from DB');
+    throw new Error(`Error selecting meeting from DB: ${error}`);
   }
 };

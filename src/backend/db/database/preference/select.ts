@@ -27,7 +27,6 @@ export const selectPreferenceFromDB = async (
 
     return getArrElement<PreferenceSchema>(data);
   } catch (error) {
-    console.log('error', error);
-    throw new Error('Error selecting preference from DB');
+    throw new Error(`Error selecting preference from DB: ${error}`);
   }
 };
