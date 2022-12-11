@@ -11,7 +11,7 @@ type AppLayoutProps = {
 const App = ({ children }: AppLayoutProps) => {
   return (
     <>
-      <Meta title="Totem Pole" description="Totem Pole" />
+      <Meta title="MeetMe" description="MeetMe" />
       <Container
         sx={{ px: { xs: 2, sm: 3, md: 4 }, py: { xs: 4, sm: 6, md: 8 }, m: 0 }}
       >

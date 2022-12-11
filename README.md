@@ -45,8 +45,8 @@
 Run the following command on your local environment:
 
 ```shell
-git clone --depth=1 https://github.com/Mhudlark/totem-pole.git
-cd totem-pole
+git clone --depth=1 https://github.com/Mhudlark/meetme.git
+cd meetme
 yarn install
 ```
 
