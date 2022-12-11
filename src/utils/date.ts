@@ -77,3 +77,16 @@ export const setDateTimeWithTime24 = (date: Date, time: Time24): Date => {
   const newDate = setHours(date, time.getHours());
   return setMinutes(newDate, time.getMinutes());
 };
+
+/**
+ * Calculates the number of days between two dates, including the start and end dates
+ * @param startDate The start date
+ * @param endDate The end date
+ * @returns The number of days between the two dates, inclusive
+ */
+export const calculateNumDaysBetweenDates = (
+  startDate: Date,
+  endDate: Date
+) => {
+  return differenceInDays(endDate, startDate) + 1;
+};

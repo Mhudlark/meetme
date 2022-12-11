@@ -1,11 +1,12 @@
 import { addDays, differenceInDays } from 'date-fns';
+import { range } from 'lodash';
 
 import type { Preference } from '@/types/preference';
 import { Time24 } from '@/types/time24';
 import type { User } from '@/types/user';
+import { getUserFromId } from '@/types/user';
 
-import { setDateTimeWithTime24 } from './date';
-import { clampNumber } from './math';
+import { calculateNumDaysBetweenDates, setDateTimeWithTime24 } from './date';
 
 type Availability = {
   count: number;
@@ -21,54 +22,98 @@ type Day = Interval[];
 
 export type Overlap = Day[];
 
+/**
+ * Calculates the number of intervals between the given times
+ * @param minTime The minimum time of the day
+ * @param maxTime The maximum time of the day
+ * @param intervalSize The size of each interval in hours
+ */
+const calculateNumIntervalsBetweenTimes = (
+  minTime: Time24,
+  maxTime: Time24,
+  intervalSize: number
+): number => {
+  return (maxTime.valueOf() - minTime.valueOf()) / intervalSize;
+};
+
+/**
+ * Calculates the index of the interval that the given time falls in
+ * @param time The time to calculate the interval index for
+ * @param minTime The minimum time of the day
+ * @param intervalSize The size of each interval in hours
+ * @param numIntervalsInDay The number of intervals in a day
+ * @returns
+ */
+const calculateIntervalIndexFromTime = (
+  time: Time24,
+  minTime: Time24,
+  intervalSize: number,
+  numIntervalsInDay: number
+): number => {
+  const modifiedTime = Math.max(
+    minTime.valueOf(),
+    time.valueOf() - intervalSize
+  );
+
+  const intervalIndex = Math.floor(
+    (modifiedTime - minTime.valueOf()) / intervalSize
+  );
+
+  if (intervalIndex < 0)
+    throw new Error(
+      `Interval index, ${intervalIndex}, is less than 0.
+      Min time: ${minTime}, time: ${time}, modifiedTime: ${modifiedTime}.`
+    );
+  if (intervalIndex >= numIntervalsInDay)
+    throw new Error(
+      `Interval index, ${intervalIndex}, is greater than or equal to the number of intervals in a day, ${numIntervalsInDay}.
+      Min time: ${minTime}, time: ${time}, modifiedTime: ${modifiedTime}.`
+    );
+
+  return intervalIndex;
+};
+
 const createIntervals = (
   startDate: Date,
   endDate: Date,
   minTime: Time24,
   maxTime: Time24,
   intervalSize: number
-) => {
-  const numDays = differenceInDays(endDate, startDate);
-  const lengthOfDay = maxTime.valueOf() - minTime.valueOf();
-  const numIntervalsPerDay = lengthOfDay / intervalSize - 1;
+): Overlap => {
+  const numDays = calculateNumDaysBetweenDates(startDate, endDate);
 
-  const totalIntervals: Overlap = [];
+  console.log('create Intervals - numDays', numDays);
 
-  for (let i = 0; i < numDays; i += 1) {
-    const dayIntervals: Day = [];
-    for (let j = 0; j < numIntervalsPerDay; j += 1) {
-      const time = minTime.valueOf() + j * intervalSize;
-      const day = addDays(startDate, i);
+  const numIntervalsPerDay = calculateNumIntervalsBetweenTimes(
+    minTime,
+    maxTime,
+    intervalSize
+  );
+
+  // Generate intervals for entire range
+  const totalIntervals: Overlap = range(numDays).map((dayIndex) => {
+    // Generate intervals for each day
+    const dayIntervals: Day = range(numIntervalsPerDay).map((intervalIndex) => {
+      const time = minTime.valueOf() + intervalIndex * intervalSize;
+      const day = addDays(startDate, dayIndex);
 
       const availability: Availability = {
         count: 0,
         ids: [],
       };
 
-      const interval = {
+      const interval: Interval = {
         start: setDateTimeWithTime24(day, new Time24(time)),
         availability,
       };
 
-      dayIntervals.push(interval);
-    }
-    totalIntervals.push(dayIntervals);
-  }
+      return interval;
+    });
+
+    return dayIntervals;
+  });
 
   return totalIntervals;
-};
-
-const calculateIntervalFromTime = (
-  time: Time24,
-  minTime: Time24,
-  intervalSize: number,
-  intervalsInDay: number
-) => {
-  return clampNumber(
-    Math.floor((time.valueOf() - minTime.valueOf()) / intervalSize),
-    0,
-    intervalsInDay
-  );
 };
 
 export const calculateOverlappingPreferences = (
@@ -92,38 +137,36 @@ export const calculateOverlappingPreferences = (
     preference.scheduleSelections.forEach((selection) => {
       const dayIndex = differenceInDays(selection.startDate, startDate);
       const dayIntervals = allIntervals[dayIndex] as Day;
-      const intervalsInDay = dayIntervals.length;
+      const numIntervalsInDay = dayIntervals.length;
 
       const startTime = new Time24(selection.startDate);
-      const startInterval = calculateIntervalFromTime(
+      const startIntervalIndex = calculateIntervalIndexFromTime(
         startTime,
         minTime,
         intervalSize,
-        intervalsInDay
+        numIntervalsInDay
       );
 
       const endTime = new Time24(selection.endDate);
-      const endInterval = calculateIntervalFromTime(
+      const endIntervalIndex = calculateIntervalIndexFromTime(
         endTime,
         minTime,
         intervalSize,
-        intervalsInDay
+        numIntervalsInDay
       );
 
-      if (startInterval < 0 || startInterval > intervalsInDay)
-        throw new Error('Start interval is out of bounds');
+      // If the start and end interval indices are the same,
+      // then the selection is less than an interval
+      if (startIntervalIndex === endIntervalIndex) return;
 
-      if (endInterval < 0 || endInterval > intervalsInDay)
-        throw new Error('End interval is out of bounds');
+      for (
+        let intervalIndex = startIntervalIndex;
+        intervalIndex < endIntervalIndex;
+        intervalIndex += 1
+      ) {
+        const interval = dayIntervals[intervalIndex] as Interval;
 
-      if (startInterval === endInterval) return;
-
-      for (let i = startInterval; i < endInterval; i += 1) {
-        const interval = dayIntervals[i] as Interval;
-
-        const preferenceUser = users.find(
-          (user) => user.userId === preference.userId
-        ) as User;
+        const preferenceUser = getUserFromId(users, preference.userId);
 
         interval.availability.count += 1;
         interval.availability.ids.push(preferenceUser.username);
