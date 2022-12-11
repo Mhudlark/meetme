@@ -6,13 +6,29 @@ const isNumberValidTime24 = (num: number): boolean => {
   return true;
 };
 
+const parseHoursMinsToTime24Number = (
+  hours: number,
+  minutes: number
+): number => {
+  const num = hours + minutes / 60;
+  isNumberValidTime24(num);
+  return num;
+};
+
+const parseDateToTime24Number = (time: Date): number => {
+  const hours = getHours(time);
+  const minutes = getMinutes(time);
+
+  return parseHoursMinsToTime24Number(hours, minutes);
+};
+
 const parseStringToTime24Number = (timeStr: string): number => {
   const [hoursStr, minutesStr] = timeStr.split(':');
 
   const hours = Number(hoursStr);
   const minutes = Number(minutesStr);
 
-  return hours + minutes / 60;
+  return parseHoursMinsToTime24Number(hours, minutes);
 };
 
 /**
@@ -25,21 +41,26 @@ export class Time24 {
   constructor(time24: number);
   constructor(time: Date);
   constructor(time24: string);
+  constructor(hours: number, minutes: number);
   constructor(...args: Array<any>) {
-    if (typeof args[0] === 'number') {
+    if (args.length === 1 && typeof args[0] === 'number') {
       const num = args[0] as number;
       isNumberValidTime24(num);
       this.value = num;
-    } else if (isDate(args[0])) {
+    } else if (args.length === 1 && isDate(args[0])) {
       const date = args[0] as Date;
-      const hours = getHours(date);
-      const minutes = getMinutes(date) / 60;
-      this.value = hours + minutes;
-    } else if (typeof args[0] === 'string') {
+      this.value = parseDateToTime24Number(date);
+    } else if (args.length === 1 && typeof args[0] === 'string') {
       const str = args[0] as string;
-      const num = parseStringToTime24Number(str);
-      isNumberValidTime24(num);
-      this.value = num;
+      this.value = parseStringToTime24Number(str);
+    } else if (
+      args.length === 2 &&
+      typeof args[0] === 'number' &&
+      typeof args[1] === 'number'
+    ) {
+      const hours = args[0] as number;
+      const minutes = args[1] as number;
+      this.value = parseHoursMinsToTime24Number(hours, minutes);
     }
   }
 
