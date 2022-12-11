@@ -1,4 +1,4 @@
-import { addDays, differenceInDays } from 'date-fns';
+import { differenceInCalendarDays } from 'date-fns';
 import { range } from 'lodash';
 
 import type { Preference } from '@/types/preference';
@@ -6,7 +6,7 @@ import { Time24 } from '@/types/time24';
 import type { User } from '@/types/user';
 import { getUserFromId } from '@/types/user';
 
-import { calculateNumDaysBetweenDates, setDateTimeWithTime24 } from './date';
+import { getDateRange, setDateTimeWithTime24 } from './date';
 
 type Availability = {
   count: number;
@@ -50,24 +50,19 @@ const calculateIntervalIndexFromTime = (
   intervalSize: number,
   numIntervalsInDay: number
 ): number => {
-  const modifiedTime = Math.max(
-    minTime.valueOf(),
-    time.valueOf() - intervalSize
-  );
-
   const intervalIndex = Math.floor(
-    (modifiedTime - minTime.valueOf()) / intervalSize
+    (time.valueOf() - minTime.valueOf()) / intervalSize
   );
 
   if (intervalIndex < 0)
     throw new Error(
       `Interval index, ${intervalIndex}, is less than 0.
-      Min time: ${minTime}, time: ${time}, modifiedTime: ${modifiedTime}.`
+      Min time: ${minTime}, time: ${time}.`
     );
-  if (intervalIndex >= numIntervalsInDay)
+  if (intervalIndex > numIntervalsInDay)
     throw new Error(
       `Interval index, ${intervalIndex}, is greater than or equal to the number of intervals in a day, ${numIntervalsInDay}.
-      Min time: ${minTime}, time: ${time}, modifiedTime: ${modifiedTime}.`
+      Min time: ${minTime}, time: ${time}.`
     );
 
   return intervalIndex;
@@ -80,10 +75,6 @@ const createIntervals = (
   maxTime: Time24,
   intervalSize: number
 ): Overlap => {
-  const numDays = calculateNumDaysBetweenDates(startDate, endDate);
-
-  console.log('create Intervals - numDays', numDays);
-
   const numIntervalsPerDay = calculateNumIntervalsBetweenTimes(
     minTime,
     maxTime,
@@ -91,27 +82,30 @@ const createIntervals = (
   );
 
   // Generate intervals for entire range
-  const totalIntervals: Overlap = range(numDays).map((dayIndex) => {
-    // Generate intervals for each day
-    const dayIntervals: Day = range(numIntervalsPerDay).map((intervalIndex) => {
-      const time = minTime.valueOf() + intervalIndex * intervalSize;
-      const day = addDays(startDate, dayIndex);
+  const totalIntervals: Overlap = getDateRange(startDate, endDate, true).map(
+    (day) => {
+      // Generate intervals for each day
+      const dayIntervals: Day = range(numIntervalsPerDay).map(
+        (intervalIndex) => {
+          const time = minTime.valueOf() + intervalIndex * intervalSize;
 
-      const availability: Availability = {
-        count: 0,
-        ids: [],
-      };
+          const availability: Availability = {
+            count: 0,
+            ids: [],
+          };
 
-      const interval: Interval = {
-        start: setDateTimeWithTime24(day, new Time24(time)),
-        availability,
-      };
+          const interval: Interval = {
+            start: setDateTimeWithTime24(day, new Time24(time)),
+            availability,
+          };
 
-      return interval;
-    });
+          return interval;
+        }
+      );
 
-    return dayIntervals;
-  });
+      return dayIntervals;
+    }
+  );
 
   return totalIntervals;
 };
@@ -135,7 +129,7 @@ export const calculateOverlappingPreferences = (
 
   preferences.forEach((preference) => {
     preference.scheduleSelections.forEach((selection) => {
-      const dayIndex = differenceInDays(selection.startDate, startDate);
+      const dayIndex = differenceInCalendarDays(selection.startDate, startDate);
       const dayIntervals = allIntervals[dayIndex] as Day;
       const numIntervalsInDay = dayIntervals.length;
 
