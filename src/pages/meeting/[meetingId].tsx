@@ -70,18 +70,17 @@ const Meeting = () => {
     isExistingUser,
   } = useContext(DbContext);
 
-  const [username, setUsername] = useState<string | null>(null);
-  const [haveSelectionsChanged, setHaveSelectionsChanged] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [username, setUsername] = useState<string | null>(null);
+  const [selections, setSelections] =
+    useState<SchedulorSelection[]>(defaultSelections);
+  const [haveSelectionsChanged, setHaveSelectionsChanged] = useState(false);
 
   const isUsernameValid = useMemo(() => {
     return username !== null && validateUsername(username);
   }, [username]);
 
   const intervalSize = 1;
-
-  const [selections, setSelections] =
-    useState<SchedulorSelection[]>(defaultSelections);
 
   const resetStates = () => {
     setUsername(null);

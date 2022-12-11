@@ -2,18 +2,26 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
+import { deleteMeetingFromDB } from '@/backend/db/database/meeting/delete';
 import { insertMeetingIntoDB } from '@/backend/db/database/meeting/insert';
 import { selectMeetingFromDB } from '@/backend/db/database/meeting/select';
-import { deletePreferenceFromDB } from '@/backend/db/database/preference/delete';
+import {
+  deleteAllPreferencesForMeetingFromDB,
+  deletePreferenceFromDB,
+} from '@/backend/db/database/preference/delete';
 import { insertPreferenceIntoDB } from '@/backend/db/database/preference/insert';
 import { updatePreferenceInDB } from '@/backend/db/database/preference/update';
-import { deleteUserFromDB } from '@/backend/db/database/user/delete';
+import {
+  deleteAllUsersForMeetingFromDB,
+  deleteUserFromDB,
+} from '@/backend/db/database/user/delete';
 import { insertUserIntoDB } from '@/backend/db/database/user/insert';
 import type { SchedulorSelection } from '@/sharedTypes';
 import type { Meeting, MeetingDetails } from '@/types/meeting';
 import {
   createMeetingFromBaseMeetingSchema,
   createMeetingFromMeetingSchema,
+  isMeetingHost,
 } from '@/types/meeting';
 import type { Preference } from '@/types/preference';
 import { createPreferenceFromPreferenceSchema } from '@/types/preference';
@@ -33,11 +41,13 @@ export type DbContextType = {
   updatePreferences: (selections: SchedulorSelection[]) => Promise<void>;
   signOut: () => Promise<void>;
   leaveMeeting: (username: string) => Promise<void>;
+  deleteMeeting: (meetingId: string) => Promise<void>;
   user: User | null;
   meeting: Meeting | null;
   preference: Preference | null;
   isSignedIn: boolean;
   isExistingUser: boolean;
+  isHost: boolean;
 };
 
 const DbContextInitialValue: DbContextType = {
@@ -48,11 +58,13 @@ const DbContextInitialValue: DbContextType = {
   updatePreferences: (_) => Promise.resolve(),
   signOut: () => Promise.resolve(),
   leaveMeeting: (_) => Promise.resolve(),
+  deleteMeeting: (_) => Promise.resolve(),
   user: null,
   meeting: null,
   preference: null,
   isSignedIn: false,
   isExistingUser: false,
+  isHost: false,
 };
 
 export const DbContext = createContext<DbContextType>(DbContextInitialValue);
@@ -69,6 +81,9 @@ const DbProvider = ({ children }: DbProviderProps) => {
   // A user can be signed in locally without being in the database (yet)
   const [isSignedIn, setIsSignedIn] = useState(false);
   const isExistingUser = useMemo(() => !!preference, [preference]);
+  const isHost = useMemo(() => {
+    return isMeetingHost(meeting, user);
+  }, [meeting, user]);
 
   const createMeeting = async (meetingDetails: MeetingDetails) => {
     const baseMeetingInfo = await insertMeetingIntoDB(supabase, meetingDetails);
@@ -171,6 +186,24 @@ const DbProvider = ({ children }: DbProviderProps) => {
     setIsSignedIn(false);
   };
 
+  const deleteMeeting = async (meetingId: string) => {
+    if (!meeting) throw new Error('User is not in a meeting');
+    if (!user) throw new Error('User is not signed in already');
+    if (!isHost) throw new Error('User is not the host of the meeting');
+
+    // Delete preferences first because foreign key (userId, meetingId)
+    await deleteAllPreferencesForMeetingFromDB(supabase, meetingId);
+    // Delete users next because foreign key (meetingId)
+    await deleteAllUsersForMeetingFromDB(supabase, meetingId);
+    // Delete meeting last
+    await deleteMeetingFromDB(supabase, meetingId);
+
+    setPreference(null);
+    setUser(null);
+    setMeeting(null);
+    setIsSignedIn(false);
+  };
+
   return (
     <DbContext.Provider
       value={{
@@ -181,11 +214,13 @@ const DbProvider = ({ children }: DbProviderProps) => {
         updatePreferences,
         signOut,
         leaveMeeting,
+        deleteMeeting,
         user,
         meeting,
         preference,
         isSignedIn,
         isExistingUser,
+        isHost,
       }}
     >
       {children}

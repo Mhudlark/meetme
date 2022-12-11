@@ -29,3 +29,27 @@ export const deleteUserFromDB = async (
     throw new Error(`Error deleting user from DB: ${error}`);
   }
 };
+
+/**
+ * Delete all users for a given meeting from the DB
+ * @param {Supabase} supabase The Supabase client
+ * @param {string} meetingId The meeting id
+ */
+export const deleteAllUsersForMeetingFromDB = async (
+  supabase: Supabase,
+  meetingId: string
+): Promise<UserSchema[]> => {
+  try {
+    const { data, error } = await supabase
+      .from(dbConfig.channels.users.channel)
+      .delete()
+      .match({ [usersSchema.meeting_id]: meetingId })
+      .select();
+
+    checkSupabaseErrorResponse(error);
+
+    return data as UserSchema[];
+  } catch (error) {
+    throw new Error(`Error deleting all users for meeting from DB: ${error}`);
+  }
+};

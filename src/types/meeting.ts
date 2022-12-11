@@ -1,3 +1,5 @@
+import { isAfter } from 'date-fns';
+
 import type {
   BaseMeetingSchema,
   MeetingSchema,
@@ -61,4 +63,15 @@ export type MeetingDetails = {
   endDate: Date;
   minTime: number;
   maxTime: number;
+};
+
+export const isMeetingHost = (meeting: Meeting | null, user: User | null) => {
+  if (!meeting) return false;
+  if (!user) return false;
+
+  const host = meeting.users.sort((a, b) =>
+    isAfter(a.joinedAt, b.joinedAt) ? 1 : -1
+  )[0];
+
+  return host?.userId === user.userId;
 };
