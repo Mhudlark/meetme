@@ -10,7 +10,7 @@ import { updatePreferenceInDB } from '@/backend/db/database/preference/update';
 import { deleteUserFromDB } from '@/backend/db/database/user/delete';
 import { insertUserIntoDB } from '@/backend/db/database/user/insert';
 import type { SchedulorSelection } from '@/sharedTypes';
-import type { Meeting } from '@/types/meeting';
+import type { Meeting, MeetingDetails } from '@/types/meeting';
 import {
   createMeetingFromBaseMeetingSchema,
   createMeetingFromMeetingSchema,
@@ -22,7 +22,7 @@ import { createUserFromUserSchema } from '@/types/user';
 import { validateUsername } from '@/utils/validation';
 
 export type DbContextType = {
-  createMeeting: (meetingName: string) => Promise<string>;
+  createMeeting: (meetingDetails: MeetingDetails) => Promise<string>;
   getMeeting: (meetingId: string) => Promise<void>;
   signIn: (username: string) => Promise<void>;
   addPreferences: (
@@ -70,8 +70,8 @@ const DbProvider = ({ children }: DbProviderProps) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const isExistingUser = useMemo(() => !!preference, [preference]);
 
-  const createMeeting = async (meetingName: string) => {
-    const baseMeetingInfo = await insertMeetingIntoDB(supabase, meetingName);
+  const createMeeting = async (meetingDetails: MeetingDetails) => {
+    const baseMeetingInfo = await insertMeetingIntoDB(supabase, meetingDetails);
 
     setMeeting(createMeetingFromBaseMeetingSchema(baseMeetingInfo));
 

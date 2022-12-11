@@ -1,3 +1,4 @@
+import type { MeetingDetails } from '@/types/meeting';
 import { getArrElement } from '@/utils/array';
 
 import { dbConfig } from '../../dbConfig';
@@ -9,16 +10,25 @@ import type { BaseMeetingSchema } from '../schemas/types';
 /**
  * Insert a new meeting into the DB
  * @param {Supabase} supabase The Supabase client
- * @param {string} meetingName The meeting name
+ * @param {MeetingDetails} meetingDetails The details of the meeting to insert
  */
 export const insertMeetingIntoDB = async (
   supabase: Supabase,
-  meetingName: string
+  meetingDetails: MeetingDetails
 ): Promise<BaseMeetingSchema> => {
   try {
     const { data, error } = await supabase
       .from(dbConfig.channels.meetings.channel)
-      .insert([{ [meetingsSchema.name]: meetingName }])
+      .insert([
+        {
+          [meetingsSchema.name]: meetingDetails.name,
+          [meetingsSchema.description]: meetingDetails.description,
+          [meetingsSchema.start_date]: meetingDetails.startDate,
+          [meetingsSchema.end_date]: meetingDetails.endDate,
+          [meetingsSchema.min_time]: meetingDetails.minTime,
+          [meetingsSchema.max_time]: meetingDetails.maxTime,
+        },
+      ])
       .select();
 
     checkSupabaseErrorResponse(error);

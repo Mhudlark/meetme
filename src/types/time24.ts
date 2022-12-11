@@ -1,8 +1,10 @@
 import { getHours, getMinutes, isDate } from 'date-fns';
 
 const isNumberValidTime24 = (num: number): boolean => {
-  if (num < 0 || num > 24) throw new Error(`Invalid time value: ${num}`);
-  if (num % 0.5 !== 0) throw new Error(`Invalid time value: ${num}`);
+  if (num < 0 || num > 24)
+    throw new Error(`Invalid time value (hours not valid): ${num}`);
+  if (num % 0.5 !== 0 && num !== 0)
+    throw new Error(`Invalid time value (30 mins is not a factor): ${num}`);
   return true;
 };
 
