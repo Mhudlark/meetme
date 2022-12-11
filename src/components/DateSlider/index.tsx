@@ -31,14 +31,16 @@ export default function DateSlider({
   intervalSize,
 }: DateSliderProps) {
   const marks: SliderMark[] = useMemo(() => {
-    const newMarks: SliderMark[] = range(minTime, maxTime, intervalSize).map(
-      (timeNum) => {
-        return {
-          value: timeNum,
-          label: formatTimeValue(timeNum),
-        };
-      }
-    );
+    const newMarks: SliderMark[] = range(
+      minTime,
+      maxTime + intervalSize,
+      intervalSize
+    ).map((timeNum) => {
+      return {
+        value: timeNum,
+        label: formatTimeValue(timeNum),
+      };
+    });
 
     return newMarks;
   }, []);
