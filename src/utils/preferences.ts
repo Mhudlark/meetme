@@ -24,11 +24,12 @@ export type Overlap = Day[];
 
 /**
  * Calculates the number of intervals between the given times
+ * (will return a decimal if the interval size is not a factor of the time difference)
  * @param minTime The minimum time of the day
  * @param maxTime The maximum time of the day
  * @param intervalSize The size of each interval in hours
  */
-const calculateNumIntervalsBetweenTimes = (
+export const calculateNumIntervalsBetweenTimes = (
   minTime: Time24,
   maxTime: Time24,
   intervalSize: number
@@ -44,7 +45,7 @@ const calculateNumIntervalsBetweenTimes = (
  * @param numIntervalsInDay The number of intervals in a day
  * @returns
  */
-const calculateIntervalIndexFromTime = (
+export const calculateIntervalIndexFromTime = (
   time: Time24,
   minTime: Time24,
   intervalSize: number,
