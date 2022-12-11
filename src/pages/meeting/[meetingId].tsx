@@ -1,23 +1,17 @@
-import {
-  Box,
-  CircularProgress,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { CircularProgress, Stack, TextField, Typography } from '@mui/material';
 import { addDays, differenceInCalendarDays } from 'date-fns';
 import { range } from 'lodash';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
 import Button from '@/components/Button';
+import MeetingDetails from '@/components/Meeting/meetingDetails';
 import PreferencesOverlapPreview from '@/components/PreferenceOverlapPreview';
 import LineSchedulor from '@/components/Schedulor/LineSchedulor';
 import { DbContext } from '@/context/dbContext';
 import type { SchedulorSelection } from '@/sharedTypes';
 import { Time24 } from '@/types/time24';
 import { setDateTimeWithTime24 } from '@/utils/date';
-import { useWindowUrl } from '@/utils/hooks';
 import { paths } from '@/utils/paths';
 import { calculateOverlappingPreferences } from '@/utils/preferences';
 import { validateUsername } from '@/utils/validation';
@@ -52,7 +46,6 @@ const defaultSelections = generateSelections(
 );
 
 const Meeting = () => {
-  const windowUrl = useWindowUrl();
   const router = useRouter();
   const meetingId = router.query.meetingId as string;
 
@@ -64,7 +57,6 @@ const Meeting = () => {
     signOut,
     leaveMeeting,
     meeting,
-    user,
     preference,
     isSignedIn,
     isExistingUser,
@@ -137,10 +129,6 @@ const Meeting = () => {
     router.push(paths.home);
   };
 
-  const copyLinkToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-  };
-
   // Get meeting details
   useEffect(() => {
     if (meetingId) {
@@ -200,37 +188,7 @@ const Meeting = () => {
               gap: 2,
             }}
           >
-            <Stack sx={{ gap: 1 }}>
-              <Typography variant="h3">{meeting?.details.name}</Typography>
-              {/* {isSignedIn && <Typography variant="h6">{username}</Typography>} */}
-              <Button onClick={copyLinkToClipboard}>
-                Copy link to share this with meet with others
-              </Button>
-              <Stack sx={{ gap: 0.5 }}>
-                <Typography variant="caption">
-                  {'Or, share this link with others:'}
-                </Typography>
-                <Typography variant="caption">{windowUrl}</Typography>
-              </Stack>
-              <Stack sx={{ flexDirection: 'row', flexWrap: 'wrap', gap: 0.5 }}>
-                {meeting?.users
-                  ?.filter(
-                    (meetingUser) => meetingUser.username !== user?.username
-                  )
-                  .map((meetingUser) => (
-                    <Box
-                      key={meetingUser.username}
-                      sx={{
-                        backgroundColor: '#f2f2f288',
-                        borderRadius: 1,
-                        p: 0.5,
-                      }}
-                    >
-                      {meetingUser.username}
-                    </Box>
-                  ))}
-              </Stack>
-            </Stack>
+            <MeetingDetails />
             {isSignedIn && isUsernameValid && (
               <Stack sx={{ gap: 2 }}>
                 <Button color="error" onClick={onLeaveMeetingClicked}>
