@@ -1,10 +1,11 @@
-import { Box, Stack, TextareaAutosize } from '@mui/material';
+import { Stack } from '@mui/material';
 import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useContext, useMemo, useState } from 'react';
 
 import Button from '@/components/Button';
 import DatePicker from '@/components/DatePicker';
+import TextArea from '@/components/TextArea';
 import TextField from '@/components/TextField';
 import TimePicker from '@/components/TimePicker';
 import { DbContext } from '@/context/dbContext';
@@ -76,19 +77,10 @@ const Index = () => {
       }}
     >
       <TextField placeholder={'Meeting name'} onChange={onMeetingNameChange} />
-      <Box sx={{ borderRadius: 1, p: 1, backgroundColor: '#efefef' }}>
-        <TextareaAutosize
-          style={{
-            width: '100%',
-            padding: '8px',
-            borderRadius: '8px',
-            backgroundColor: '#fdfdfd',
-          }}
-          placeholder="Description"
-          onChange={(e) => setDescription(e.target.value)}
-          minRows={3}
-        />
-      </Box>
+      <TextArea
+        placeholder={'Description...'}
+        onChange={(e) => setDescription(e.target.value)}
+      />
       <Stack sx={{ gap: 1.5 }}>
         <DatePicker
           label="Start date"

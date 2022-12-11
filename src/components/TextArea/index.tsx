@@ -1,15 +1,16 @@
-import type { CSSProperties, InputHTMLAttributes } from 'react';
+import { TextareaAutosize } from '@mui/material';
+import type { CSSProperties } from 'react';
 
-const baseTextFieldClassName = `
+const baseTextAreaClassName = `
   form-input
   w-full
 `;
 
-const getTextFieldClassName = (variant: 'standard' | 'sexy' | undefined) => {
+const getTextAreaClassName = (variant: 'standard' | 'sexy' | undefined) => {
   switch (variant) {
     case 'standard':
       return `
-        ${baseTextFieldClassName}
+        ${baseTextAreaClassName}
         px-3
         py-1.5
         text-base
@@ -25,7 +26,7 @@ const getTextFieldClassName = (variant: 'standard' | 'sexy' | undefined) => {
       `;
     case 'sexy':
       return `
-        ${baseTextFieldClassName}
+        ${baseTextAreaClassName}
         px-3
         py-3
         text-base
@@ -45,25 +46,33 @@ const getTextFieldClassName = (variant: 'standard' | 'sexy' | undefined) => {
   }
 };
 
-export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface TextAreaProps {
   variant?: 'standard' | 'sexy';
+  placeholder?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   sx?: CSSProperties;
 }
 
-const textFieldPropsDefaultValues: TextFieldProps = {
+const textAreaPropsDefaultValues: TextAreaProps = {
+  placeholder: '',
   variant: 'sexy',
 };
 
-const TextField = ({
-  variant = textFieldPropsDefaultValues.variant,
+const TextArea = ({
+  variant = textAreaPropsDefaultValues.variant,
+  placeholder,
+  onChange,
   sx,
-  ...props
-}: TextFieldProps) => {
+}: TextAreaProps) => {
   return (
-    <input style={sx} className={getTextFieldClassName(variant)} {...props}>
-      {props.children}
-    </input>
+    <TextareaAutosize
+      style={sx}
+      placeholder={placeholder}
+      onChange={(e) => onChange?.(e)}
+      minRows={3}
+      className={getTextAreaClassName(variant)}
+    />
   );
 };
 
-export default TextField;
+export default TextArea;

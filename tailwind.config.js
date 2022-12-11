@@ -15,7 +15,15 @@ module.exports = {
       '6xl': '4rem',
     },
     extend: {
-      colors: {},
+      colors: {
+        'rose-gray': {
+          50: '#f0eef0',
+        },
+      },
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+        body: ['Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],

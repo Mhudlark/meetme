@@ -1,5 +1,13 @@
 @tailwind base;
 
+body {
+  @apply bg-rose-gray-50;
+}
+
+* {
+  font-family: 'Poppins', sans-serif;
+}
+
 a {
   @apply text-blue-700;
 }
