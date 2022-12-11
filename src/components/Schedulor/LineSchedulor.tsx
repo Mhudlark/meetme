@@ -26,7 +26,7 @@ export default function LineSchedulor({
   intervalSize,
 }: LineSchedulorProps) {
   const days = useMemo(
-    () => getDateRange(startDate, endDate),
+    () => getDateRange(startDate, endDate, true),
     [startDate, endDate]
   );
 
