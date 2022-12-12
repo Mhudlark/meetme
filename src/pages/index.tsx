@@ -95,12 +95,10 @@ const Index = () => {
       </Stack>
       <Stack sx={{ gap: 1.5 }}>
         <TimePicker
-          label="Min time"
           onChange={(newTime) => setMinTime(newTime)}
           defaultValue={formIntialValues.minTime}
         />
         <TimePicker
-          label="Max time"
           onChange={(newTime) => setMaxTime(newTime)}
           defaultValue={formIntialValues.maxTime}
         />

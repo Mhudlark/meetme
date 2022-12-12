@@ -1,4 +1,5 @@
 import { getHours, getMinutes, isDate } from 'date-fns';
+import { range } from 'lodash';
 
 const isNumberValidTime24 = (num: number): boolean => {
   if (num < 0 || num > 24)
@@ -81,6 +82,12 @@ export class Time24 {
     return time % 1 === 0.5 ? 30 : 0;
   }
 
+  public toUnpaddedString(twelveHour: boolean = false): string {
+    const hours = this.getHours(twelveHour);
+    const minutes = this.getMinutes();
+    return `${hours.toString()}:${minutes.toString().padStart(2, '0')}`;
+  }
+
   public toString(twelveHour: boolean = false): string {
     const hours = this.getHours(twelveHour);
     const minutes = this.getMinutes();
@@ -89,3 +96,15 @@ export class Time24 {
       .padStart(2, '0')}`;
   }
 }
+
+export const getTimeRange = (
+  startTime: Time24,
+  endTime: Time24,
+  step: number,
+  includeEndTime: boolean = false
+): Time24[] => {
+  const startTimeNum = startTime.valueOf();
+  const endTimeNum = endTime.valueOf() + (includeEndTime ? step : 0);
+
+  return range(startTimeNum, endTimeNum, step).map((t) => new Time24(t));
+};

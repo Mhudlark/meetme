@@ -1,45 +1,74 @@
-import { TextField } from '@mui/material';
-import type { CSSProperties } from 'react';
+import Select from 'react-select';
 
-import { Time24 } from '@/types/time24';
+import { getTimeRange, Time24 } from '@/types/time24';
+
+interface TimeOption {
+  value: number;
+  label: string;
+}
+
+const timeOptions = getTimeRange(new Time24(0), new Time24(24), 0.5, true).map(
+  (time: Time24) => {
+    return {
+      value: time.valueOf(),
+      label: time.toUnpaddedString(),
+    } as TimeOption;
+  }
+);
 
 export interface TimePickerProps {
-  label: string;
   defaultValue?: Time24;
-  sx?: CSSProperties;
   onChange?: (newTime: Time24) => void;
 }
 
 const timePickerPropsDefaultValues: TimePickerProps = {
-  label: 'Time',
   defaultValue: new Time24(12),
 };
 
 const TimePicker = ({
-  label = timePickerPropsDefaultValues.label,
   defaultValue = timePickerPropsDefaultValues.defaultValue,
-  sx,
   onChange,
 }: TimePickerProps) => {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const timeStr = event.target.value;
-    const time = new Time24(timeStr);
-    onChange?.(time);
+  const handleChange = (val: any | TimeOption) => {
+    const option = val as TimeOption;
+    onChange?.(new Time24(option.value));
   };
 
   return (
-    <TextField
-      id="time"
-      label={label}
-      type="time"
-      defaultValue={defaultValue?.toString()}
-      InputLabelProps={{
-        shrink: true,
+    <Select
+      classNamePrefix="select"
+      defaultValue={timeOptions.find(
+        (time) => time.value === defaultValue?.valueOf()
+      )}
+      isSearchable={true}
+      name="time"
+      options={timeOptions}
+      styles={{
+        control: (baseStyles, state) => ({
+          ...baseStyles,
+          backgroundColor: state.isFocused ? '#f9fafb' : 'transparent',
+          borderColor: state.isFocused ? 'black' : '#374151',
+          outline: state.isFocused ? 'none' : 'none',
+        }),
+        option: (baseStyles) => ({
+          ...baseStyles,
+          fontFamily: 'Roboto',
+          fontWeight: '400',
+        }),
+        singleValue: (baseStyles) => ({
+          ...baseStyles,
+          fontFamily: 'Roboto',
+          fontWeight: '500',
+        }),
+        indicatorSeparator: (baseStyles, state) => ({
+          ...baseStyles,
+          backgroundColor: state.isFocused ? 'black' : '#374151',
+        }),
+        dropdownIndicator: (baseStyles, state) => ({
+          ...baseStyles,
+          color: state.isFocused ? '000000cc' : '#374151cc',
+        }),
       }}
-      inputProps={{
-        step: 1800, // 30 min
-      }}
-      sx={{ width: 150, ...sx }}
       onChange={handleChange}
     />
   );
