@@ -1,3 +1,4 @@
+import { CircularProgress, Stack } from '@mui/material';
 import type { ButtonHTMLAttributes, CSSProperties } from 'react';
 
 const baseButtonClassName = `
@@ -27,10 +28,10 @@ const getButtonClassName = (
     case 'primary':
       return `
       ${baseButtonClassName}
-      bg-gray-900 hover:bg-white focus:bg-white
-      text-white hover:text-gray-900 focus:text-black
+      bg-gray-900 hover:bg-white
+      text-white hover:text-gray-900
       border-2 
-      border-transparent hover:border-gray-900 focus:border-black
+      border-transparent hover:border-gray-900
       `;
     case 'secondary':
       return `
@@ -67,16 +68,19 @@ const getButtonClassName = (
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: 'primary' | 'secondary' | 'error' | 'warning' | 'success';
+  isLoading?: boolean;
   sx?: CSSProperties;
 }
 
 const buttonPropsDefaultValues: ButtonProps = {
   color: 'primary',
+  isLoading: false,
 };
 
 const Button = ({
   color = buttonPropsDefaultValues.color,
   disabled,
+  isLoading,
   sx,
   ...props
 }: ButtonProps) => {
@@ -88,7 +92,24 @@ const Button = ({
       disabled={disabled}
       {...props}
     >
-      {props.children}
+      {isLoading && !disabled ? (
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            alignContent: 'center',
+            justifyContent: 'center',
+            width:
+              typeof props?.children === 'string'
+                ? `${props.children.length * 8.4}px`
+                : '60px',
+            height: '24px',
+          }}
+        >
+          <CircularProgress size={20} sx={{ color: 'white' }} />
+        </Stack>
+      ) : (
+        props.children
+      )}
     </button>
   );
 };

@@ -31,11 +31,6 @@ const Index = () => {
   const [meetingName, setMeetingName] = useState<string>(
     formIntialValues.meetingName
   );
-  const isMeetingNameValid = useMemo(
-    () => validateMeetingName(meetingName),
-    [meetingName]
-  );
-
   const [description, setDescription] = useState<string>(
     formIntialValues.description
   );
@@ -43,6 +38,12 @@ const Index = () => {
   const [endDate, setEndDate] = useState<Date>(formIntialValues.endDate);
   const [minTime, setMinTime] = useState<Time24>(formIntialValues.minTime);
   const [maxTime, setMaxTime] = useState<Time24>(formIntialValues.maxTime);
+
+  const isMeetingNameValid = useMemo(
+    () => validateMeetingName(meetingName),
+    [meetingName]
+  );
+  const [isCreateEventLoading, setIsCreateEventLoading] = useState(false);
 
   const onMeetingNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMeetingName(event.target.value);
@@ -65,7 +66,9 @@ const Index = () => {
       maxTime: maxTime.valueOf(),
     };
 
+    setIsCreateEventLoading(true);
     const meetingId = await createMeeting(meetingDetails);
+    setIsCreateEventLoading(false);
     router.push(`${paths.meeting}/${meetingId}`);
   };
 
@@ -120,6 +123,7 @@ const Index = () => {
       <Button
         onClick={onCreateEventClicked}
         disabled={!isMeetingNameValid}
+        isLoading={isCreateEventLoading}
         sx={{ width: 'fit-content' }}
       >
         Create Event
