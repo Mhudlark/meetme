@@ -118,3 +118,10 @@ export const useWindowUrl = () => {
 
   return windowUrl;
 };
+
+export const useConsoleLog = (value: any, valueName?: string) => {
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log(valueName ?? '', value);
+  }, [value]);
+};

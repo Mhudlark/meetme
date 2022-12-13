@@ -10,7 +10,7 @@ import { getDateRange, setDateTimeWithTime24 } from './date';
 
 type Availability = {
   count: number;
-  ids: string[];
+  users: User[];
 };
 
 type Interval = {
@@ -92,7 +92,7 @@ const createIntervals = (
 
           const availability: Availability = {
             count: 0,
-            ids: [],
+            users: [],
           };
 
           const interval: Interval = {
@@ -164,7 +164,7 @@ export const calculateOverlappingPreferences = (
         const preferenceUser = getUserFromId(users, preference.userId);
 
         interval.availability.count += 1;
-        interval.availability.ids.push(preferenceUser.username);
+        interval.availability.users.push(preferenceUser);
       }
     });
   });

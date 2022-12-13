@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 import { addDays, differenceInCalendarDays } from 'date-fns';
 import { range } from 'lodash';
 import { useRouter } from 'next/router';
@@ -252,15 +252,9 @@ const Meeting = () => {
           )}
           {meeting?.preferences &&
             Array.isArray(meeting.preferences) &&
-            meeting.preferences.length > 0 && (
+            meeting.preferences.length > 0 &&
+            preferencesOverlap && (
               <Stack sx={{ gap: 2 }}>
-                <Typography
-                  variant="h5"
-                  sx={{ backgroundColor: '#e1e1e1', borderRadius: 1, p: 1 }}
-                >
-                  Preferences
-                </Typography>
-
                 <PreferenceOverlapPreview
                   preferencesOverlap={preferencesOverlap}
                 />
