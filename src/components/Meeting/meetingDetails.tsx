@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { useContext } from 'react';
 
-import Button from '@/components/Button';
+import CustomButton from '@/components/Button';
 import { DbContext } from '@/context/dbContext';
 import { useWindowUrl } from '@/utils/hooks';
 
@@ -18,9 +18,9 @@ const MeetingDetails = () => {
     <Stack sx={{ gap: 1 }}>
       <Typography variant="h3">{meeting?.details.name}</Typography>
       {/* {isSignedIn && <Typography variant="h6">{username}</Typography>} */}
-      <Button onClick={copyLinkToClipboard}>
+      <CustomButton onClick={copyLinkToClipboard}>
         Copy link to share this with meet with others
-      </Button>
+      </CustomButton>
       <Stack sx={{ gap: 0.5 }}>
         <Typography variant="caption">
           {'Or, share this link with others:'}

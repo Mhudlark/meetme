@@ -62,7 +62,7 @@ const textAreaPropsDefaultValues: TextAreaProps = {
   variant: 'sexy',
 };
 
-const TextArea = ({
+const CustomTextArea = ({
   variant = textAreaPropsDefaultValues.variant,
   placeholder,
   onChange,
@@ -79,4 +79,4 @@ const TextArea = ({
   );
 };
 
-export default TextArea;
+export default CustomTextArea;

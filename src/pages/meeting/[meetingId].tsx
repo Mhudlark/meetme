@@ -1,11 +1,12 @@
-import { CircularProgress, Stack, TextField, Typography } from '@mui/material';
+import { CircularProgress, Stack, Typography } from '@mui/material';
 import { addDays, differenceInCalendarDays } from 'date-fns';
 import { range } from 'lodash';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
-import Button from '@/components/Button';
+import CustomButton from '@/components/Button';
 import MeetingDetails from '@/components/Meeting/meetingDetails';
+import SignInModal from '@/components/Meeting/signInModal';
 import PreferencesOverlapPreview from '@/components/PreferenceOverlapPreview';
 import LineSchedulor from '@/components/Schedulor/LineSchedulor';
 import { DbContext } from '@/context/dbContext';
@@ -63,6 +64,8 @@ const Meeting = () => {
   } = useContext(DbContext);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+
   const [username, setUsername] = useState<string | null>(null);
   const [selections, setSelections] =
     useState<SchedulorSelection[]>(defaultSelections);
@@ -81,13 +84,10 @@ const Meeting = () => {
     setSelections(defaultSelections);
   };
 
-  const onUsernameChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
-  };
-
   const onSignInClicked = async () => {
     if (!username || !isUsernameValid) return;
     await signIn(username);
+    setIsSignInModalOpen(false);
   };
 
   const onSelectionsChanged = (newSelections: SchedulorSelection[]) => {
@@ -191,24 +191,27 @@ const Meeting = () => {
             <MeetingDetails />
             {isSignedIn && isUsernameValid && (
               <Stack sx={{ gap: 2 }}>
-                <Button color="error" onClick={onLeaveMeetingClicked}>
+                <CustomButton color="error" onClick={onLeaveMeetingClicked}>
                   Leave Meeting
-                </Button>
-                <Button color="warning" onClick={onSignOutClicked}>
+                </CustomButton>
+                <CustomButton color="warning" onClick={onSignOutClicked}>
                   Sign out
-                </Button>
+                </CustomButton>
               </Stack>
             )}
           </Stack>
           {!isSignedIn && (
             <>
-              <TextField
-                placeholder={'Username'}
-                onChange={onUsernameChanged}
-              />
-              <Button onClick={onSignInClicked} disabled={!isUsernameValid}>
+              <CustomButton onClick={() => setIsSignInModalOpen(true)}>
                 Sign In
-              </Button>
+              </CustomButton>
+              <SignInModal
+                isOpen={isSignInModalOpen}
+                onClose={() => setIsSignInModalOpen(false)}
+                onUsernameChanged={setUsername}
+                onSignInClicked={onSignInClicked}
+                isUsernameValid={isUsernameValid}
+              />
             </>
           )}
           {isSignedIn && !isExistingUser && (
@@ -222,7 +225,9 @@ const Meeting = () => {
                 maxTime={meeting.details.maxTime}
                 intervalSize={intervalSize}
               />
-              <Button onClick={onAddPreferencesClicked}>Add preferences</Button>
+              <CustomButton onClick={onAddPreferencesClicked}>
+                Add preferences
+              </CustomButton>
             </>
           )}
           {isSignedIn && isExistingUser && selections && (
@@ -236,12 +241,12 @@ const Meeting = () => {
                 maxTime={meeting.details.maxTime}
                 intervalSize={intervalSize}
               />
-              <Button
+              <CustomButton
                 onClick={onUpdatePreferencesClicked}
                 disabled={!haveSelectionsChanged}
               >
                 Update preferences
-              </Button>
+              </CustomButton>
             </>
           )}
           {meeting?.preferences &&

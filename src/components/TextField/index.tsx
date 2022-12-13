@@ -52,7 +52,7 @@ const textFieldPropsDefaultValues: TextFieldProps = {
   variant: 'sexy',
 };
 
-const TextField = ({
+const CustomTextField = ({
   variant = textFieldPropsDefaultValues.variant,
   sx,
   ...props
@@ -64,4 +64,4 @@ const TextField = ({
   );
 };
 
-export default TextField;
+export default CustomTextField;

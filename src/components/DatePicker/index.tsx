@@ -6,7 +6,7 @@ import colors from 'tailwindcss/colors';
 
 import { formatDateToFriendlyString } from '@/utils/date';
 
-import Button from '../Button';
+import CustomButton from '../Button';
 import Modal from '../Modal';
 
 export interface DatePickerProps {
@@ -35,9 +35,9 @@ const DatePicker = ({
 
   return (
     <>
-      <Button onClick={() => setIsModalOpen(true)}>
+      <CustomButton onClick={() => setIsModalOpen(true)}>
         {formatDateToFriendlyString(selected)}
-      </Button>
+      </CustomButton>
       <Modal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}

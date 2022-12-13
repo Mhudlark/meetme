@@ -4,7 +4,7 @@ import { Box, Modal } from '@mui/material';
 import type { ReactNode } from 'react';
 import colors from 'tailwindcss/colors';
 
-export interface ModalProps {
+export interface CustomModalProps {
   open: boolean;
   onClose: () => void;
   ariaLabelledBy?: string;
@@ -12,13 +12,13 @@ export interface ModalProps {
   children?: ReactNode;
 }
 
-const DatePicker = ({
+const CustomModal = ({
   open,
   onClose,
   ariaLabelledBy,
   ariaDescribedBy,
   children,
-}: ModalProps) => {
+}: CustomModalProps) => {
   return (
     <Modal
       open={open}
@@ -47,4 +47,4 @@ const DatePicker = ({
   );
 };
 
-export default DatePicker;
+export default CustomModal;

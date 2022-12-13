@@ -19,7 +19,7 @@ const getButtonClassName = (
       ${baseButtonClassName}
       bg-gray-300
       text-gray-600
-      border border-gray-300
+      border-2 border-gray-300
       cursor-auto
     `;
   }
@@ -77,7 +77,7 @@ const buttonPropsDefaultValues: ButtonProps = {
   isLoading: false,
 };
 
-const Button = ({
+const CustomButton = ({
   color = buttonPropsDefaultValues.color,
   disabled,
   isLoading,
@@ -114,4 +114,4 @@ const Button = ({
   );
 };
 
-export default Button;
+export default CustomButton;

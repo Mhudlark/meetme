@@ -3,11 +3,11 @@ import { addDays } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useContext, useMemo, useState } from 'react';
 
-import Button from '@/components/Button';
+import CustomButton from '@/components/Button';
 import DatePicker from '@/components/DatePicker';
 import FormFieldStack from '@/components/Styled/formFieldStack';
-import TextArea from '@/components/TextArea';
-import TextField from '@/components/TextField';
+import CustomTextArea from '@/components/TextArea';
+import CustomTextField from '@/components/TextField';
 import TimePicker from '@/components/TimePicker';
 import { DbContext } from '@/context/dbContext';
 import type { MeetingDetails } from '@/types/meeting';
@@ -81,13 +81,13 @@ const Index = () => {
       }}
     >
       <FormFieldStack label={'Meeting name'}>
-        <TextField
+        <CustomTextField
           placeholder={`Jane's meeting...`}
           onChange={onMeetingNameChange}
         />
       </FormFieldStack>
       <FormFieldStack label={'Meeting description'}>
-        <TextArea
+        <CustomTextArea
           placeholder={'Description...'}
           onChange={(e) => setDescription(e.target.value)}
         />
@@ -120,14 +120,14 @@ const Index = () => {
           />
         </FormFieldStack>
       </Stack>
-      <Button
+      <CustomButton
         onClick={onCreateEventClicked}
         disabled={!isMeetingNameValid}
         isLoading={isCreateEventLoading}
         sx={{ width: 'fit-content' }}
       >
         Create Event
-      </Button>
+      </CustomButton>
     </Stack>
   );
 };
