@@ -4,6 +4,8 @@ import { Box, Modal } from '@mui/material';
 import type { ReactNode } from 'react';
 import colors from 'tailwindcss/colors';
 
+import { customColors } from '@/styles/colors';
+
 export interface CustomModalProps {
   open: boolean;
   onClose: () => void;
@@ -33,7 +35,7 @@ const CustomModal = ({
           left: '50%',
           transform: 'translate(-50%, -50%)',
           width: 'min(90vw, 400px)',
-          backgroundColor: colors.gray[50],
+          backgroundColor: customColors.roseGray[50],
           boxShadow: 24,
           p: 4,
           borderRadius: 1.5,
