@@ -5,6 +5,7 @@ import { useContext, useMemo, useState } from 'react';
 
 import Button from '@/components/Button';
 import DatePicker from '@/components/DatePicker';
+import FormFieldStack from '@/components/Styled/formFieldStack';
 import TextArea from '@/components/TextArea';
 import TextField from '@/components/TextField';
 import TimePicker from '@/components/TimePicker';
@@ -76,7 +77,12 @@ const Index = () => {
         height: '100%',
       }}
     >
-      <TextField placeholder={'Meeting name'} onChange={onMeetingNameChange} />
+      <FormFieldStack label={'Meeting name'}>
+        <TextField
+          placeholder={`Jane's meeting...`}
+          onChange={onMeetingNameChange}
+        />
+      </FormFieldStack>
       <TextArea
         placeholder={'Description...'}
         onChange={(e) => setDescription(e.target.value)}
