@@ -1,9 +1,8 @@
-import { Stack } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 
 import CustomButton from '@/components/Button';
 
 import CustomModal from '../Modal';
-import FormFieldStack from '../Styled/formFieldStack';
 import CustomTextField from '../TextField';
 
 export interface SignInModalProps {
@@ -23,15 +22,14 @@ const SignInModal = ({
 }: SignInModalProps) => {
   return (
     <CustomModal open={isOpen} onClose={onClose} ariaLabelledBy="Sign in modal">
-      <Stack sx={{ gap: 2 }}>
-        <FormFieldStack label="Username">
-          <CustomTextField
-            placeholder={'Enter your username...'}
-            onChange={(e) => onUsernameChanged(e.target.value)}
-          />
-        </FormFieldStack>
+      <Stack sx={{ gap: 4, alignItems: 'center' }}>
+        <Typography variant="h2">Join the meeting</Typography>
+        <CustomTextField
+          placeholder={'Enter your username...'}
+          onChange={(e) => onUsernameChanged(e.target.value)}
+        />
         <CustomButton onClick={onSignInClicked} disabled={!isUsernameValid}>
-          Sign In
+          Join
         </CustomButton>
       </Stack>
     </CustomModal>
