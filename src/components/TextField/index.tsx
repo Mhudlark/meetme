@@ -3,6 +3,10 @@ import type { CSSProperties, InputHTMLAttributes } from 'react';
 const baseTextFieldClassName = `
   form-input
   w-full
+  transition duration-200 ease-in-out
+  ease-in-out
+  m-0
+  focus:outline-none
 `;
 
 const getTextFieldClassName = (variant: 'standard' | 'sexy' | undefined) => {
@@ -14,14 +18,11 @@ const getTextFieldClassName = (variant: 'standard' | 'sexy' | undefined) => {
         py-1.5
         text-base
         font-normal
-        text-gray-700
-        bg-white bg-clip-padding
-        border border-solid border-gray-300
+        text-gray-700 hover:text-gray-900 focus:text-gray-900
+        bg-white bg-clip-padding hover:bg-gray-50 focus:bg-gray-100
+        border border-solid 
+        border-gray-300 hover:border-gray-700 focus:border-gray-900
         rounded
-        transition duration-300 ease-in-out
-        ease-in-out
-        m-0
-        focus:text-gray-900 focus:bg-gray-100 focus:border-gray-900 focus:outline-none
       `;
     case 'sexy':
       return `
@@ -31,14 +32,11 @@ const getTextFieldClassName = (variant: 'standard' | 'sexy' | undefined) => {
         text-base
         font-body
         font-medium
-        text-gray-900
-        bg-transparent bg-clip-padding
-        border-2 border-solid border-gray-700
-        rounded-lg
-        transition duration-200 ease-in-out
-        ease-in-out
-        m-0
-        focus:text-black focus:bg-white focus:border-black focus:outline-none
+        text-gray-900 hover:text-black focus:text-black
+        bg-transparent bg-clip-padding hover:bg-gray-100 focus:bg-white
+        border-2 border-solid 
+        border-gray-700 focus:border-black
+        rounded-lg        
       `;
     default:
       return '';

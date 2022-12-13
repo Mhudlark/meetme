@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, CSSProperties } from 'react';
 const baseButtonClassName = `
   w-fit
   py-2 px-4
-  rounded-full  
+  rounded-md 
   font-bold
   cursor-pointer
   transition duration-300 ease-in-out
@@ -27,9 +27,10 @@ const getButtonClassName = (
     case 'primary':
       return `
       ${baseButtonClassName}
-      bg-gray-900 hover:bg-gray-100 
-      text-gray-100 hover:text-gray-900
-      border border-transparent hover:border-gray-900
+      bg-gray-900 hover:bg-white focus:bg-white
+      text-white hover:text-gray-900 focus:text-black
+      border-2 
+      border-transparent hover:border-gray-900 focus:border-black
       `;
     case 'secondary':
       return `

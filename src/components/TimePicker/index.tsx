@@ -1,4 +1,5 @@
 import Select from 'react-select';
+import colors from 'tailwindcss/colors';
 
 import { getTimeRange, Time24 } from '@/types/time24';
 
@@ -46,9 +47,10 @@ const TimePicker = ({
       styles={{
         control: (baseStyles, state) => ({
           ...baseStyles,
-          backgroundColor: state.isFocused ? '#f9fafb' : 'transparent',
+          backgroundColor: state.isFocused ? colors.gray[50] : 'transparent',
           borderColor: state.isFocused ? 'black' : '#374151',
           outline: state.isFocused ? 'none' : 'none',
+          borderWidth: '2px',
         }),
         option: (baseStyles) => ({
           ...baseStyles,
