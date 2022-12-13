@@ -83,29 +83,39 @@ const Index = () => {
           onChange={onMeetingNameChange}
         />
       </FormFieldStack>
-      <TextArea
-        placeholder={'Description...'}
-        onChange={(e) => setDescription(e.target.value)}
-      />
+      <FormFieldStack label={'Meeting description'}>
+        <TextArea
+          placeholder={'Description...'}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </FormFieldStack>
       <Stack sx={{ gap: 1.5 }}>
-        <DatePicker
-          onChange={(newDate) => setStartDate(newDate)}
-          defaultValue={formIntialValues.startDate}
-        />
-        <DatePicker
-          onChange={(newDate) => setEndDate(newDate)}
-          defaultValue={formIntialValues.endDate}
-        />
+        <FormFieldStack label={'Meeting start date'}>
+          <DatePicker
+            onChange={(newDate) => setStartDate(newDate)}
+            defaultValue={formIntialValues.startDate}
+          />
+        </FormFieldStack>
+        <FormFieldStack label={'Meeting end date'}>
+          <DatePicker
+            onChange={(newDate) => setEndDate(newDate)}
+            defaultValue={formIntialValues.endDate}
+          />
+        </FormFieldStack>
       </Stack>
       <Stack sx={{ gap: 1.5 }}>
-        <TimePicker
-          onChange={(newTime) => setMinTime(newTime)}
-          defaultValue={formIntialValues.minTime}
-        />
-        <TimePicker
-          onChange={(newTime) => setMaxTime(newTime)}
-          defaultValue={formIntialValues.maxTime}
-        />
+        <FormFieldStack label={'Meeting earliest time'}>
+          <TimePicker
+            onChange={(newTime) => setMinTime(newTime)}
+            defaultValue={formIntialValues.minTime}
+          />
+        </FormFieldStack>
+        <FormFieldStack label={'Meeting latest time'}>
+          <TimePicker
+            onChange={(newTime) => setMaxTime(newTime)}
+            defaultValue={formIntialValues.maxTime}
+          />
+        </FormFieldStack>
       </Stack>
       <Button
         onClick={onCreateEventClicked}

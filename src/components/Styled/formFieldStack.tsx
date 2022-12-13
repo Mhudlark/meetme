@@ -11,8 +11,12 @@ const FormFieldStack = ({ label, sx, children }: FormFieldStackProps) => {
   return (
     <>
       {(label || children) && (
-        <Stack sx={sx}>
-          {label && <Typography variant="h6">{label}</Typography>}
+        <Stack sx={{ gap: 0.6, ...sx }}>
+          {label && (
+            <Typography variant="h4" sx={{ pl: 0.5 }}>
+              {label}
+            </Typography>
+          )}
           {children}
         </Stack>
       )}

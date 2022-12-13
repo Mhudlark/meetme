@@ -1,5 +1,6 @@
 import '../styles/global.css';
 
+import { ThemeProvider } from '@emotion/react';
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import type { NextPage } from 'next';
@@ -10,6 +11,7 @@ import { useState } from 'react';
 import UIAlertProvider from '@/context/Alert/alertContext';
 import DbProvider from '@/context/dbContext';
 import App from '@/layouts/App';
+import theme from '@/styles/theme';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -28,7 +30,9 @@ const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
     <SessionContextProvider supabaseClient={supabaseClient}>
       <UIAlertProvider>
         <DbProvider>
-          <App>{getLayout(<Component {...pageProps} />)}</App>
+          <ThemeProvider theme={theme}>
+            <App>{getLayout(<Component {...pageProps} />)}</App>
+          </ThemeProvider>
         </DbProvider>
       </UIAlertProvider>
     </SessionContextProvider>

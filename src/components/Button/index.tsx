@@ -17,7 +17,7 @@ const getButtonClassName = (
     return ` 
       ${baseButtonClassName}
       bg-gray-300
-      text-gray-700
+      text-gray-600
       border border-gray-300
       cursor-auto
     `;
