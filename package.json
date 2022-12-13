@@ -12,13 +12,14 @@
     "lint": "next lint",
     "check-types": "tsc --noEmit --pretty && tsc --project cypress --noEmit --pretty",
     "test": "jest",
-    "eval": "yarn lint && yarn check-types && yarn test",
+    "eval": "yarn lint && yarn echo-br && yarn check-types && yarn echo-br && yarn test",
     "commit": "cz",
     "cypress": "cypress open",
     "cypress:headless": "cypress run",
     "e2e": "start-server-and-test dev http://localhost:3000 cypress",
     "e2e:headless": "start-server-and-test dev http://localhost:3000 cypress:headless",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "echo-br": ": ----------------------------------------------------------------------------"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
