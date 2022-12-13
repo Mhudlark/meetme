@@ -1,10 +1,11 @@
-import { CircularProgress, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { addDays, differenceInCalendarDays } from 'date-fns';
 import { range } from 'lodash';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
 import CustomButton from '@/components/Button';
+import LoadingScreen from '@/components/Meeting/loadingScreen';
 import MeetingDetails from '@/components/Meeting/meetingDetails';
 import PreferenceOverlapPreview from '@/components/Meeting/overlapPreview';
 import SignInModal from '@/components/Meeting/signInModal';
@@ -267,7 +268,7 @@ const Meeting = () => {
             )}
         </>
       ) : (
-        <CircularProgress />
+        <LoadingScreen />
       )}
     </Stack>
   );
