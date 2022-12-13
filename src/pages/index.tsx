@@ -83,12 +83,10 @@ const Index = () => {
       />
       <Stack sx={{ gap: 1.5 }}>
         <DatePicker
-          label="Start date"
           onChange={(newDate) => setStartDate(newDate)}
           defaultValue={formIntialValues.startDate}
         />
         <DatePicker
-          label="End date"
           onChange={(newDate) => setEndDate(newDate)}
           defaultValue={formIntialValues.endDate}
         />
