@@ -13,9 +13,15 @@ const theme = responsiveFontSizes(
         margin: 0,
         fontWeight: 500,
       },
+      h2: {
+        fontSize: '38px',
+        lineHeight: 44 / 38,
+        margin: 0,
+        fontWeight: 600,
+      },
       h3: {
-        fontSize: '18px',
-        lineHeight: 28 / 18,
+        fontSize: '24px',
+        lineHeight: 30 / 24,
         margin: 0,
         fontWeight: 500,
       },

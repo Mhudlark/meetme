@@ -3,11 +3,8 @@ import { useContext } from 'react';
 
 import CustomButton from '@/components/Button';
 import { DbContext } from '@/context/dbContext';
-import { useWindowUrl } from '@/utils/hooks';
 
 const MeetingDetails = () => {
-  const windowUrl = useWindowUrl();
-
   const { meeting, user } = useContext(DbContext);
 
   const copyLinkToClipboard = () => {
@@ -15,18 +12,12 @@ const MeetingDetails = () => {
   };
 
   return (
-    <Stack sx={{ gap: 1 }}>
-      <Typography variant="h3">{meeting?.details.name}</Typography>
+    <Stack sx={{ gap: 2 }}>
+      <Typography variant="h2">{meeting?.details.name}</Typography>
       {/* {isSignedIn && <Typography variant="h6">{username}</Typography>} */}
       <CustomButton onClick={copyLinkToClipboard}>
-        Copy link to share this with meet with others
+        Copy meeting link
       </CustomButton>
-      <Stack sx={{ gap: 0.5 }}>
-        <Typography variant="caption">
-          {'Or, share this link with others:'}
-        </Typography>
-        <Typography variant="caption">{windowUrl}</Typography>
-      </Stack>
       <Stack sx={{ flexDirection: 'row', flexWrap: 'wrap', gap: 0.5 }}>
         {meeting?.users
           ?.filter((meetingUser) => meetingUser.username !== user?.username)

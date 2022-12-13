@@ -11,7 +11,7 @@ export interface PreferenceOverlapPreviewProps {
   preferencesOverlap: Overlap | null;
 }
 
-export default function PreferencesOverlapPreview({
+export default function PreferenceOverlapPreview({
   preferencesOverlap,
 }: PreferenceOverlapPreviewProps) {
   return (

@@ -6,8 +6,8 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 
 import CustomButton from '@/components/Button';
 import MeetingDetails from '@/components/Meeting/meetingDetails';
+import PreferenceOverlapPreview from '@/components/Meeting/overlapPreview';
 import SignInModal from '@/components/Meeting/signInModal';
-import PreferencesOverlapPreview from '@/components/PreferenceOverlapPreview';
 import LineSchedulor from '@/components/Schedulor/LineSchedulor';
 import { DbContext } from '@/context/dbContext';
 import type { SchedulorSelection } from '@/sharedTypes';
@@ -260,7 +260,7 @@ const Meeting = () => {
                   Preferences
                 </Typography>
 
-                <PreferencesOverlapPreview
+                <PreferenceOverlapPreview
                   preferencesOverlap={preferencesOverlap}
                 />
               </Stack>
