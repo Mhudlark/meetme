@@ -87,7 +87,7 @@ export default function PreferenceOverlapPreview({
   }, [filteredUsers, preferencesOverlap]);
 
   return (
-    <Stack sx={{ gap: 2 }}>
+    <Stack sx={{ gap: 2, width: '100%', height: '100%' }}>
       <Typography variant="h3">{`Everyone's preferences`}</Typography>
       <Stack sx={{ flexDirection: 'row', gap: 1 }}>
         {filteredUsers.map((filteredUser) => (
@@ -98,7 +98,15 @@ export default function PreferenceOverlapPreview({
           />
         ))}
       </Stack>
-      <Stack sx={{ borderRadius: 2, gap: 2 }}>
+      <Stack
+        sx={{
+          borderRadius: 2,
+          gap: 2,
+          width: '100%',
+          height: '100%',
+          overflow: 'auto',
+        }}
+      >
         {filteredPreferencesOverlap?.map((row, rowIndex) => (
           <Stack key={rowIndex}>
             {row?.[0]?.start && (

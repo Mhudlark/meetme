@@ -2,6 +2,7 @@ import {
   addDays,
   differenceInCalendarDays,
   format,
+  isDate,
   setHours,
   setMinutes,
 } from 'date-fns';
@@ -37,6 +38,7 @@ export const getDateRange = (
 };
 
 export const formatDateToFriendlyString = (date: Date): string => {
+  if (!isDate(date)) throw new Error(`Invalid date: ${date}`);
   return format(date, 'EEEE do MMM, yyyy');
 };
 

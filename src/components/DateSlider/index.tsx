@@ -65,13 +65,19 @@ export default function DateSlider({
   };
 
   return (
-    <RangeSlider
-      minRange={0}
-      marks={marks}
-      value={sliderValue}
-      onChange={handleChange}
-      ariaLabel={`${formatDateToFriendlyString(value[0] as Date)} range slider`}
-      ariaValueFormat={formatTimeValue}
-    />
+    <>
+      {value && value.length > 0 && (
+        <RangeSlider
+          minRange={0}
+          marks={marks}
+          value={sliderValue}
+          onChange={handleChange}
+          ariaLabel={`${formatDateToFriendlyString(
+            value[0] as Date
+          )} range slider`}
+          ariaValueFormat={formatTimeValue}
+        />
+      )}
+    </>
   );
 }
