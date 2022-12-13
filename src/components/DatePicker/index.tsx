@@ -26,9 +26,10 @@ const DatePicker = ({
   const [selected, setSelected] = useState<Date>(defaultValue as Date);
 
   const handleChange = (newDate?: Date) => {
-    if (!newDate) return;
-    setSelected(newDate);
-    onChange?.(newDate);
+    if (newDate) {
+      setSelected(newDate);
+      onChange?.(newDate);
+    }
     setIsModalOpen(false);
   };
 
