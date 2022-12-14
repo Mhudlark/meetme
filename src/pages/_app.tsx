@@ -28,13 +28,13 @@ const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
 
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
-      <UIAlertProvider>
-        <DbProvider>
-          <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
+        <UIAlertProvider>
+          <DbProvider>
             <App>{getLayout(<Component {...pageProps} />)}</App>
-          </ThemeProvider>
-        </DbProvider>
-      </UIAlertProvider>
+          </DbProvider>
+        </UIAlertProvider>
+      </ThemeProvider>
     </SessionContextProvider>
   );
 };

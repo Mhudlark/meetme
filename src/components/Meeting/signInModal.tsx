@@ -22,7 +22,24 @@ const SignInModal = ({
 }: SignInModalProps) => {
   return (
     <CustomModal open={isOpen} onClose={onClose} ariaLabelledBy="Sign in modal">
-      <Stack sx={{ gap: 4, alignItems: 'center' }}>
+      <Stack
+        sx={{
+          gap: 4,
+          alignItems: 'center',
+          py: {
+            xs: 2,
+            sm: 4,
+          },
+          px: {
+            xs: 1,
+            sm: 4,
+          },
+          width: {
+            xs: '320px',
+            sm: '400px',
+          },
+        }}
+      >
         <Typography variant="h2">Join the meeting</Typography>
         <CustomTextField
           placeholder={'Enter your username...'}
