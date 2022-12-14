@@ -1,8 +1,10 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { ContentCopy } from '@mui/icons-material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { isSameDay } from 'date-fns';
 import { useMemo } from 'react';
 
 import type { SchedulorSelection } from '@/sharedTypes';
+import { customColors } from '@/styles/colors';
 import { Time24 } from '@/types/time24';
 import {
   formatDateToFriendlyString,
@@ -10,7 +12,6 @@ import {
   setDateTimeWithTime24,
 } from '@/utils/date';
 
-import CustomButton from '../Button';
 import DateSlider from '../DateSlider';
 import CustomSwitch from '../Switch';
 
@@ -124,15 +125,36 @@ export default function LineSchedulor({
             <Typography variant="h6">
               {formatDateToFriendlyString(day)}
             </Typography>
-            {index !== 0 && (
-              <CustomButton onClick={() => copyPreviousDaySelection(day)}>
-                Copy previous day
-              </CustomButton>
-            )}
-            <CustomSwitch
-              isChecked={isDateSelected?.[index] ?? false}
-              onChange={(checked) => handleToggleChange(day, checked)}
-            />
+            <Stack
+              sx={{
+                flexDirection: 'row',
+                gap: 2,
+              }}
+            >
+              {index !== 0 && (
+                <Button
+                  variant="text"
+                  onClick={() => copyPreviousDaySelection(day)}
+                  endIcon={<ContentCopy />}
+                  sx={{
+                    color: customColors.gray[600],
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    '&:hover': {
+                      backgroundColor: `${customColors.gray[200]}66`,
+                      color: customColors.gray[900],
+                    },
+                  }}
+                >
+                  Copy previous day
+                </Button>
+              )}
+              <CustomSwitch
+                isChecked={isDateSelected?.[index] ?? false}
+                onChange={(checked) => handleToggleChange(day, checked)}
+              />
+            </Stack>
           </Stack>
           <Box
             sx={{
