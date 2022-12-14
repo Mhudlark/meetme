@@ -125,7 +125,7 @@ export default function PreferenceOverlapPreview({
                 <CustomTooltip
                   key={`${rowIndex}-${intervalIndex}`}
                   title={interval.availability.users
-                    .map((user) => user.userId)
+                    .map((user) => user.username)
                     .join(', ')}
                   placement="top"
                 >
@@ -137,6 +137,7 @@ export default function PreferenceOverlapPreview({
                       p: 1,
                       flexGrow: 1,
                       borderRadius: '4px',
+                      userSelect: 'none',
                     }}
                   >
                     {new Time24(interval.start).toString()}
