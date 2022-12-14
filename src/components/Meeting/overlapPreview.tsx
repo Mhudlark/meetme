@@ -9,7 +9,7 @@ import type { Overlap } from '@/utils/preferences';
 import { getOverlapColour } from '@/utils/preferences';
 
 import CustomTooltip from '../Tooltip';
-import FilteredUserToggle from './filteredUser';
+import FilteredUserToggle from './filteredUserToggle';
 
 export type FilteredUser = User & {
   included: boolean;
