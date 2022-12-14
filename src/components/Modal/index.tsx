@@ -35,10 +35,11 @@ const CustomModal = ({
           left: '50%',
           transform: 'translate(-50%, -50%)',
           width: {
-            xs: 'min(92vw, 400px)',
-            sm: 'min(92vw, 540px)',
-            md: 'min(92vw, 720px)',
+            xs: 'min(fit-content, 400px)',
+            sm: 'min(fit-content, 540px)',
+            md: 'min(fit-content, 720px)',
           },
+          maxWidth: '92vw',
           height: {
             xs: 'min(fit-content, 600px)',
             md: 'min(fit-content, 800px)',
@@ -46,7 +47,7 @@ const CustomModal = ({
           },
           maxHeight: '90vh',
           overflow: 'auto',
-          backgroundColor: customColors.background.DEFAULT,
+          backgroundColor: customColors.gray[50],
           boxShadow: 24,
           p: 4,
           borderRadius: 1.5,

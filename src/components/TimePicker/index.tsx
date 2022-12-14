@@ -1,6 +1,6 @@
 import Select from 'react-select';
-import colors from 'tailwindcss/colors';
 
+import { customColors } from '@/styles/colors';
 import { getTimeRange, Time24 } from '@/types/time24';
 
 interface TimeOption {
@@ -48,23 +48,31 @@ const TimePicker = ({
       styles={{
         control: (baseStyles, state) => ({
           ...baseStyles,
-          backgroundColor: state.isFocused ? colors.white : colors.zinc[50],
-          borderColor: state.isFocused ? 'black' : colors.gray[700],
+          backgroundColor: state.isFocused
+            ? customColors.white
+            : customColors.zinc[50],
+          borderColor: state.isFocused ? 'black' : customColors.gray[700],
           boxShadow: 'none',
-          outline: state.isFocused ? `2px solid ${colors.gray[900]}` : 'none',
+          outline: state.isFocused
+            ? `2px solid ${customColors.gray[900]}`
+            : 'none',
           outlineOffset: '3px',
           borderWidth: '2px',
           '&:hover': {
-            borderColor: colors.gray[700],
-            backgroundColor: colors.gray[200],
+            borderColor: customColors.gray[700],
+            backgroundColor: customColors.gray[200],
           },
         }),
         option: (baseStyles, state) => ({
           ...baseStyles,
           fontFamily: 'Roboto',
           fontWeight: '400',
-          backgroundColor: state.isFocused ? colors.slate[200] : colors.white,
-          color: state.isFocused ? colors.gray[900] : colors.gray[900],
+          backgroundColor: state.isFocused
+            ? customColors.slate[200]
+            : customColors.white,
+          color: state.isFocused
+            ? customColors.gray[900]
+            : customColors.gray[900],
         }),
         singleValue: (baseStyles) => ({
           ...baseStyles,
