@@ -67,6 +67,10 @@ export class Time24 {
     }
   }
 
+  public equals(time: Time24): boolean {
+    return this.value === time.value;
+  }
+
   public valueOf(): number {
     return this.value;
   }

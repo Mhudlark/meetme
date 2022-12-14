@@ -1,10 +1,18 @@
 import { Box, Stack, Typography } from '@mui/material';
+import { isSameDay } from 'date-fns';
 import { useMemo } from 'react';
 
 import type { SchedulorSelection } from '@/sharedTypes';
-import { formatDateToFriendlyString, getDateRange } from '@/utils/date';
+import { Time24 } from '@/types/time24';
+import {
+  formatDateToFriendlyString,
+  getDateRange,
+  setDateTimeWithTime24,
+} from '@/utils/date';
 
+import CustomButton from '../Button';
 import DateSlider from '../DateSlider';
+import CustomSwitch from '../Switch';
 
 export interface LineSchedulorProps {
   selections: SchedulorSelection[];
@@ -30,6 +38,31 @@ export default function LineSchedulor({
     [startDate, endDate]
   );
 
+  const handleToggleChange = (day: Date, checked: boolean) => {
+    const newSelections = selections.map((selection) => {
+      if (selection.startDate.getDate() === day.getDate()) {
+        const newStartDate = setDateTimeWithTime24(
+          selection.startDate,
+          new Time24(minTime)
+        );
+        const newEndDate = setDateTimeWithTime24(
+          selection.endDate,
+          checked ? new Time24(maxTime) : new Time24(minTime)
+        );
+
+        const newSelection: SchedulorSelection = {
+          startDate: newStartDate,
+          endDate: newEndDate,
+        };
+        return newSelection;
+      }
+
+      return selection;
+    });
+
+    onChange(newSelections);
+  };
+
   const handleChange = (day: Date, newDates: Date[]) => {
     const newSelections = selections.map((selection) => {
       if (selection.startDate.getDate() === day.getDate()) {
@@ -46,13 +79,61 @@ export default function LineSchedulor({
     onChange(newSelections);
   };
 
+  const copyPreviousDaySelection = (day: Date) => {
+    const newSelections = selections.map((selection, index) => {
+      if (index > 0 && isSameDay(selection.startDate, day)) {
+        const previousSelection = selections[index - 1] as SchedulorSelection;
+        const newSelection: SchedulorSelection = {
+          startDate: setDateTimeWithTime24(
+            selection.startDate,
+            new Time24(previousSelection.startDate)
+          ),
+          endDate: setDateTimeWithTime24(
+            selection.endDate,
+            new Time24(previousSelection.endDate)
+          ),
+        };
+        return newSelection;
+      }
+      return selection;
+    });
+
+    onChange(newSelections);
+  };
+
+  const isDateSelected = useMemo(() => {
+    return selections.map((selection) => {
+      const startTime = new Time24(selection.startDate);
+      const endTime = new Time24(selection.endDate);
+      return !startTime.equals(endTime);
+    });
+  }, [selections]);
+
   return (
     <Stack sx={{ gap: 3 }}>
       {days.map((day, index) => (
         <Stack key={day.toISOString()} sx={{ gap: 1 }}>
-          <Typography variant="h6">
-            {formatDateToFriendlyString(day)}
-          </Typography>
+          <Stack
+            sx={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 1,
+            }}
+          >
+            <Typography variant="h6">
+              {formatDateToFriendlyString(day)}
+            </Typography>
+            {index !== 0 && (
+              <CustomButton onClick={() => copyPreviousDaySelection(day)}>
+                Copy previous day
+              </CustomButton>
+            )}
+            <CustomSwitch
+              isChecked={isDateSelected?.[index] ?? false}
+              onChange={(checked) => handleToggleChange(day, checked)}
+            />
+          </Stack>
           <Box
             sx={{
               p: 0.5,

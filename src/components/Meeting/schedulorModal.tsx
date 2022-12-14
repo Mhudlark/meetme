@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import type { SchedulorSelection } from '@/sharedTypes';
@@ -61,12 +61,12 @@ const SchedulorModal = ({
       onClose={onClose}
       ariaLabelledBy="Schedulor in modal"
       sx={{
-        maxWidth: { xs: '94vw', md: '740px' },
+        maxWidth: { xs: '94vw', sm: 'min(740px, 94vw)' },
       }}
     >
       <Stack
         sx={{
-          gap: 2,
+          gap: 4,
           py: {
             xs: 2,
             sm: 4,
@@ -76,11 +76,12 @@ const SchedulorModal = ({
             sm: 2,
           },
           width: {
-            xs: '92vw',
-            md: 'min(720px, 92vw)',
+            xs: '84vw',
+            sm: 'min(680px, 84vw)',
           },
         }}
       >
+        <Typography variant="h2">Pick your preferences</Typography>
         <LineSchedulor
           selections={localSelections}
           onChange={onSelectionsChanged}
