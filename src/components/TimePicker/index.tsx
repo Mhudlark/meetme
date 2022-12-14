@@ -42,7 +42,7 @@ const TimePicker = ({
       defaultValue={timeOptions.find(
         (time) => time.value === defaultValue?.valueOf()
       )}
-      isSearchable={true}
+      isSearchable={false}
       name="time"
       options={timeOptions}
       styles={{
