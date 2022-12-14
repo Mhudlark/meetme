@@ -1,7 +1,8 @@
 import 'react-day-picker/dist/style.css';
 
+import type { SxProps, Theme } from '@mui/material';
 import { Box, Modal } from '@mui/material';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import colors from 'tailwindcss/colors';
 
 import { customColors } from '@/styles/colors';
@@ -12,6 +13,7 @@ export interface CustomModalProps {
   ariaLabelledBy?: string;
   ariaDescribedBy?: string;
   children?: ReactNode;
+  sx?: SxProps<Theme> | CSSProperties;
 }
 
 const CustomModal = ({
@@ -20,6 +22,7 @@ const CustomModal = ({
   ariaLabelledBy,
   ariaDescribedBy,
   children,
+  sx,
 }: CustomModalProps) => {
   return (
     <Modal
@@ -56,6 +59,7 @@ const CustomModal = ({
           borderRadius: 1.5,
           border: '2px solid',
           borderColor: colors.gray[900],
+          ...sx,
         }}
       >
         {children}

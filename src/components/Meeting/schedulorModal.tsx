@@ -60,8 +60,27 @@ const SchedulorModal = ({
       open={isOpen}
       onClose={onClose}
       ariaLabelledBy="Schedulor in modal"
+      sx={{
+        maxWidth: { xs: '94vw', md: '740px' },
+      }}
     >
-      <Stack sx={{ gap: 2 }}>
+      <Stack
+        sx={{
+          gap: 2,
+          py: {
+            xs: 2,
+            sm: 4,
+          },
+          px: {
+            xs: 1,
+            sm: 2,
+          },
+          width: {
+            xs: '92vw',
+            md: 'min(720px, 92vw)',
+          },
+        }}
+      >
         <LineSchedulor
           selections={localSelections}
           onChange={onSelectionsChanged}
