@@ -28,6 +28,7 @@
     "@fontsource/poppins": "^4.5.10",
     "@fontsource/roboto": "^4.5.8",
     "@fontsource/rubik": "^4.5.11",
+    "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.10.13",
     "@supabase/auth-helpers-nextjs": "^0.5.2",
     "@supabase/auth-helpers-react": "^0.3.1",
