@@ -8,7 +8,7 @@ const baseButtonClassName = `
   font-bold
   cursor-pointer
   transition duration-300 ease-in-out
-  outline-offset-4
+  focus:outline-offset-4
   focus:outline-gray-900
 `;
 

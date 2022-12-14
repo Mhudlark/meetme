@@ -46,7 +46,7 @@ const CustomModal = ({
           },
           maxHeight: '90vh',
           overflow: 'auto',
-          backgroundColor: customColors.roseGray[50],
+          backgroundColor: customColors.background.DEFAULT,
           boxShadow: 24,
           p: 4,
           borderRadius: 1.5,

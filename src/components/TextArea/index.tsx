@@ -34,8 +34,9 @@ const getTextAreaClassName = (variant: 'standard' | 'sexy' | undefined) => {
         text-base
         font-body
         font-medium
+        placeholder-gray-600
         text-gray-900 hover:text-black focus:text-black
-        bg-transparent hover:bg-gray-100 focus:bg-white
+        bg-zinc-50 hover:bg-gray-200 focus:bg-white
         bg-clip-padding
         border-2 border-solid
         border-gray-700 focus:border-black
@@ -43,7 +44,7 @@ const getTextAreaClassName = (variant: 'standard' | 'sexy' | undefined) => {
         transition duration-200 ease-in-out
         ease-in-out
         m-0
-        focus:outline-none
+        focus:outline-2 focus:outline-gray-900 focus:outline-offset-4
       `;
     default:
       return '';

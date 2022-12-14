@@ -37,6 +37,7 @@ const TimePicker = ({
 
   return (
     <Select
+      id="time-picker-select"
       classNamePrefix="select"
       defaultValue={timeOptions.find(
         (time) => time.value === defaultValue?.valueOf()
@@ -47,15 +48,23 @@ const TimePicker = ({
       styles={{
         control: (baseStyles, state) => ({
           ...baseStyles,
-          backgroundColor: state.isFocused ? colors.gray[50] : 'transparent',
-          borderColor: state.isFocused ? 'black' : '#374151',
-          outline: state.isFocused ? 'none' : 'none',
+          backgroundColor: state.isFocused ? colors.white : colors.zinc[50],
+          borderColor: state.isFocused ? 'black' : colors.gray[700],
+          boxShadow: 'none',
+          outline: state.isFocused ? `2px solid ${colors.gray[900]}` : 'none',
+          outlineOffset: '3px',
           borderWidth: '2px',
+          '&:hover': {
+            borderColor: colors.gray[700],
+            backgroundColor: colors.gray[200],
+          },
         }),
-        option: (baseStyles) => ({
+        option: (baseStyles, state) => ({
           ...baseStyles,
           fontFamily: 'Roboto',
           fontWeight: '400',
+          backgroundColor: state.isFocused ? colors.slate[200] : colors.white,
+          color: state.isFocused ? colors.gray[900] : colors.gray[900],
         }),
         singleValue: (baseStyles) => ({
           ...baseStyles,
