@@ -1,12 +1,15 @@
+import { AddCircle, CheckCircle } from '@mui/icons-material';
 import { useMemo } from 'react';
 
 import type { FilteredUser } from './overlapPreview';
 
 const baseFilteredUserToggleClassName = `
+  flex items-center gap-1.5
   w-fit
-  py-2 px-4
-  rounded-md 
+  py-1 pl-2 pr-2.5
+  rounded-full 
   font-bold
+  select-none
   cursor-pointer
   transition duration-300 ease-in-out
   outline-offset-4
@@ -17,18 +20,18 @@ const getFilteredUserToggleClassName = (selected: boolean) => {
   if (selected) {
     return ` 
       ${baseFilteredUserToggleClassName}
-      bg-gray-900 hover:bg-gray-400 focus:bg-gray-900
-      text-white hover:text-gray-900 focus:text-white
+      bg-gray-900 hover:bg-transparent
+      text-white hover:text-gray-900
       border-2 
-      border-gray-900 hover:border-gray-400
+      border-gray-900
     `;
   }
   return ` 
       ${baseFilteredUserToggleClassName}
-      bg-gray-300 hover:bg-gray-700 focus:bg-gray-300
-      text-gray-700 hover:text-white focus:text-gray-700
+      bg-transparent hover:bg-gray-900
+      text-gray-900 hover:text-white
       border-2 
-      border-gray-300 hover:border-gray-700 focus:border-gray-300
+      border-gray-900
     `;
 };
 
@@ -52,6 +55,7 @@ export default function FilteredUserToggle({
       className={className}
       onClick={() => toggleFilteredUser(filteredUser)}
     >
+      {filteredUser.included ? <CheckCircle /> : <AddCircle />}
       {filteredUser.username}
     </div>
   );
