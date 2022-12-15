@@ -71,6 +71,10 @@ export class Time24 {
     return new Time24(time);
   }
 
+  public static fromDate(time: Date): Time24 {
+    return new Time24(time);
+  }
+
   public equals(time: Time24): boolean {
     return this.value === time.value;
   }

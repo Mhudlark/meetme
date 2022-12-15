@@ -10,8 +10,6 @@ import { createPreferenceFromPreferenceSchema } from './preference';
 import type { User } from './user';
 import { createUserFromUserSchema } from './user';
 
-export const INTERVAL_SIZE = 1;
-
 export class Meeting {
   constructor(
     public id: string,

@@ -1,8 +1,11 @@
 import type { SchedulorSelectionRange } from '@/sharedTypes';
-import { formatDateToFriendlyString } from '@/utils/date';
+import { INTERVAL_SIZE } from '@/utils/constants';
+import {
+  formatDateToFriendlyString,
+  setDateTimeWithTime24,
+} from '@/utils/date';
 
-import type { Time24 } from './time24';
-import { getTimeRange } from './time24';
+import { getTimeRange, Time24 } from './time24';
 
 type IntervalsBinaryArr = { startTime: Time24; included: boolean }[];
 
@@ -238,9 +241,46 @@ export class SchedulorSelection {
     }
   }
 
+  public isEmpty(): boolean {
+    return this.selectionRanges.length === 0;
+  }
+
+  public getSelectionRangesStartTimes(): Time24[] {
+    return this.selectionRanges.map((range) => range.startTime);
+  }
+
+  public getMinSelectedTime(): Time24 | null {
+    if (this.isEmpty()) return null;
+
+    return this.selectionRanges?.[0]?.startTime as Time24;
+  }
+
+  public getMinSelectedDateTime(): Date | null {
+    const minSelectedTime = this.getMinSelectedTime();
+
+    if (!minSelectedTime) return null;
+
+    return setDateTimeWithTime24(this.date, minSelectedTime as Time24);
+  }
+
+  public getMaxSelectedTime(): Time24 | null {
+    if (this.isEmpty()) return null;
+
+    return this.selectionRanges?.[this.selectionRanges.length - 1]
+      ?.endTime as Time24;
+  }
+
+  public getMaxSelectedDateTime(): Date | null {
+    const maxSelectedTime = this.getMaxSelectedTime();
+
+    if (!maxSelectedTime) return null;
+
+    return setDateTimeWithTime24(this.date, maxSelectedTime as Time24);
+  }
+
   public addSelectionRange(startTime: Time24, endTime: Time24): void {
     // If no selection ranges exist, add the new range and return
-    if (this.selectionRanges.length === 0) {
+    if (this.isEmpty()) {
       this.selectionRanges.push({ startTime, endTime });
       return;
     }
@@ -258,7 +298,7 @@ export class SchedulorSelection {
 
   public removeSelectionRange(startTime: Time24, endTime: Time24): void {
     // If no selection ranges exist, just return
-    if (this.selectionRanges.length === 0) {
+    if (this.isEmpty()) {
       return;
     }
 
@@ -288,4 +328,52 @@ export class SchedulorSelection {
       ]),
     });
   }
+
+  public copy(): SchedulorSelection {
+    return new SchedulorSelection(
+      this.date,
+      [...this.selectionRanges],
+      this.intervalSize
+    );
+  }
+
+  public copyWithDate(date: Date): SchedulorSelection {
+    const newSelection = new SchedulorSelection(
+      this.date,
+      [...this.selectionRanges],
+      this.intervalSize
+    );
+    newSelection.date = date;
+    return newSelection;
+  }
+
+  public copyWithTimes(startTime: Time24, endTime: Time24): SchedulorSelection {
+    const newSelection = this.copy();
+    newSelection.selectionRanges = [{ startTime, endTime }];
+    return newSelection;
+  }
 }
+
+export const parseSelectionRanges = (
+  selectionRanges: string
+): SchedulorSelectionRange[] => {
+  const parsedSelectionRanges: any[] = JSON.parse(selectionRanges);
+
+  return parsedSelectionRanges.map((selectionRange: any) => ({
+    startTime: new Time24(selectionRange[0]),
+    endTime: new Time24(selectionRange[1]),
+  }));
+};
+
+export const parseSelection = (selection: {
+  date: string;
+  selectionRanges: string;
+}): SchedulorSelection => {
+  const parsedSelectionRanges = parseSelectionRanges(selection.selectionRanges);
+
+  return new SchedulorSelection(
+    new Date(selection.date),
+    parsedSelectionRanges,
+    INTERVAL_SIZE
+  );
+};

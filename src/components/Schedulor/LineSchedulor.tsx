@@ -3,8 +3,8 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import { isSameDay } from 'date-fns';
 import { useMemo } from 'react';
 
-import type { SchedulorSelection } from '@/sharedTypes';
 import { customColors } from '@/styles/colors';
+import type { SchedulorSelection } from '@/types/schedulorSelection';
 import { Time24 } from '@/types/time24';
 import {
   formatDateToFriendlyString,
@@ -41,21 +41,11 @@ export default function LineSchedulor({
 
   const handleToggleChange = (day: Date, checked: boolean) => {
     const newSelections = selections.map((selection) => {
-      if (selection.startDate.getDate() === day.getDate()) {
-        const newStartDate = setDateTimeWithTime24(
-          selection.startDate,
-          new Time24(minTime)
-        );
-        const newEndDate = setDateTimeWithTime24(
-          selection.endDate,
-          checked ? new Time24(maxTime) : new Time24(minTime)
-        );
+      if (selection.date.getDate() === day.getDate()) {
+        const newStartTime = new Time24(minTime);
+        const newEndTime = checked ? new Time24(maxTime) : new Time24(minTime);
 
-        const newSelection: SchedulorSelection = {
-          startDate: newStartDate,
-          endDate: newEndDate,
-        };
-        return newSelection;
+        return selection.copyWithTimes(newStartTime, newEndTime);
       }
 
       return selection;
@@ -66,12 +56,11 @@ export default function LineSchedulor({
 
   const handleChange = (day: Date, newDates: Date[]) => {
     const newSelections = selections.map((selection) => {
-      if (selection.startDate.getDate() === day.getDate()) {
-        const newSelection: SchedulorSelection = {
-          startDate: newDates[0] as Date,
-          endDate: newDates[1] as Date,
-        };
-        return newSelection;
+      if (selection.date.getDate() === day.getDate()) {
+        return selection.copyWithTimes(
+          Time24.fromDate(newDates[0] as Date),
+          Time24.fromDate(newDates[1] as Date)
+        );
       }
 
       return selection;
@@ -82,19 +71,9 @@ export default function LineSchedulor({
 
   const copyPreviousDaySelection = (day: Date) => {
     const newSelections = selections.map((selection, index) => {
-      if (index > 0 && isSameDay(selection.startDate, day)) {
+      if (index > 0 && isSameDay(selection.date, day)) {
         const previousSelection = selections[index - 1] as SchedulorSelection;
-        const newSelection: SchedulorSelection = {
-          startDate: setDateTimeWithTime24(
-            selection.startDate,
-            new Time24(previousSelection.startDate)
-          ),
-          endDate: setDateTimeWithTime24(
-            selection.endDate,
-            new Time24(previousSelection.endDate)
-          ),
-        };
-        return newSelection;
+        return previousSelection.copyWithDate(selection.date);
       }
       return selection;
     });
@@ -104,9 +83,7 @@ export default function LineSchedulor({
 
   const isDateSelected = useMemo(() => {
     return selections.map((selection) => {
-      const startTime = new Time24(selection.startDate);
-      const endTime = new Time24(selection.endDate);
-      return !startTime.equals(endTime);
+      return !selection.isEmpty();
     });
   }, [selections]);
 
@@ -170,8 +147,10 @@ export default function LineSchedulor({
             >
               <DateSlider
                 value={[
-                  selections?.[index]?.startDate as Date,
-                  selections?.[index]?.endDate as Date,
+                  selections?.[index]?.getMinSelectedDateTime() ??
+                    setDateTimeWithTime24(day, new Time24(minTime)),
+                  selections?.[index]?.getMaxSelectedDateTime() ??
+                    setDateTimeWithTime24(day, new Time24(maxTime)),
                 ]}
                 onChange={(newTimes) => handleChange(day, newTimes)}
                 minTime={minTime}

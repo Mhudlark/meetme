@@ -1,9 +1,9 @@
 import { Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import type { SchedulorSelection } from '@/sharedTypes';
 import type { MeetingDetails } from '@/types/meeting';
-import { INTERVAL_SIZE } from '@/types/meeting';
+import type { SchedulorSelection } from '@/types/schedulorSelection';
+import { INTERVAL_SIZE } from '@/utils/constants';
 
 import CustomButton from '../Button';
 import CustomModal from '../Modal';

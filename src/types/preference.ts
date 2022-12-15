@@ -1,5 +1,7 @@
 import type { PreferenceSchema } from '@/backend/db/database/schemas/types';
-import type { SchedulorSelection } from '@/sharedTypes';
+
+import type { SchedulorSelection } from './schedulorSelection';
+import { parseSelection } from './schedulorSelection';
 
 export class Preference {
   constructor(
@@ -22,16 +24,6 @@ export class Preference {
     );
   }
 }
-
-export const parseSelection = (selection: {
-  startDate: string;
-  endDate: string;
-}): SchedulorSelection => {
-  return {
-    startDate: new Date(selection.startDate),
-    endDate: new Date(selection.endDate),
-  };
-};
 
 export const parseSelectionsString = (
   selections: string

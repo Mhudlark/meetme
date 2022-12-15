@@ -1,4 +1,4 @@
-import type { SchedulorSelection } from '@/sharedTypes';
+import type { SchedulorSelection } from '@/types/schedulorSelection';
 import { getArrElement } from '@/utils/array';
 
 import { dbConfig } from '../../dbConfig';

@@ -16,7 +16,6 @@ import {
   deleteUserFromDB,
 } from '@/backend/db/database/user/delete';
 import { insertUserIntoDB } from '@/backend/db/database/user/insert';
-import type { SchedulorSelection } from '@/sharedTypes';
 import type { Meeting, MeetingDetails } from '@/types/meeting';
 import {
   createMeetingFromBaseMeetingSchema,
@@ -25,6 +24,7 @@ import {
 } from '@/types/meeting';
 import type { Preference } from '@/types/preference';
 import { createPreferenceFromPreferenceSchema } from '@/types/preference';
+import type { SchedulorSelection } from '@/types/schedulorSelection';
 import type { User } from '@/types/user';
 import { createUserFromUserSchema } from '@/types/user';
 import { validateUsername } from '@/utils/validation';

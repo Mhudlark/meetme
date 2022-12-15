@@ -11,10 +11,9 @@ import PreferenceOverlapPreview from '@/components/Meeting/overlapPreview';
 import SchedulorModal from '@/components/Meeting/schedulorModal';
 import SignInModal from '@/components/Meeting/signInModal';
 import { DbContext } from '@/context/dbContext';
-import type { SchedulorSelection } from '@/sharedTypes';
-import { INTERVAL_SIZE } from '@/types/meeting';
+import { SchedulorSelection } from '@/types/schedulorSelection';
 import { Time24 } from '@/types/time24';
-import { setDateTimeWithTime24 } from '@/utils/date';
+import { INTERVAL_SIZE } from '@/utils/constants';
 import { paths } from '@/utils/paths';
 import { calculateOverlappingPreferences } from '@/utils/preferences';
 import { validateUsername } from '@/utils/validation';
@@ -30,13 +29,12 @@ const generateSelections = (
   return range(0, numDays).map((i) => {
     const day = addDays(startDate, i);
 
-    const dayStart = setDateTimeWithTime24(day, minTime);
-    const dayEnd = setDateTimeWithTime24(day, maxTime);
-
-    const selection: SchedulorSelection = {
-      startDate: dayStart,
-      endDate: dayEnd,
-    };
+    const selection = new SchedulorSelection(
+      day,
+      minTime,
+      maxTime,
+      INTERVAL_SIZE
+    );
     return selection;
   });
 };
