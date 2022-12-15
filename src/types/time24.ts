@@ -67,6 +67,10 @@ export class Time24 {
     }
   }
 
+  public static fromNumber(time: number): Time24 {
+    return new Time24(time);
+  }
+
   public equals(time: Time24): boolean {
     return this.value === time.value;
   }
@@ -84,6 +88,38 @@ export class Time24 {
   public getMinutes(): number {
     const time = this.valueOf();
     return time % 1 === 0.5 ? 30 : 0;
+  }
+
+  public isLessThan(otherTime: Time24): boolean {
+    return this.valueOf() < otherTime.valueOf();
+  }
+
+  public isLessThanOrEqual(otherTime: Time24): boolean {
+    return this.valueOf() <= otherTime.valueOf();
+  }
+
+  public isGreaterThan(otherTime: Time24): boolean {
+    return this.valueOf() > otherTime.valueOf();
+  }
+
+  public isGreaterThanOrEqual(otherTime: Time24): boolean {
+    return this.valueOf() >= otherTime.valueOf();
+  }
+
+  public getMinTime(otherTime: Time24): Time24 {
+    return this.isLessThan(otherTime) ? this : otherTime;
+  }
+
+  public getMaxTime(otherTime: Time24): Time24 {
+    return this.isGreaterThan(otherTime) ? this : otherTime;
+  }
+
+  public addTime24(time: Time24): Time24 {
+    return new Time24(this.valueOf() + time.valueOf());
+  }
+
+  public addTime(time: number): Time24 {
+    return new Time24(this.valueOf() + time);
   }
 
   public toUnpaddedString(twelveHour: boolean = false): string {
