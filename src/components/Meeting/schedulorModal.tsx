@@ -3,11 +3,12 @@ import { useEffect, useState } from 'react';
 
 import type { MeetingDetails } from '@/types/meeting';
 import type { SchedulorSelection } from '@/types/schedulorSelection';
+import { Time24 } from '@/types/time24';
 import { INTERVAL_SIZE } from '@/utils/constants';
 
 import CustomButton from '../Button';
 import CustomModal from '../Modal';
-import LineSchedulor from '../Schedulor/LineSchedulor';
+import GridSchedulor from '../Schedulor/GridSchedulor';
 
 const variantInfos = {
   add: {
@@ -83,13 +84,13 @@ const SchedulorModal = ({
         }}
       >
         <Typography variant="h2">Pick your preferences</Typography>
-        <LineSchedulor
+        <GridSchedulor
           selections={localSelections}
           onChange={onSelectionsChanged}
           startDate={meetingDetails.startDate}
           endDate={meetingDetails.endDate}
-          minTime={meetingDetails.minTime}
-          maxTime={meetingDetails.maxTime}
+          minTime={Time24.fromNumber(meetingDetails.minTime)}
+          maxTime={Time24.fromNumber(meetingDetails.maxTime)}
           intervalSize={INTERVAL_SIZE}
         />
         <CustomButton onClick={onSubmitSelectionsClicked}>

@@ -29,7 +29,7 @@ const AvailabilityPicker = ({
   const marks: SliderMark[] = useMemo(() => {
     const newMarks: SliderMark[] = range(
       minTime.valueOf(),
-      maxTime.valueOf() + intervalSize,
+      maxTime.valueOf(),
       intervalSize
     ).map((timeNum) => {
       return {
@@ -42,17 +42,9 @@ const AvailabilityPicker = ({
   }, [minTime, maxTime, intervalSize]);
 
   const isEachIntervalSelected = useMemo(() => {
-    const intervalsStartNums = range(
-      minTime.valueOf(),
-      maxTime.valueOf(),
-      intervalSize
-    );
-    const selectedIntervalsStartNums = selection
-      .getSelectionRangesStartTimes()
-      .map((time) => time.valueOf());
-    return intervalsStartNums.map((interval) =>
-      selectedIntervalsStartNums.includes(interval)
-    );
+    return selection
+      .getSelectedIntervals(minTime, maxTime)
+      .map((interval) => interval.selected);
   }, [selection]);
 
   const handleIntervalClicked = (
@@ -82,13 +74,19 @@ const AvailabilityPicker = ({
   };
 
   return (
-    <div id="availability picker container" className="flex">
+    <div id="availability picker container" className="flex gap-1">
       {marks.map((mark, index) => (
         <div
           key={mark.value}
-          className={`flex-auto ${
-            isEachIntervalSelected?.[index] ? 'bg-gray-900' : 'bg-gray-200'
-          } select-none`}
+          className={`
+            flex-auto 
+            ${isEachIntervalSelected?.[index] ? 'bg-gray-900' : 'bg-gray-200'}
+            ${isEachIntervalSelected?.[index] ? 'text-white' : 'text-gray-900'} 
+            select-none
+            rounded-md
+            py-1
+            px-2
+          `}
           onClick={() => handleIntervalClicked(mark.value, index)}
         >
           {mark.label}

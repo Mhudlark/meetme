@@ -7,7 +7,9 @@ import {
 
 import { getTimeRange, Time24 } from './time24';
 
-type IntervalsBinaryArr = { startTime: Time24; included: boolean }[];
+type SelectableInterval = { startTime: Time24; selected: boolean };
+
+type SelectableIntervals = SelectableInterval[];
 
 /**
  * Returns the smallest min time from the selection ranges
@@ -48,65 +50,82 @@ const getMaxTimeFromSelectionRanges = (
 };
 
 /**
- * Creates a binary array of intervals (represented as objects)
- * The included obj property is set to true if the interval is included in the selection ranges
+ * Creates an array of intervals with the selected property set to true
+ * if the interval is included in the selection ranges
  * By default, the included property is set to false
  * @param selectionRanges The selection ranges
  * @param intervalSize The interval size in hours
  */
-const createInitialIntervalsBinaryArr = (
+const initSelectableIntervals = (
   selectionRanges: SchedulorSelectionRange[],
   intervalSize: number
-): IntervalsBinaryArr => {
+): SelectableIntervals => {
   const intervalsStartTimes = getTimeRange(
     getMinTimeFromSelectionRanges(selectionRanges),
     getMaxTimeFromSelectionRanges(selectionRanges),
     intervalSize
   );
 
-  const intervalsBinaryArr = intervalsStartTimes.map((intervalStartTime) => ({
-    startTime: intervalStartTime,
-    included: false,
-  }));
+  const selectableIntervals: SelectableIntervals = intervalsStartTimes.map(
+    (intervalStartTime) => ({
+      startTime: intervalStartTime,
+      selected: false,
+    })
+  );
 
-  return intervalsBinaryArr;
+  return selectableIntervals;
 };
 
 /**
- * Creates a binary array of intervals (represented as objects)
- * The included obj property is set to true if the interval is included in the selection ranges
+ * Fills the selectable intervals array with the selection ranges
+ * Interval.included is set to true if the interval is selected in the selection ranges
+ * @param selectableIntervals The selectable intervals
  * @param selectionRanges The selection ranges
- * @param intervalSize The interval size in hours
  */
-const calculateIntervalsBinaryArr = (
-  selectionRanges: SchedulorSelectionRange[],
-  intervalSize: number
-): IntervalsBinaryArr => {
-  const intervalsBinaryArr = createInitialIntervalsBinaryArr(
-    selectionRanges,
-    intervalSize
-  );
+const fillSelectableIntervals = (
+  selectableIntervals: SelectableIntervals,
+  selectionRanges: SchedulorSelectionRange[]
+): SelectableIntervals => {
+  const selectableIntervalsCopy = [...selectableIntervals];
 
   selectionRanges.forEach((selectionRange) => {
-    intervalsBinaryArr.forEach((interval, index) => {
+    selectableIntervalsCopy.forEach((interval, index) => {
       if (
         selectionRange.startTime.isLessThanOrEqual(interval.startTime) &&
         selectionRange.endTime.isGreaterThan(interval.startTime)
       ) {
-        const intervalPointer = intervalsBinaryArr?.[index];
-        if (intervalPointer) intervalPointer.included = true;
+        const intervalPointer = selectableIntervalsCopy?.[index];
+        if (intervalPointer) intervalPointer.selected = true;
       }
     });
   });
 
-  return intervalsBinaryArr;
+  return selectableIntervalsCopy;
 };
 
-const removeRangeFromIntervalsBinaryArr = (
-  intervalsBinaryArr: IntervalsBinaryArr,
+/**
+ * Creates a selectable intervals array from the selection ranges
+ * Interval.included is set to true if the interval is selected in the selection ranges
+ * @param selectionRanges The selection ranges
+ * @param intervalSize The interval size in hours
+ */
+const calculateSelectableIntervals = (
+  selectionRanges: SchedulorSelectionRange[],
+  intervalSize: number
+): SelectableIntervals => {
+  const selectableIntervals = initSelectableIntervals(
+    selectionRanges,
+    intervalSize
+  );
+
+  return fillSelectableIntervals(selectableIntervals, selectionRanges);
+};
+
+const removeRangeFromSelectableIntervals = (
+  selectableIntervals: SelectableIntervals,
   rangeToRemove: SchedulorSelectionRange
-): IntervalsBinaryArr => {
-  const newIntervalsBinaryArr = [...intervalsBinaryArr];
+): SelectableIntervals => {
+  const newIntervalsBinaryArr = [...selectableIntervals];
 
   newIntervalsBinaryArr.forEach((interval, index) => {
     if (
@@ -114,7 +133,7 @@ const removeRangeFromIntervalsBinaryArr = (
       rangeToRemove.endTime.isGreaterThan(interval.startTime)
     ) {
       const intervalPointer = newIntervalsBinaryArr?.[index];
-      if (intervalPointer) intervalPointer.included = false;
+      if (intervalPointer) intervalPointer.selected = false;
     }
   });
 
@@ -123,19 +142,19 @@ const removeRangeFromIntervalsBinaryArr = (
 
 /**
  * Calculates a new selection ranges array from the intervals binary array
- * @param intervalsBinaryArr The intervals binary array
+ * @param selectableIntervals The intervals binary array
  * @param intervalSize The interval size in hours
  * @returns A new selection ranges array
  */
-const getSelectionRangesFromIntervalsBinaryArr = (
-  intervalsBinaryArr: IntervalsBinaryArr,
+const getSelectionRangesFromSelectableIntervals = (
+  selectableIntervals: SelectableIntervals,
   intervalSize: number
 ): SchedulorSelectionRange[] => {
   const selectionRanges: SchedulorSelectionRange[] = [];
   let currentRange: SchedulorSelectionRange | null = null;
 
-  intervalsBinaryArr.forEach((interval) => {
-    if (interval.included) {
+  selectableIntervals.forEach((interval) => {
+    if (interval.selected) {
       if (!currentRange) {
         currentRange = {
           startTime: interval.startTime,
@@ -166,13 +185,13 @@ const reduceSelectionRanges = (
   selectionRanges: SchedulorSelectionRange[],
   intervalSize: number
 ) => {
-  const intervalsBinaryArr = calculateIntervalsBinaryArr(
+  const selectableIntervals = calculateSelectableIntervals(
     selectionRanges,
     intervalSize
   );
 
-  return getSelectionRangesFromIntervalsBinaryArr(
-    intervalsBinaryArr,
+  return getSelectionRangesFromSelectableIntervals(
+    selectableIntervals,
     intervalSize
   );
 };
@@ -189,18 +208,18 @@ const removeSelectionRangeFromSelectionRanges = (
   selectionRangeToRemove: SchedulorSelectionRange,
   intervalSize: number
 ): SchedulorSelectionRange[] => {
-  const intervalsBinaryArr = calculateIntervalsBinaryArr(
+  const selectableIntervals = calculateSelectableIntervals(
     selectionRanges,
     intervalSize
   );
 
-  const intervalsBinaryArrWithoutRange = removeRangeFromIntervalsBinaryArr(
-    intervalsBinaryArr,
+  const selectableIntervalsWithoutRange = removeRangeFromSelectableIntervals(
+    selectableIntervals,
     selectionRangeToRemove
   );
 
-  return getSelectionRangesFromIntervalsBinaryArr(
-    intervalsBinaryArrWithoutRange,
+  return getSelectionRangesFromSelectableIntervals(
+    selectableIntervalsWithoutRange,
     intervalSize
   );
 };
@@ -278,6 +297,18 @@ export class SchedulorSelection {
     return setDateTimeWithTime24(this.date, maxSelectedTime as Time24);
   }
 
+  public getSelectedIntervals(
+    minTime: Time24,
+    maxTime: Time24
+  ): SelectableIntervals {
+    const selectableIntervals = initSelectableIntervals(
+      [{ startTime: minTime, endTime: maxTime }],
+      this.intervalSize
+    );
+
+    return fillSelectableIntervals(selectableIntervals, this.selectionRanges);
+  }
+
   public addSelectionRange(startTime: Time24, endTime: Time24): void {
     // If no selection ranges exist, add the new range and return
     if (this.isEmpty()) {
@@ -351,6 +382,11 @@ export class SchedulorSelection {
     const newSelection = this.copy();
     newSelection.selectionRanges = [{ startTime, endTime }];
     return newSelection;
+  }
+
+  public copyAsEmpty(): SchedulorSelection {
+    console.log('copyAsEmpty');
+    return new SchedulorSelection(this.date, [], this.intervalSize);
   }
 }
 
