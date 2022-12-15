@@ -130,11 +130,11 @@ export const calculateOverlappingPreferences = (
 
   preferences.forEach((preference) => {
     preference.scheduleSelections.forEach((selection) => {
-      const dayIndex = differenceInCalendarDays(selection.startDate, startDate);
+      const dayIndex = differenceInCalendarDays(selection.date, startDate);
       const dayIntervals = allIntervals[dayIndex] as Day;
       const numIntervalsInDay = dayIntervals.length;
 
-      const startTime = new Time24(selection.startDate);
+      const startTime = selection.getMinSelectedTime() as Time24;
       const startIntervalIndex = calculateIntervalIndexFromTime(
         startTime,
         minTime,
@@ -142,7 +142,7 @@ export const calculateOverlappingPreferences = (
         numIntervalsInDay
       );
 
-      const endTime = new Time24(selection.endDate);
+      const endTime = selection.getMaxSelectedTime() as Time24;
       const endIntervalIndex = calculateIntervalIndexFromTime(
         endTime,
         minTime,
