@@ -4,6 +4,8 @@ import { formatDateToFriendlyString } from '@/utils/date';
 import type { Time24 } from './time24';
 import { getTimeRange } from './time24';
 
+type IntervalsBinaryArr = { startTime: Time24; included: boolean }[];
+
 /**
  * Returns the smallest min time from the selection ranges
  * @param selectionRanges The selection ranges
@@ -52,7 +54,7 @@ const getMaxTimeFromSelectionRanges = (
 const createInitialIntervalsBinaryArr = (
   selectionRanges: SchedulorSelectionRange[],
   intervalSize: number
-) => {
+): IntervalsBinaryArr => {
   const intervalsStartTimes = getTimeRange(
     getMinTimeFromSelectionRanges(selectionRanges),
     getMaxTimeFromSelectionRanges(selectionRanges),
@@ -76,7 +78,7 @@ const createInitialIntervalsBinaryArr = (
 const calculateIntervalsBinaryArr = (
   selectionRanges: SchedulorSelectionRange[],
   intervalSize: number
-) => {
+): IntervalsBinaryArr => {
   const intervalsBinaryArr = createInitialIntervalsBinaryArr(
     selectionRanges,
     intervalSize
@@ -97,6 +99,59 @@ const calculateIntervalsBinaryArr = (
   return intervalsBinaryArr;
 };
 
+const removeRangeFromIntervalsBinaryArr = (
+  intervalsBinaryArr: IntervalsBinaryArr,
+  rangeToRemove: SchedulorSelectionRange
+): IntervalsBinaryArr => {
+  const newIntervalsBinaryArr = [...intervalsBinaryArr];
+
+  newIntervalsBinaryArr.forEach((interval, index) => {
+    if (
+      rangeToRemove.startTime.isLessThanOrEqual(interval.startTime) &&
+      rangeToRemove.endTime.isGreaterThan(interval.startTime)
+    ) {
+      const intervalPointer = newIntervalsBinaryArr?.[index];
+      if (intervalPointer) intervalPointer.included = false;
+    }
+  });
+
+  return newIntervalsBinaryArr;
+};
+
+/**
+ * Calculates a new selection ranges array from the intervals binary array
+ * @param intervalsBinaryArr The intervals binary array
+ * @param intervalSize The interval size in hours
+ * @returns A new selection ranges array
+ */
+const getSelectionRangesFromIntervalsBinaryArr = (
+  intervalsBinaryArr: IntervalsBinaryArr,
+  intervalSize: number
+): SchedulorSelectionRange[] => {
+  const selectionRanges: SchedulorSelectionRange[] = [];
+  let currentRange: SchedulorSelectionRange | null = null;
+
+  intervalsBinaryArr.forEach((interval) => {
+    if (interval.included) {
+      if (!currentRange) {
+        currentRange = {
+          startTime: interval.startTime,
+          endTime: interval.startTime.addTime(intervalSize),
+        };
+      } else {
+        currentRange.endTime = interval.startTime.addTime(intervalSize);
+      }
+    } else if (currentRange) {
+      selectionRanges.push(currentRange);
+      currentRange = null;
+    }
+  });
+
+  if (currentRange) selectionRanges.push(currentRange);
+
+  return selectionRanges;
+};
+
 /**
  * Reduces the selection ranges into the minimum number of ranges.
  * Also, sorts the ranges by start time
@@ -113,28 +168,38 @@ const reduceSelectionRanges = (
     intervalSize
   );
 
-  const newRanges: SchedulorSelectionRange[] = [];
-  let currentRange: SchedulorSelectionRange | null = null;
+  return getSelectionRangesFromIntervalsBinaryArr(
+    intervalsBinaryArr,
+    intervalSize
+  );
+};
 
-  intervalsBinaryArr.forEach((interval) => {
-    if (interval.included) {
-      if (!currentRange) {
-        currentRange = {
-          startTime: interval.startTime,
-          endTime: interval.startTime.addTime(intervalSize),
-        };
-      } else {
-        currentRange.endTime = interval.startTime.addTime(intervalSize);
-      }
-    } else if (currentRange) {
-      newRanges.push(currentRange);
-      currentRange = null;
-    }
-  });
+/**
+ * Removes the range from the selection ranges array and reduces it to the minimum number of ranges
+ * @param selectionRanges The selection ranges
+ * @param selectionRangeToRemove The selection range to remove
+ * @param intervalSize The interval size in hours
+ * @returns A minified, ordered version of the selection ranges
+ */
+const removeSelectionRangeFromSelectionRanges = (
+  selectionRanges: SchedulorSelectionRange[],
+  selectionRangeToRemove: SchedulorSelectionRange,
+  intervalSize: number
+): SchedulorSelectionRange[] => {
+  const intervalsBinaryArr = calculateIntervalsBinaryArr(
+    selectionRanges,
+    intervalSize
+  );
 
-  if (currentRange) newRanges.push(currentRange);
+  const intervalsBinaryArrWithoutRange = removeRangeFromIntervalsBinaryArr(
+    intervalsBinaryArr,
+    selectionRangeToRemove
+  );
 
-  return newRanges;
+  return getSelectionRangesFromIntervalsBinaryArr(
+    intervalsBinaryArrWithoutRange,
+    intervalSize
+  );
 };
 
 export class SchedulorSelection {
@@ -187,6 +252,22 @@ export class SchedulorSelection {
 
     this.selectionRanges = reduceSelectionRanges(
       newSelectionRanges,
+      this.intervalSize
+    );
+  }
+
+  public removeSelectionRange(startTime: Time24, endTime: Time24): void {
+    // If no selection ranges exist, just return
+    if (this.selectionRanges.length === 0) {
+      return;
+    }
+
+    this.selectionRanges = removeSelectionRangeFromSelectionRanges(
+      this.selectionRanges,
+      {
+        startTime,
+        endTime,
+      },
       this.intervalSize
     );
   }
