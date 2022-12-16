@@ -27,3 +27,30 @@ a:hover {
 .content ul {
   @apply my-6;
 }
+
+/* 
+============================================
+Scrollbar styling
+============================================
+*/
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f188;
+}
+
+/* Thumb */
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 10px;
+}
+
+/* Thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #111827;
+}
