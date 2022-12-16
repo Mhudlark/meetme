@@ -30,7 +30,7 @@ const getFilteredUserToggleClassName = (selected: boolean) => {
       ${baseFilteredUserToggleClassName}
       bg-transparent hover:bg-gray-900
       text-gray-900 hover:text-white
-      border-2 
+      border-2
       border-gray-900
     `;
 };
