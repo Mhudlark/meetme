@@ -1,9 +1,6 @@
 import type { SelectionIntervalRange } from '@/sharedTypes';
 import { INTERVAL_SIZE } from '@/utils/constants';
-import {
-  formatDateToFriendlyString,
-  setDateTimeWithTime24,
-} from '@/utils/date';
+import { formatDateToFriendlyString } from '@/utils/date';
 
 import type { Time24 } from './time24';
 import { getTimeRange } from './time24';
@@ -267,36 +264,6 @@ export class SchedulorSelection {
 
   public getSelectionRangesStartTimes(): Time24[] {
     return this.selectionIntervalRanges.map((range) => range.startTime);
-  }
-
-  public getMinSelectedTime(): Time24 | null {
-    if (this.isEmpty()) return null;
-
-    return this.selectionIntervalRanges?.[0]?.startTime as Time24;
-  }
-
-  public getMinSelectedDateTime(): Date | null {
-    const minSelectedTime = this.getMinSelectedTime();
-
-    if (!minSelectedTime) return null;
-
-    return setDateTimeWithTime24(this.date, minSelectedTime as Time24);
-  }
-
-  public getMaxSelectedTime(): Time24 | null {
-    if (this.isEmpty()) return null;
-
-    return this.selectionIntervalRanges?.[
-      this.selectionIntervalRanges.length - 1
-    ]?.endTime as Time24;
-  }
-
-  public getMaxSelectedDateTime(): Date | null {
-    const maxSelectedTime = this.getMaxSelectedTime();
-
-    if (!maxSelectedTime) return null;
-
-    return setDateTimeWithTime24(this.date, maxSelectedTime as Time24);
   }
 
   public getSelectedIntervals(
