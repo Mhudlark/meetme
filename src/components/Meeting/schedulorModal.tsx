@@ -62,8 +62,8 @@ const SchedulorModal = ({
       onClose={onClose}
       ariaLabelledBy="Schedulor in modal"
       sx={{
-        maxWidth: { xs: '100vw', sm: 'min(740px, 94vw)' },
-        maxHeight: { xs: '100vh', sm: '90vh' },
+        maxWidth: { xs: '100%', sm: 'min(740px, 94vw)' },
+        maxHeight: { xs: '100%', sm: '90vh' },
       }}
     >
       <Stack
