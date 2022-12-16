@@ -1,5 +1,5 @@
 import { ContentCopy } from '@mui/icons-material';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { isSameDay } from 'date-fns';
 import { useMemo } from 'react';
 
@@ -122,19 +122,13 @@ export default function GridSchedulor({
               />
             </Stack>
           </Stack>
-          <Box
-            sx={{
-              p: 0.5,
-            }}
-          >
-            <AvailabilityPicker
-              onChange={(newDates) => handleChange(day, newDates)}
-              selection={selections?.[index] as SchedulorSelection}
-              minTime={minTime}
-              maxTime={maxTime}
-              intervalSize={intervalSize}
-            />
-          </Box>
+          <AvailabilityPicker
+            onChange={(newDates) => handleChange(day, newDates)}
+            selection={selections?.[index] as SchedulorSelection}
+            minTime={minTime}
+            maxTime={maxTime}
+            intervalSize={intervalSize}
+          />
         </Stack>
       ))}
     </Stack>

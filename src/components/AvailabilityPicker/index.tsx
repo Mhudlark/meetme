@@ -74,12 +74,20 @@ const AvailabilityPicker = ({
   };
 
   return (
-    <div id="availability picker container" className="flex gap-1">
+    <div
+      id="availability picker container"
+      className="
+      grid grid-cols-auto-fill-64
+      justify-start
+      gap-1
+      "
+    >
       {marks.map((mark, index) => (
         <div
           key={mark.value}
           className={`
-            flex-auto 
+            flex
+            justify-center        
             ${isEachIntervalSelected?.[index] ? 'bg-gray-900' : 'bg-gray-200'}
             ${isEachIntervalSelected?.[index] ? 'text-white' : 'text-gray-900'} 
             select-none

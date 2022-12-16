@@ -23,6 +23,12 @@ module.exports = {
           DEFAULT: '#fff1f2',
         },
       },
+      gridTemplateColumns: {
+        // Simple auto fill column grid
+        'auto-fill': 'repeat(auto-fill, minmax(0, 1fr))',
+        'auto-fill-32': 'repeat(auto-fill, minmax(32px, 1fr))',
+        'auto-fill-64': 'repeat(auto-fill, minmax(64px, 1fr))',
+      },
     },
   },
   plugins: [],
