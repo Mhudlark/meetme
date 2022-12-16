@@ -69,10 +69,7 @@ const SchedulorModal = ({
       <Stack
         sx={{
           gap: 4,
-          py: {
-            xs: 2,
-            sm: 4,
-          },
+          py: 4,
           px: {
             xs: 1,
             sm: 2,
