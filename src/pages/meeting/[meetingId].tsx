@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
 import CustomButton from '@/components/Button';
+import LeaveMeetingModal from '@/components/Meeting/leaveMeetingModal';
 import LoadingScreen from '@/components/Meeting/loadingScreen';
 import MeetingDetails from '@/components/Meeting/meetingDetails';
 import PreferenceOverlapPreview from '@/components/Meeting/overlapPreview';
@@ -68,6 +69,7 @@ const Meeting = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+  const [isLeaveMeetingModalOpen, setIsLeaveMeetingModalOpen] = useState(false);
   const [isSubmitPreferencesModalOpen, setIsSubmitPreferencesModalOpen] =
     useState(false);
 
@@ -127,7 +129,7 @@ const Meeting = () => {
     resetStates();
   };
 
-  const onLeaveMeetingClicked = async () => {
+  const confirmLeaveMeeting = async () => {
     if (!username) return;
 
     await leaveMeeting(username);
@@ -191,6 +193,11 @@ const Meeting = () => {
             onSignInClicked={onSignInClicked}
             isUsernameValid={isUsernameValid}
           />
+          <LeaveMeetingModal
+            isOpen={isLeaveMeetingModalOpen}
+            onClose={() => setIsLeaveMeetingModalOpen(false)}
+            onLeaveMeetingClicked={confirmLeaveMeeting}
+          />
           <SchedulorModal
             isOpen={isSubmitPreferencesModalOpen}
             onClose={() => setIsSubmitPreferencesModalOpen(false)}
@@ -213,7 +220,10 @@ const Meeting = () => {
               <MeetingDetails />
               {isSignedIn && isUsernameValid && (
                 <Stack sx={{ gap: 2 }}>
-                  <CustomButton color="error" onClick={onLeaveMeetingClicked}>
+                  <CustomButton
+                    color="error"
+                    onClick={() => setIsLeaveMeetingModalOpen(true)}
+                  >
                     Leave Meeting
                   </CustomButton>
                   <CustomButton color="warning" onClick={onSignOutClicked}>

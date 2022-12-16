@@ -35,7 +35,7 @@ const SignInModal = ({
             sm: 4,
           },
           width: {
-            xs: '320px',
+            xs: '314px',
             sm: '400px',
           },
         }}

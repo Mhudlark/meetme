@@ -38,9 +38,9 @@ const getButtonClassName = (
     case 'secondary':
       return `
       ${baseButtonClassName}
-      bg-gray-100 hover:bg-gray-900 
-      text-gray-900 hover:text-gray-100
-      border border-transparent hover:border-gray-100
+      bg-transparent hover:bg-gray-900 
+      text-gray-900 hover:text-white
+      border-2 border-gray-900
       `;
     case 'error':
       return `
@@ -71,7 +71,7 @@ const getButtonClassName = (
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: 'primary' | 'secondary' | 'error' | 'warning' | 'success';
   isLoading?: boolean;
-  sx?: CSSProperties;
+  style?: CSSProperties;
 }
 
 const buttonPropsDefaultValues: ButtonProps = {
@@ -83,12 +83,12 @@ const CustomButton = ({
   color = buttonPropsDefaultValues.color,
   disabled,
   isLoading,
-  sx,
+  style,
   ...props
 }: ButtonProps) => {
   return (
     <button
-      style={sx}
+      style={style}
       type="button"
       className={getButtonClassName(color, disabled)}
       disabled={disabled}

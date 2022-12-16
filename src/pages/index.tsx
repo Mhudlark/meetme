@@ -124,7 +124,7 @@ const Index = () => {
         onClick={onCreateEventClicked}
         disabled={!isMeetingNameValid}
         isLoading={isCreateEventLoading}
-        sx={{ width: 'fit-content' }}
+        style={{ width: 'fit-content' }}
       >
         Create Event
       </CustomButton>
