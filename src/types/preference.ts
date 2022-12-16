@@ -1,5 +1,5 @@
 import type { PreferenceSchema } from '@/backend/db/database/schemas/types';
-import { parseSchedulorSelection } from '@/utils/types/parse';
+import { parseSelectionsString } from '@/utils/types/parse';
 
 import type { SchedulorSelection } from './schedulorSelection';
 
@@ -24,12 +24,6 @@ export class Preference {
     );
   }
 }
-
-export const parseSelectionsString = (
-  selections: string
-): SchedulorSelection[] => {
-  return JSON.parse(selections).map(parseSchedulorSelection);
-};
 
 export const createPreferenceFromPreferenceSchema = (
   schema: PreferenceSchema

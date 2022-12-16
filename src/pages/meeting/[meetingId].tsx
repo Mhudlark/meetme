@@ -10,6 +10,7 @@ import MeetingDetails from '@/components/Meeting/meetingDetails';
 import PreferenceOverlapPreview from '@/components/Meeting/overlapPreview';
 import SchedulorModal from '@/components/Meeting/schedulorModal';
 import SignInModal from '@/components/Meeting/signInModal';
+import { UIAlertContext } from '@/context/Alert/alertContext';
 import { DbContext } from '@/context/dbContext';
 import { SchedulorSelection } from '@/types/schedulorSelection';
 import { Time24 } from '@/types/time24';
@@ -63,6 +64,8 @@ const Meeting = () => {
     isExistingUser,
   } = useContext(DbContext);
 
+  const { dispatchErrorAlert } = useContext(UIAlertContext);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isSubmitPreferencesModalOpen, setIsSubmitPreferencesModalOpen] =
@@ -94,7 +97,16 @@ const Meeting = () => {
     newSelections: SchedulorSelection[],
     add: boolean = true
   ) => {
-    if (!newSelections || !username) return;
+    if (!username) {
+      setIsSubmitPreferencesModalOpen(false);
+      dispatchErrorAlert('No user signed in');
+      return;
+    }
+    if (!newSelections) {
+      setIsSubmitPreferencesModalOpen(false);
+      dispatchErrorAlert('No new selections');
+      return;
+    }
 
     if (add) {
       await addPreferences(
@@ -103,7 +115,7 @@ const Meeting = () => {
         newSelections
       );
     } else {
-      await updatePreferences(selections);
+      await updatePreferences(newSelections);
     }
     setIsSubmitPreferencesModalOpen(false);
   };
