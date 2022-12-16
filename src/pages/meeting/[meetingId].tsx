@@ -211,15 +211,14 @@ const Meeting = () => {
           <Stack sx={{ gap: 10, width: '100%', height: '100%' }}>
             <Stack
               sx={{
-                flexDirection: { xs: 'column', md: 'row' },
-                justifyContent: 'space-between',
-                alignItems: { xs: 'start', md: 'center' },
                 gap: 2,
               }}
             >
               <MeetingDetails />
               {isSignedIn && isUsernameValid && (
-                <Stack sx={{ gap: 2 }}>
+                <Stack
+                  sx={{ gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}
+                >
                   <CustomButton
                     color="error"
                     onClick={() => setIsLeaveMeetingModalOpen(true)}

@@ -10,6 +10,7 @@ const baseButtonClassName = `
   transition duration-300 ease-in-out
   focus:outline-offset-4
   focus:outline-gray-900
+  border-2
 `;
 
 const getButtonClassName = (
@@ -21,7 +22,7 @@ const getButtonClassName = (
       ${baseButtonClassName}
       bg-gray-300
       text-gray-600
-      border-2 border-gray-300
+      border-gray-300
       cursor-auto
     `;
   }
@@ -32,36 +33,35 @@ const getButtonClassName = (
       ${baseButtonClassName}
       bg-gray-900 hover:bg-white
       text-white hover:text-gray-900
-      border-2 
-      border-transparent hover:border-gray-900
+      border-gray-900
       `;
     case 'secondary':
       return `
       ${baseButtonClassName}
-      bg-transparent hover:bg-gray-900 
+      bg-white hover:bg-gray-900 
       text-gray-900 hover:text-white
-      border-2 border-gray-900
+      border-gray-900
       `;
     case 'error':
       return `
       ${baseButtonClassName}
-      bg-red-600 hover:bg-red-100
-      text-gray-100 hover:text-red-600
-      border border-transparent hover:border-red-600
+      bg-red-600 hover:bg-white
+      text-white hover:text-red-600
+      border-red-600
       `;
     case 'warning':
       return `
       ${baseButtonClassName}
-      bg-orange-600 hover:bg-orange-100
-      text-gray-100 hover:text-orange-600
-      border border-transparent hover:border-orange-600
+      bg-orange-600 hover:bg-white
+      text-white hover:text-orange-600
+      border-orange-600
       `;
     case 'success':
       return `
       ${baseButtonClassName}
-      bg-green-600 hover:bg-green-100
-      text-green-100 hover:text-green-600
-      border border-transparent hover:border-green-600
+      bg-green-600 hover:bg-white
+      text-white hover:text-green-600
+      border-green-600
       `;
     default:
       return '';
