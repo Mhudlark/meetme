@@ -20,27 +20,29 @@ const LeaveMeetingModal = ({
       open={isOpen}
       onClose={onClose}
       ariaLabelledBy="Confirm leave meeting modal"
+      sx={{
+        pt: {
+          xs: 3,
+          sm: 4,
+        },
+        pb: {
+          xs: 2,
+          sm: 4,
+        },
+        px: {
+          xs: 2,
+          sm: 4,
+        },
+        width: {
+          xs: '300px',
+          sm: '400px',
+        },
+      }}
     >
       <Stack
         sx={{
           gap: 4,
           alignItems: 'center',
-          pt: {
-            xs: 2,
-            sm: 2,
-          },
-          pb: {
-            xs: 1,
-            sm: 2,
-          },
-          px: {
-            xs: 1,
-            sm: 2,
-          },
-          width: {
-            xs: '292px',
-            sm: '380px',
-          },
         }}
       >
         <Typography variant="h3">

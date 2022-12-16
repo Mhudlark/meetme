@@ -64,20 +64,24 @@ const SchedulorModal = ({
       sx={{
         maxWidth: { xs: '100%', sm: 'min(740px, 94vw)' },
         maxHeight: { xs: '100%', sm: '90vh' },
+        borderRadius: { xs: 0, sm: 1.5 },
+        py: {
+          xs: 5,
+          sm: 6,
+        },
+        px: {
+          xs: 2,
+          sm: 4,
+        },
+        width: {
+          xs: '100%',
+          sm: 'fit-content',
+        },
       }}
     >
       <Stack
         sx={{
           gap: 4,
-          py: 4,
-          px: {
-            xs: 1,
-            sm: 2,
-          },
-          width: {
-            xs: '96vw',
-            sm: 'min(680px, 84vw)',
-          },
         }}
       >
         <Typography variant="h2">Pick your preferences</Typography>

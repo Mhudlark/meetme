@@ -21,23 +21,29 @@ const SignInModal = ({
   isUsernameValid,
 }: SignInModalProps) => {
   return (
-    <CustomModal open={isOpen} onClose={onClose} ariaLabelledBy="Sign in modal">
+    <CustomModal
+      open={isOpen}
+      onClose={onClose}
+      ariaLabelledBy="Sign in modal"
+      sx={{
+        py: {
+          xs: 3,
+          sm: 6,
+        },
+        px: {
+          xs: 2,
+          sm: 6,
+        },
+        width: {
+          xs: '320px',
+          sm: '400px',
+        },
+      }}
+    >
       <Stack
         sx={{
           gap: 4,
           alignItems: 'center',
-          py: {
-            xs: 2,
-            sm: 4,
-          },
-          px: {
-            xs: 1,
-            sm: 4,
-          },
-          width: {
-            xs: '314px',
-            sm: '400px',
-          },
         }}
       >
         <Typography variant="h2">Join the meeting</Typography>
