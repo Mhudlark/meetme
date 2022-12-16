@@ -62,6 +62,7 @@ const SchedulorModal = ({
       onClose={onClose}
       ariaLabelledBy="Schedulor in modal"
       sx={{
+        minWidth: { xs: '100%', sm: 'min(720px, 90vw)', md: '720px' },
         maxWidth: { xs: '100%', sm: 'min(740px, 94vw)' },
         maxHeight: { xs: '100%', sm: '90vh' },
         borderRadius: { xs: 0, sm: 1.5 },
