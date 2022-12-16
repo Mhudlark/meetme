@@ -1,7 +1,7 @@
 import type { PreferenceSchema } from '@/backend/db/database/schemas/types';
+import { parseSchedulorSelection } from '@/utils/types/parse';
 
 import type { SchedulorSelection } from './schedulorSelection';
-import { parseSchedulorSelection } from './schedulorSelection';
 
 export class Preference {
   constructor(
