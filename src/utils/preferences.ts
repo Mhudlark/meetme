@@ -134,38 +134,38 @@ export const calculateOverlappingPreferences = (
       const dayIntervals = allIntervals[dayIndex] as Day;
       const numIntervalsInDay = dayIntervals.length;
 
-      const startTime = selection.getMinSelectedTime() as Time24;
-      const startIntervalIndex = calculateIntervalIndexFromTime(
-        startTime,
-        minTime,
-        intervalSize,
-        numIntervalsInDay
-      );
+      selection.selectionIntervalRanges.forEach(({ startTime, endTime }) => {
+        const startIntervalIndex = calculateIntervalIndexFromTime(
+          startTime,
+          minTime,
+          intervalSize,
+          numIntervalsInDay
+        );
 
-      const endTime = selection.getMaxSelectedTime() as Time24;
-      const endIntervalIndex = calculateIntervalIndexFromTime(
-        endTime,
-        minTime,
-        intervalSize,
-        numIntervalsInDay
-      );
+        const endIntervalIndex = calculateIntervalIndexFromTime(
+          endTime,
+          minTime,
+          intervalSize,
+          numIntervalsInDay
+        );
 
-      // If the start and end interval indices are the same,
-      // then the selection is less than an interval
-      if (startIntervalIndex === endIntervalIndex) return;
+        // If the start and end interval indices are the same,
+        // then the selection is less than an interval
+        if (startIntervalIndex === endIntervalIndex) return;
 
-      for (
-        let intervalIndex = startIntervalIndex;
-        intervalIndex < endIntervalIndex;
-        intervalIndex += 1
-      ) {
-        const interval = dayIntervals[intervalIndex] as Interval;
+        for (
+          let intervalIndex = startIntervalIndex;
+          intervalIndex < endIntervalIndex;
+          intervalIndex += 1
+        ) {
+          const interval = dayIntervals[intervalIndex] as Interval;
 
-        const preferenceUser = getUserFromId(users, preference.userId);
+          const preferenceUser = getUserFromId(users, preference.userId);
 
-        interval.availability.count += 1;
-        interval.availability.users.push(preferenceUser);
-      }
+          interval.availability.count += 1;
+          interval.availability.users.push(preferenceUser);
+        }
+      });
     });
   });
 

@@ -1,11 +1,12 @@
-import type { SchedulorSelectionRange } from '@/sharedTypes';
+import type { SelectionIntervalRange } from '@/sharedTypes';
 import { INTERVAL_SIZE } from '@/utils/constants';
 import {
   formatDateToFriendlyString,
   setDateTimeWithTime24,
 } from '@/utils/date';
 
-import { getTimeRange, Time24 } from './time24';
+import type { Time24 } from './time24';
+import { getTimeRange } from './time24';
 
 type SelectableInterval = { startTime: Time24; selected: boolean };
 
@@ -16,7 +17,7 @@ type SelectableIntervals = SelectableInterval[];
  * @param selectionRanges The selection ranges
  */
 const getMinTimeFromSelectionRanges = (
-  selectionRanges: SchedulorSelectionRange[]
+  selectionRanges: SelectionIntervalRange[]
 ): Time24 => {
   if (selectionRanges.length === 0)
     throw new Error('The selection ranges array is empty');
@@ -35,7 +36,7 @@ const getMinTimeFromSelectionRanges = (
  * @param selectionRanges The selection ranges
  */
 const getMaxTimeFromSelectionRanges = (
-  selectionRanges: SchedulorSelectionRange[]
+  selectionRanges: SelectionIntervalRange[]
 ): Time24 => {
   if (selectionRanges.length === 0)
     throw new Error('The selection ranges array is empty');
@@ -57,7 +58,7 @@ const getMaxTimeFromSelectionRanges = (
  * @param intervalSize The interval size in hours
  */
 const initSelectableIntervals = (
-  selectionRanges: SchedulorSelectionRange[],
+  selectionRanges: SelectionIntervalRange[],
   intervalSize: number
 ): SelectableIntervals => {
   const intervalsStartTimes = getTimeRange(
@@ -84,7 +85,7 @@ const initSelectableIntervals = (
  */
 const fillSelectableIntervals = (
   selectableIntervals: SelectableIntervals,
-  selectionRanges: SchedulorSelectionRange[]
+  selectionRanges: SelectionIntervalRange[]
 ): SelectableIntervals => {
   const selectableIntervalsCopy = [...selectableIntervals];
 
@@ -110,7 +111,7 @@ const fillSelectableIntervals = (
  * @param intervalSize The interval size in hours
  */
 const calculateSelectableIntervals = (
-  selectionRanges: SchedulorSelectionRange[],
+  selectionRanges: SelectionIntervalRange[],
   intervalSize: number
 ): SelectableIntervals => {
   const selectableIntervals = initSelectableIntervals(
@@ -123,7 +124,7 @@ const calculateSelectableIntervals = (
 
 const removeRangeFromSelectableIntervals = (
   selectableIntervals: SelectableIntervals,
-  rangeToRemove: SchedulorSelectionRange
+  rangeToRemove: SelectionIntervalRange
 ): SelectableIntervals => {
   const newIntervalsBinaryArr = [...selectableIntervals];
 
@@ -149,9 +150,9 @@ const removeRangeFromSelectableIntervals = (
 const getSelectionRangesFromSelectableIntervals = (
   selectableIntervals: SelectableIntervals,
   intervalSize: number
-): SchedulorSelectionRange[] => {
-  const selectionRanges: SchedulorSelectionRange[] = [];
-  let currentRange: SchedulorSelectionRange | null = null;
+): SelectionIntervalRange[] => {
+  const selectionRanges: SelectionIntervalRange[] = [];
+  let currentRange: SelectionIntervalRange | null = null;
 
   selectableIntervals.forEach((interval) => {
     if (interval.selected) {
@@ -182,7 +183,7 @@ const getSelectionRangesFromSelectableIntervals = (
  * @returns A minified, ordered version of the selection ranges
  */
 const reduceSelectionRanges = (
-  selectionRanges: SchedulorSelectionRange[],
+  selectionRanges: SelectionIntervalRange[],
   intervalSize: number
 ) => {
   const selectableIntervals = calculateSelectableIntervals(
@@ -204,10 +205,10 @@ const reduceSelectionRanges = (
  * @returns A minified, ordered version of the selection ranges
  */
 const removeSelectionRangeFromSelectionRanges = (
-  selectionRanges: SchedulorSelectionRange[],
-  selectionRangeToRemove: SchedulorSelectionRange,
+  selectionRanges: SelectionIntervalRange[],
+  selectionRangeToRemove: SelectionIntervalRange,
   intervalSize: number
-): SchedulorSelectionRange[] => {
+): SelectionIntervalRange[] => {
   const selectableIntervals = calculateSelectableIntervals(
     selectionRanges,
     intervalSize
@@ -227,13 +228,13 @@ const removeSelectionRangeFromSelectionRanges = (
 export class SchedulorSelection {
   public date: Date;
 
-  public selectionRanges: SchedulorSelectionRange[];
+  public selectionIntervalRanges: SelectionIntervalRange[];
 
   public intervalSize: number;
 
   constructor(
     date: Date,
-    selectionRanges: SchedulorSelectionRange[],
+    selectionRanges: SelectionIntervalRange[],
     intervalSize: number
   );
   constructor(
@@ -247,12 +248,12 @@ export class SchedulorSelection {
     this.intervalSize = args[args.length - 1] as number;
 
     if (args.length === 3) {
-      const selectionRanges = args[1] as SchedulorSelectionRange[];
-      this.selectionRanges = selectionRanges;
+      const selectionRanges = args[1] as SelectionIntervalRange[];
+      this.selectionIntervalRanges = selectionRanges;
     } else if (args.length === 4) {
       const startTime = args[1] as Time24;
       const endTime = args[2] as Time24;
-      this.selectionRanges = [{ startTime, endTime }];
+      this.selectionIntervalRanges = [{ startTime, endTime }];
     } else {
       throw new Error(
         'Invalid arguments passed to SchedulorSelection constructor'
@@ -261,17 +262,17 @@ export class SchedulorSelection {
   }
 
   public isEmpty(): boolean {
-    return this.selectionRanges.length === 0;
+    return this.selectionIntervalRanges.length === 0;
   }
 
   public getSelectionRangesStartTimes(): Time24[] {
-    return this.selectionRanges.map((range) => range.startTime);
+    return this.selectionIntervalRanges.map((range) => range.startTime);
   }
 
   public getMinSelectedTime(): Time24 | null {
     if (this.isEmpty()) return null;
 
-    return this.selectionRanges?.[0]?.startTime as Time24;
+    return this.selectionIntervalRanges?.[0]?.startTime as Time24;
   }
 
   public getMinSelectedDateTime(): Date | null {
@@ -285,8 +286,9 @@ export class SchedulorSelection {
   public getMaxSelectedTime(): Time24 | null {
     if (this.isEmpty()) return null;
 
-    return this.selectionRanges?.[this.selectionRanges.length - 1]
-      ?.endTime as Time24;
+    return this.selectionIntervalRanges?.[
+      this.selectionIntervalRanges.length - 1
+    ]?.endTime as Time24;
   }
 
   public getMaxSelectedDateTime(): Date | null {
@@ -306,22 +308,25 @@ export class SchedulorSelection {
       this.intervalSize
     );
 
-    return fillSelectableIntervals(selectableIntervals, this.selectionRanges);
+    return fillSelectableIntervals(
+      selectableIntervals,
+      this.selectionIntervalRanges
+    );
   }
 
   public addSelectionRange(startTime: Time24, endTime: Time24): void {
     // If no selection ranges exist, add the new range and return
     if (this.isEmpty()) {
-      this.selectionRanges.push({ startTime, endTime });
+      this.selectionIntervalRanges.push({ startTime, endTime });
       return;
     }
 
     const newSelectionRanges = [
-      ...this.selectionRanges,
+      ...this.selectionIntervalRanges,
       { startTime, endTime },
     ];
 
-    this.selectionRanges = reduceSelectionRanges(
+    this.selectionIntervalRanges = reduceSelectionRanges(
       newSelectionRanges,
       this.intervalSize
     );
@@ -333,8 +338,8 @@ export class SchedulorSelection {
       return;
     }
 
-    this.selectionRanges = removeSelectionRangeFromSelectionRanges(
-      this.selectionRanges,
+    this.selectionIntervalRanges = removeSelectionRangeFromSelectionRanges(
+      this.selectionIntervalRanges,
       {
         startTime,
         endTime,
@@ -346,14 +351,14 @@ export class SchedulorSelection {
   public valueOf() {
     return {
       date: this.date,
-      selectionRanges: this.selectionRanges,
+      selectionRanges: this.selectionIntervalRanges,
     };
   }
 
   public toString(): string {
     return JSON.stringify({
       date: formatDateToFriendlyString(this.date),
-      selectionRanges: this.selectionRanges.map((range) => [
+      selectionRanges: this.selectionIntervalRanges.map((range) => [
         range.startTime.toString(),
         range.endTime.toString(),
       ]),
@@ -363,7 +368,7 @@ export class SchedulorSelection {
   public copy(): SchedulorSelection {
     return new SchedulorSelection(
       this.date,
-      [...this.selectionRanges],
+      [...this.selectionIntervalRanges],
       this.intervalSize
     );
   }
@@ -371,7 +376,7 @@ export class SchedulorSelection {
   public copyWithDate(date: Date): SchedulorSelection {
     const newSelection = new SchedulorSelection(
       this.date,
-      [...this.selectionRanges],
+      [...this.selectionIntervalRanges],
       this.intervalSize
     );
     newSelection.date = date;
@@ -380,30 +385,26 @@ export class SchedulorSelection {
 
   public copyWithTimes(startTime: Time24, endTime: Time24): SchedulorSelection {
     const newSelection = this.copy();
-    newSelection.selectionRanges = [{ startTime, endTime }];
+    newSelection.selectionIntervalRanges = [{ startTime, endTime }];
     return newSelection;
   }
 
   public copyAsEmpty(): SchedulorSelection {
-    console.log('copyAsEmpty');
     return new SchedulorSelection(this.date, [], this.intervalSize);
   }
 }
 
 export const parseSelectionRanges = (
-  selectionRanges: string
-): SchedulorSelectionRange[] => {
-  const parsedSelectionRanges: any[] = JSON.parse(selectionRanges);
-
-  return parsedSelectionRanges.map((selectionRange: any) => ({
-    startTime: new Time24(selectionRange[0]),
-    endTime: new Time24(selectionRange[1]),
-  }));
+  selectionRanges: any[]
+): SelectionIntervalRange[] => {
+  return selectionRanges.map(
+    (selectionRange: { startTime: Time24; endTime: Time24 }) => selectionRange
+  );
 };
 
-export const parseSelection = (selection: {
+export const parseSchedulorSelection = (selection: {
   date: string;
-  selectionRanges: string;
+  selectionRanges: any[];
 }): SchedulorSelection => {
   const parsedSelectionRanges = parseSelectionRanges(selection.selectionRanges);
 

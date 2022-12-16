@@ -16,8 +16,8 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionRanges[0]).toEqual(newRange);
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
+      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual(newRange);
     });
 
     it('add range that encompasses current selection range', () => {
@@ -38,8 +38,8 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionRanges[0]).toEqual(newRange);
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
+      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual(newRange);
     });
 
     it('add range that encompasses current selection ranges', () => {
@@ -68,8 +68,8 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionRanges[0]).toEqual(newRange);
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
+      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual(newRange);
     });
 
     it('add range that is smaller than current selection range', () => {
@@ -94,8 +94,10 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionRanges[0]).toEqual(expectedRange);
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
+      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual(
+        expectedRange
+      );
     });
 
     it('add range that is smaller than one of current selection ranges', () => {
@@ -122,8 +124,8 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(2);
-      expect(schedulorSelection.selectionRanges).toEqual(ranges);
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(2);
+      expect(schedulorSelection.selectionIntervalRanges).toEqual(ranges);
     });
 
     it('add range that does not overlap with one of current selection ranges', () => {
@@ -150,8 +152,8 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(3);
-      expect(schedulorSelection.selectionRanges[1]).toEqual(newRange);
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(3);
+      expect(schedulorSelection.selectionIntervalRanges[1]).toEqual(newRange);
     });
 
     it('add range that overlaps with start of one of current selection ranges', () => {
@@ -178,8 +180,8 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(2);
-      expect(schedulorSelection.selectionRanges[0]).toEqual({
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(2);
+      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual({
         startTime: Time24.fromNumber(7),
         endTime: Time24.fromNumber(17),
       });
@@ -209,8 +211,8 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(2);
-      expect(schedulorSelection.selectionRanges[0]).toEqual({
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(2);
+      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual({
         startTime: Time24.fromNumber(9),
         endTime: Time24.fromNumber(15),
       });
@@ -240,8 +242,8 @@ describe('Schedulor selection class', () => {
         newRange.endTime
       );
 
-      expect(schedulorSelection.selectionRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionRanges[0]).toEqual({
+      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
+      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual({
         startTime: Time24.fromNumber(9),
         endTime: Time24.fromNumber(23),
       });
