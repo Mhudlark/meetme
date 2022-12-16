@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
 import { DbContext } from '@/context/dbContext';
@@ -87,7 +87,7 @@ export default function PreferenceOverlapPreview({
   }, [filteredUsers, preferencesOverlap]);
 
   return (
-    <Stack sx={{ gap: 2, width: '100%', height: '100%' }}>
+    <Stack sx={{ gap: { xs: 3, sm: 4 }, width: '100%', height: '100%' }}>
       <Typography variant="h3">{`Everyone's preferences`}</Typography>
       <Stack sx={{ flexDirection: 'row', gap: 1 }}>
         {filteredUsers.map((filteredUser) => (
@@ -101,25 +101,26 @@ export default function PreferenceOverlapPreview({
       <Stack
         sx={{
           borderRadius: 2,
-          gap: 2,
+          gap: 3,
           width: '100%',
           height: '100%',
           overflow: 'auto',
         }}
       >
         {filteredPreferencesOverlap?.map((row, rowIndex) => (
-          <Stack key={rowIndex}>
+          <Stack key={rowIndex} sx={{ gap: 1 }}>
             {row?.[0]?.start && (
               <Typography variant="body1">
                 {formatDateToFriendlyString(row[0].start)}
               </Typography>
             )}
-            <Stack
-              sx={{
-                flexDirection: 'row',
-                justifyContent: 'stretch',
-                gap: 0.5,
-              }}
+            <div
+              id="overlap day container"
+              className="
+                grid grid-cols-auto-fill-64
+                justify-start
+                gap-1
+              "
             >
               {row?.map((interval, intervalIndex) => (
                 <CustomTooltip
@@ -129,22 +130,27 @@ export default function PreferenceOverlapPreview({
                     .join(', ')}
                   placement="top"
                 >
-                  <Box
-                    sx={{
+                  <div
+                    className={`
+                    flex
+                    select-none
+                    justify-center
+                    rounded-md
+                    border-2 border-gray-900
+                    py-1
+                    px-2
+                `}
+                    style={{
                       backgroundColor: getOverlapColour(
                         interval.availability.count
                       ),
-                      p: 1,
-                      flexGrow: 1,
-                      borderRadius: '4px',
-                      userSelect: 'none',
                     }}
                   >
                     {new Time24(interval.start).toString()}
-                  </Box>
+                  </div>
                 </CustomTooltip>
               ))}
-            </Stack>
+            </div>
           </Stack>
         ))}
       </Stack>
