@@ -1,10 +1,10 @@
-import { SchedulorSelection } from '../schedulorSelection';
+import { PreferenceSelection } from '../preferenceSelection';
 import { Time24 } from '../time24';
 
 describe('Schedulor selection class', () => {
   describe('addSelectionRange', () => {
     it('add range to empty selection', () => {
-      const schedulorSelection = new SchedulorSelection(new Date(), [], 1);
+      const schedulorSelection = new PreferenceSelection(new Date(), [], 1);
 
       const newRange = {
         startTime: Time24.fromNumber(9),
@@ -21,7 +21,7 @@ describe('Schedulor selection class', () => {
     });
 
     it('add range that encompasses current selection range', () => {
-      const schedulorSelection = new SchedulorSelection(
+      const schedulorSelection = new PreferenceSelection(
         new Date(),
         Time24.fromNumber(10),
         Time24.fromNumber(16),
@@ -43,7 +43,7 @@ describe('Schedulor selection class', () => {
     });
 
     it('add range that encompasses current selection ranges', () => {
-      const schedulorSelection = new SchedulorSelection(
+      const schedulorSelection = new PreferenceSelection(
         new Date(),
         [
           {
@@ -78,7 +78,7 @@ describe('Schedulor selection class', () => {
         endTime: Time24.fromNumber(17),
       };
 
-      const schedulorSelection = new SchedulorSelection(
+      const schedulorSelection = new PreferenceSelection(
         new Date(),
         [expectedRange],
         1
@@ -112,7 +112,7 @@ describe('Schedulor selection class', () => {
         },
       ];
 
-      const schedulorSelection = new SchedulorSelection(new Date(), ranges, 1);
+      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
 
       const newRange = {
         startTime: Time24.fromNumber(10),
@@ -140,7 +140,7 @@ describe('Schedulor selection class', () => {
         },
       ];
 
-      const schedulorSelection = new SchedulorSelection(new Date(), ranges, 1);
+      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
 
       const newRange = {
         startTime: Time24.fromNumber(14),
@@ -168,7 +168,7 @@ describe('Schedulor selection class', () => {
         },
       ];
 
-      const schedulorSelection = new SchedulorSelection(new Date(), ranges, 1);
+      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
 
       const newRange = {
         startTime: Time24.fromNumber(7),
@@ -199,7 +199,7 @@ describe('Schedulor selection class', () => {
         },
       ];
 
-      const schedulorSelection = new SchedulorSelection(new Date(), ranges, 1);
+      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
 
       const newRange = {
         startTime: Time24.fromNumber(10),
@@ -230,7 +230,7 @@ describe('Schedulor selection class', () => {
         },
       ];
 
-      const schedulorSelection = new SchedulorSelection(new Date(), ranges, 1);
+      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
 
       const newRange = {
         startTime: Time24.fromNumber(10),

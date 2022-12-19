@@ -12,7 +12,7 @@ import {
 
 import type { Time24 } from './time24';
 
-export class SchedulorSelection {
+export class PreferenceSelection {
   public date: Date;
 
   public selectionIntervalRanges: SelectionIntervalRange[];
@@ -122,16 +122,16 @@ export class SchedulorSelection {
     });
   }
 
-  public copy(): SchedulorSelection {
-    return new SchedulorSelection(
+  public copy(): PreferenceSelection {
+    return new PreferenceSelection(
       this.date,
       [...this.selectionIntervalRanges],
       this.intervalSize
     );
   }
 
-  public copyWithDate(date: Date): SchedulorSelection {
-    const newSelection = new SchedulorSelection(
+  public copyWithDate(date: Date): PreferenceSelection {
+    const newSelection = new PreferenceSelection(
       this.date,
       [...this.selectionIntervalRanges],
       this.intervalSize
@@ -140,13 +140,13 @@ export class SchedulorSelection {
     return newSelection;
   }
 
-  public copyWithTimes(startTime: Time24, endTime: Time24): SchedulorSelection {
+  public copyWithTimes(startTime: Time24, endTime: Time24): PreferenceSelection {
     const newSelection = this.copy();
     newSelection.selectionIntervalRanges = [{ startTime, endTime }];
     return newSelection;
   }
 
-  public copyAsEmpty(): SchedulorSelection {
-    return new SchedulorSelection(this.date, [], this.intervalSize);
+  public copyAsEmpty(): PreferenceSelection {
+    return new PreferenceSelection(this.date, [], this.intervalSize);
   }
 }

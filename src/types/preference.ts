@@ -1,21 +1,21 @@
 import type { PreferenceSchema } from '@/backend/db/database/schemas/types';
 import { parseSelectionsString } from '@/utils/types/parse';
 
-import type { SchedulorSelection } from './schedulorSelection';
+import type { PreferenceSelection } from './preferenceSelection';
 
 export class Preference {
   constructor(
     public preferenceId: string,
     public meetingId: string,
     public userId: string,
-    public scheduleSelections: SchedulorSelection[]
+    public scheduleSelections: PreferenceSelection[]
   ) {}
 
   public toString(): string {
     return JSON.stringify(this.scheduleSelections);
   }
 
-  public copyWithNewSelections(selections: SchedulorSelection[]): Preference {
+  public copyWithNewSelections(selections: PreferenceSelection[]): Preference {
     return new Preference(
       this.preferenceId,
       this.meetingId,
