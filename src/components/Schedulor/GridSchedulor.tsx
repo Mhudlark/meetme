@@ -4,7 +4,7 @@ import { isSameDay } from 'date-fns';
 import { useMemo } from 'react';
 
 import { customColors } from '@/styles/colors';
-import type { SchedulorSelection } from '@/types/schedulorSelection';
+import type { PreferenceSelection } from '@/types/preferenceSelection';
 import type { Time24 } from '@/types/time24';
 import { formatDateToFriendlyString, getDateRange } from '@/utils/date';
 
@@ -12,8 +12,8 @@ import AvailabilityPicker from '../AvailabilityPicker';
 import CustomSwitch from '../Switch';
 
 export interface GridSchedulorProps {
-  selections: SchedulorSelection[];
-  onChange: (selections: SchedulorSelection[]) => void;
+  selections: PreferenceSelection[];
+  onChange: (selections: PreferenceSelection[]) => void;
   startDate: Date;
   endDate: Date;
   minTime: Time24;
@@ -49,7 +49,7 @@ export default function GridSchedulor({
     onChange(newSelections);
   };
 
-  const handleChange = (day: Date, newSelection: SchedulorSelection) => {
+  const handleChange = (day: Date, newSelection: PreferenceSelection) => {
     const newSelections = selections.map((selection) => {
       if (selection.date.getDate() === day.getDate()) return newSelection;
       return selection;
@@ -61,7 +61,7 @@ export default function GridSchedulor({
   const copyPreviousDaySelection = (day: Date) => {
     const newSelections = selections.map((selection, index) => {
       if (index > 0 && isSameDay(selection.date, day)) {
-        const previousSelection = selections[index - 1] as SchedulorSelection;
+        const previousSelection = selections[index - 1] as PreferenceSelection;
         return previousSelection.copyWithDate(selection.date);
       }
       return selection;
@@ -124,7 +124,7 @@ export default function GridSchedulor({
           </Stack>
           <AvailabilityPicker
             onChange={(newDates) => handleChange(day, newDates)}
-            selection={selections?.[index] as SchedulorSelection}
+            selection={selections?.[index] as PreferenceSelection}
             minTime={minTime}
             maxTime={maxTime}
             intervalSize={intervalSize}

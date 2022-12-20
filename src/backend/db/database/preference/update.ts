@@ -1,4 +1,4 @@
-import type { SchedulorSelection } from '@/types/schedulorSelection';
+import type { PreferenceSelection } from '@/types/preferenceSelection';
 import { getArrElement } from '@/utils/array';
 
 import { dbConfig } from '../../dbConfig';
@@ -12,13 +12,13 @@ import type { PreferenceSchema } from '../schemas/types';
  * @param {Supabase} supabase The Supabase client
  * @param {string} meetingId The meeting id
  * @param {string} userId The user id
- * @param {SchedulorSelection} selections The user preferences / selections
+ * @param {PreferenceSelection} selections The user preferences / selections
  */
 export const updatePreferenceInDB = async (
   supabase: Supabase,
   meetingId: string,
   userId: string,
-  selections: SchedulorSelection[]
+  selections: PreferenceSelection[]
 ): Promise<PreferenceSchema> => {
   try {
     const { data, error } = await supabase

@@ -2,7 +2,7 @@ import { Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import type { MeetingDetails } from '@/types/meeting';
-import type { SchedulorSelection } from '@/types/schedulorSelection';
+import type { PreferenceSelection } from '@/types/preferenceSelection';
 import { Time24 } from '@/types/time24';
 import { INTERVAL_SIZE } from '@/utils/constants';
 
@@ -24,8 +24,8 @@ export interface SchedulorModalProps {
   onClose: () => void;
   variant: 'add' | 'update';
   meetingDetails: MeetingDetails;
-  selections: SchedulorSelection[];
-  onSubmitPreferences: (selections: SchedulorSelection[]) => void;
+  selections: PreferenceSelection[];
+  onSubmitPreferences: (selections: PreferenceSelection[]) => void;
 }
 
 const SchedulorModal = ({
@@ -39,10 +39,10 @@ const SchedulorModal = ({
   const variantInfo = variantInfos[variant];
 
   const [localSelections, setLocalSelections] =
-    useState<SchedulorSelection[]>(selections);
+    useState<PreferenceSelection[]>(selections);
   const [haveSelectionsChanged, setHaveSelectionsChanged] = useState(false);
 
-  const onSelectionsChanged = (newSelections: SchedulorSelection[]) => {
+  const onSelectionsChanged = (newSelections: PreferenceSelection[]) => {
     setLocalSelections(newSelections);
     setHaveSelectionsChanged(true);
   };

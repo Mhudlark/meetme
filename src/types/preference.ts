@@ -1,5 +1,5 @@
 import type { PreferenceSchema } from '@/backend/db/database/schemas/types';
-import { parseSelectionsString } from '@/utils/types/parse';
+import { parseSelectionsString } from '@/utils/typesUtils/parse';
 
 import type { PreferenceSelection } from './preferenceSelection';
 

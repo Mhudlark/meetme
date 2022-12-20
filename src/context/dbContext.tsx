@@ -24,7 +24,7 @@ import {
 } from '@/types/meeting';
 import type { Preference } from '@/types/preference';
 import { createPreferenceFromPreferenceSchema } from '@/types/preference';
-import type { SchedulorSelection } from '@/types/schedulorSelection';
+import type { PreferenceSelection } from '@/types/preferenceSelection';
 import type { User } from '@/types/user';
 import { createUserFromUserSchema } from '@/types/user';
 import { validateUsername } from '@/utils/validation';
@@ -36,9 +36,9 @@ export type DbContextType = {
   addPreferences: (
     meetingId: string,
     username: string,
-    selections: SchedulorSelection[]
+    selections: PreferenceSelection[]
   ) => Promise<void>;
-  updatePreferences: (selections: SchedulorSelection[]) => Promise<void>;
+  updatePreferences: (selections: PreferenceSelection[]) => Promise<void>;
   signOut: () => Promise<void>;
   leaveMeeting: (username: string) => Promise<void>;
   deleteMeeting: (meetingId: string) => Promise<void>;
@@ -124,7 +124,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
   const addPreferences = async (
     meetingId: string,
     username: string,
-    selections: SchedulorSelection[]
+    selections: PreferenceSelection[]
   ) => {
     if (!username || !validateUsername(username))
       throw new Error('Username is invalid');
@@ -145,7 +145,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
     if (meeting) await getMeeting(meeting.id);
   };
 
-  const updatePreferences = async (selections: SchedulorSelection[]) => {
+  const updatePreferences = async (selections: PreferenceSelection[]) => {
     if (!user) throw new Error('User is not signed in already');
     if (!meeting) throw new Error('User is not in a meeting');
     if (!preference) throw new Error('User has no existing preferences');

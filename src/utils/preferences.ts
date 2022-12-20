@@ -13,7 +13,7 @@ type Availability = {
   users: User[];
 };
 
-type Interval = {
+export type Interval = {
   start: Date;
   availability: Availability;
 };
@@ -134,7 +134,7 @@ export const calculateOverlappingPreferences = (
       const dayIntervals = allIntervals[dayIndex] as Day;
       const numIntervalsInDay = dayIntervals.length;
 
-      selection.selectionIntervalRanges.forEach(({ startTime, endTime }) => {
+      selection.selectionIntervals.forEach(({ startTime, endTime }) => {
         const startIntervalIndex = calculateIntervalIndexFromTime(
           startTime,
           minTime,

@@ -1,7 +1,7 @@
 import { range } from 'lodash';
 import { useMemo } from 'react';
 
-import type { SchedulorSelection } from '@/types/schedulorSelection';
+import type { PreferenceSelection } from '@/types/preferenceSelection';
 import { Time24 } from '@/types/time24';
 
 import type { SliderMark } from '../RangeSlider';
@@ -15,8 +15,8 @@ export interface AvailabilityPickerProps {
   minTime: Time24;
   maxTime: Time24;
   intervalSize: number;
-  selection: SchedulorSelection;
-  onChange: (newSelection: SchedulorSelection) => void;
+  selection: PreferenceSelection;
+  onChange: (newSelection: PreferenceSelection) => void;
 }
 
 const AvailabilityPicker = ({
@@ -44,7 +44,7 @@ const AvailabilityPicker = ({
   const isEachIntervalSelected = useMemo(() => {
     return selection
       .getSelectedIntervals(minTime, maxTime)
-      .map((interval) => interval.selected);
+      .map((interval) => interval.isSelected());
   }, [selection]);
 
   const handleIntervalClicked = (
@@ -60,12 +60,12 @@ const AvailabilityPicker = ({
     const selectionCopy = selection.copy();
 
     if (isCurrentlySelected)
-      selectionCopy.removeSelectionRange(
+      selectionCopy.removeSelectionInterval(
         clickedSelectionStartTime,
         clickedSelectionEndTime
       );
     else
-      selectionCopy.addSelectionRange(
+      selectionCopy.addSelectionInterval(
         clickedSelectionStartTime,
         clickedSelectionEndTime
       );

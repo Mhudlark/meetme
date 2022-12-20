@@ -1,252 +1,262 @@
 import { PreferenceSelection } from '../preferenceSelection';
+import { SelectionInterval } from '../selectionInterval';
 import { Time24 } from '../time24';
+
+const mockDate = new Date();
+
+const mockSelectionInterval = (
+  startTime: number,
+  endTime: number,
+  intervalSize: number = 1,
+  count: number = 1
+) => {
+  return new SelectionInterval(
+    mockDate,
+    Time24.fromNumber(startTime),
+    Time24.fromNumber(endTime),
+    intervalSize,
+    count
+  );
+};
 
 describe('Schedulor selection class', () => {
   describe('addSelectionRange', () => {
     it('add range to empty selection', () => {
-      const schedulorSelection = new PreferenceSelection(new Date(), [], 1);
-
-      const newRange = {
-        startTime: Time24.fromNumber(9),
-        endTime: Time24.fromNumber(17),
-      };
-
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      const preferenceIntervalSize = 1;
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        [],
+        preferenceIntervalSize
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual(newRange);
+      const newInterval = mockSelectionInterval(9, 17, preferenceIntervalSize);
+
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
+      );
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(1);
+      expect(preferenceSelection.selectionIntervals[0]).toEqual(newInterval);
     });
 
     it('add range that encompasses current selection range', () => {
-      const schedulorSelection = new PreferenceSelection(
-        new Date(),
+      const preferenceIntervalSize = 1;
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
         Time24.fromNumber(10),
         Time24.fromNumber(16),
-        1
+        preferenceIntervalSize
       );
 
-      const newRange = {
-        startTime: Time24.fromNumber(9),
-        endTime: Time24.fromNumber(17),
-      };
+      const newInterval = mockSelectionInterval(9, 17, preferenceIntervalSize);
 
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual(newRange);
+      expect(preferenceSelection.selectionIntervals.length).toEqual(1);
+      expect(preferenceSelection.selectionIntervals[0]).toEqual(newInterval);
     });
 
     it('add range that encompasses current selection ranges', () => {
-      const schedulorSelection = new PreferenceSelection(
-        new Date(),
+      const preferenceIntervalSize = 1;
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
         [
-          {
-            startTime: Time24.fromNumber(10),
-            endTime: Time24.fromNumber(12),
-          },
-          {
-            startTime: Time24.fromNumber(14),
-            endTime: Time24.fromNumber(16),
-          },
+          mockSelectionInterval(10, 12, preferenceIntervalSize),
+          mockSelectionInterval(14, 16, preferenceIntervalSize),
         ],
-        1
+        preferenceIntervalSize
       );
 
-      const newRange = {
-        startTime: Time24.fromNumber(9),
-        endTime: Time24.fromNumber(17),
-      };
+      const newInterval = mockSelectionInterval(9, 17, preferenceIntervalSize);
 
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual(newRange);
+      expect(preferenceSelection.selectionIntervals.length).toEqual(1);
+      expect(preferenceSelection.selectionIntervals[0]).toEqual(newInterval);
     });
 
     it('add range that is smaller than current selection range', () => {
-      const expectedRange = {
-        startTime: Time24.fromNumber(9),
-        endTime: Time24.fromNumber(17),
-      };
+      const preferenceIntervalSize = 1;
 
-      const schedulorSelection = new PreferenceSelection(
-        new Date(),
-        [expectedRange],
-        1
+      const expectedInterval = mockSelectionInterval(
+        9,
+        17,
+        preferenceIntervalSize
       );
 
-      const newRange = {
-        startTime: Time24.fromNumber(10),
-        endTime: Time24.fromNumber(16),
-      };
-
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        [expectedInterval],
+        preferenceIntervalSize
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual(
-        expectedRange
+      const newInterval = mockSelectionInterval(10, 16, preferenceIntervalSize);
+
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
+      );
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(1);
+      expect(preferenceSelection.selectionIntervals[0]).toEqual(
+        expectedInterval
       );
     });
 
     it('add range that is smaller than one of current selection ranges', () => {
-      const ranges = [
-        {
-          startTime: Time24.fromNumber(9),
-          endTime: Time24.fromNumber(17),
-        },
-        {
-          startTime: Time24.fromNumber(18),
-          endTime: Time24.fromNumber(23),
-        },
+      const preferenceIntervalSize = 1;
+
+      const initialIntervals = [
+        mockSelectionInterval(9, 17, preferenceIntervalSize),
+        mockSelectionInterval(18, 23, preferenceIntervalSize),
       ];
 
-      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
-
-      const newRange = {
-        startTime: Time24.fromNumber(10),
-        endTime: Time24.fromNumber(16),
-      };
-
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        initialIntervals,
+        preferenceIntervalSize
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(2);
-      expect(schedulorSelection.selectionIntervalRanges).toEqual(ranges);
+      const newInterval = mockSelectionInterval(10, 16, preferenceIntervalSize);
+
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
+      );
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(2);
+      expect(preferenceSelection.selectionIntervals).toEqual(initialIntervals);
     });
 
     it('add range that does not overlap with one of current selection ranges', () => {
-      const ranges = [
-        {
-          startTime: Time24.fromNumber(9),
-          endTime: Time24.fromNumber(12),
-        },
-        {
-          startTime: Time24.fromNumber(20),
-          endTime: Time24.fromNumber(23),
-        },
+      const preferenceIntervalSize = 1;
+
+      const initialIntervals = [
+        mockSelectionInterval(9, 12, preferenceIntervalSize),
+        mockSelectionInterval(20, 23, preferenceIntervalSize),
       ];
 
-      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
-
-      const newRange = {
-        startTime: Time24.fromNumber(14),
-        endTime: Time24.fromNumber(17),
-      };
-
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        initialIntervals,
+        preferenceIntervalSize
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(3);
-      expect(schedulorSelection.selectionIntervalRanges[1]).toEqual(newRange);
+      const newInterval = mockSelectionInterval(14, 17, preferenceIntervalSize);
+
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
+      );
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(3);
+      expect(preferenceSelection.selectionIntervals[1]).toEqual(newInterval);
     });
 
     it('add range that overlaps with start of one of current selection ranges', () => {
-      const ranges = [
-        {
-          startTime: Time24.fromNumber(9),
-          endTime: Time24.fromNumber(17),
-        },
-        {
-          startTime: Time24.fromNumber(18),
-          endTime: Time24.fromNumber(23),
-        },
+      const preferenceIntervalSize = 1;
+
+      const initialIntervals = [
+        mockSelectionInterval(9, 17, preferenceIntervalSize),
+        mockSelectionInterval(18, 23, preferenceIntervalSize),
       ];
 
-      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
-
-      const newRange = {
-        startTime: Time24.fromNumber(7),
-        endTime: Time24.fromNumber(12),
-      };
-
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        initialIntervals,
+        preferenceIntervalSize
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(2);
-      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual({
-        startTime: Time24.fromNumber(7),
-        endTime: Time24.fromNumber(17),
-      });
+      const newInterval = mockSelectionInterval(7, 12, preferenceIntervalSize);
+
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
+      );
+
+      const expectedInterval = mockSelectionInterval(
+        7,
+        17,
+        preferenceIntervalSize
+      );
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(2);
+      expect(preferenceSelection.selectionIntervals[0]).toEqual(
+        expectedInterval
+      );
     });
 
     it('add range that overlaps with end of one of current selection ranges', () => {
-      const ranges = [
-        {
-          startTime: Time24.fromNumber(9),
-          endTime: Time24.fromNumber(12),
-        },
-        {
-          startTime: Time24.fromNumber(20),
-          endTime: Time24.fromNumber(23),
-        },
+      const preferenceIntervalSize = 1;
+
+      const initialIntervals = [
+        mockSelectionInterval(9, 12, preferenceIntervalSize),
+        mockSelectionInterval(20, 23, preferenceIntervalSize),
       ];
 
-      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
-
-      const newRange = {
-        startTime: Time24.fromNumber(10),
-        endTime: Time24.fromNumber(15),
-      };
-
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        initialIntervals,
+        preferenceIntervalSize
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(2);
-      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual({
-        startTime: Time24.fromNumber(9),
-        endTime: Time24.fromNumber(15),
-      });
+      const newInterval = mockSelectionInterval(10, 15, preferenceIntervalSize);
+
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
+      );
+
+      const expectedInterval = mockSelectionInterval(
+        9,
+        15,
+        preferenceIntervalSize
+      );
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(2);
+      expect(preferenceSelection.selectionIntervals[0]).toEqual(
+        expectedInterval
+      );
     });
 
     it('add range that overlaps multiple current selection ranges', () => {
-      const ranges = [
-        {
-          startTime: Time24.fromNumber(9),
-          endTime: Time24.fromNumber(17),
-        },
-        {
-          startTime: Time24.fromNumber(18),
-          endTime: Time24.fromNumber(23),
-        },
+      const preferenceIntervalSize = 1;
+
+      const initialIntervals = [
+        mockSelectionInterval(9, 17, preferenceIntervalSize),
+        mockSelectionInterval(18, 23, preferenceIntervalSize),
       ];
 
-      const schedulorSelection = new PreferenceSelection(new Date(), ranges, 1);
-
-      const newRange = {
-        startTime: Time24.fromNumber(10),
-        endTime: Time24.fromNumber(20),
-      };
-
-      schedulorSelection.addSelectionRange(
-        newRange.startTime,
-        newRange.endTime
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        initialIntervals,
+        preferenceIntervalSize
       );
 
-      expect(schedulorSelection.selectionIntervalRanges.length).toEqual(1);
-      expect(schedulorSelection.selectionIntervalRanges[0]).toEqual({
-        startTime: Time24.fromNumber(9),
-        endTime: Time24.fromNumber(23),
-      });
+      const newInterval = mockSelectionInterval(10, 20, preferenceIntervalSize);
+
+      preferenceSelection.addSelectionInterval(
+        newInterval.startTime,
+        newInterval.endTime
+      );
+
+      const expectedInterval = mockSelectionInterval(
+        9,
+        23,
+        preferenceIntervalSize
+      );
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(1);
+      expect(preferenceSelection.selectionIntervals[0]).toEqual(
+        expectedInterval
+      );
     });
   });
 });

@@ -13,7 +13,7 @@ import SchedulorModal from '@/components/Meeting/schedulorModal';
 import SignInModal from '@/components/Meeting/signInModal';
 import { UIAlertContext } from '@/context/Alert/alertContext';
 import { DbContext } from '@/context/dbContext';
-import { SchedulorSelection } from '@/types/schedulorSelection';
+import { PreferenceSelection } from '@/types/preferenceSelection';
 import { Time24 } from '@/types/time24';
 import { INTERVAL_SIZE } from '@/utils/constants';
 import { paths } from '@/utils/paths';
@@ -31,7 +31,7 @@ const generateSelections = (
   return range(0, numDays).map((i) => {
     const day = addDays(startDate, i);
 
-    const selection = new SchedulorSelection(
+    const selection = new PreferenceSelection(
       day,
       minTime,
       maxTime,
@@ -75,7 +75,7 @@ const Meeting = () => {
 
   const [username, setUsername] = useState<string | null>(null);
   const [selections, setSelections] =
-    useState<SchedulorSelection[]>(defaultSelections);
+    useState<PreferenceSelection[]>(defaultSelections);
 
   const isUsernameValid = useMemo(() => {
     return username !== null && validateUsername(username);
@@ -96,7 +96,7 @@ const Meeting = () => {
   };
 
   const onSubmitPreferencesClicked = async (
-    newSelections: SchedulorSelection[],
+    newSelections: PreferenceSelection[],
     add: boolean = true
   ) => {
     if (!username) {
