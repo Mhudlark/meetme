@@ -1,9 +1,7 @@
 import { formatDateToFriendlyString } from '@/utils/date';
-import { add } from '@/utils/math';
 import {
   addIntervalToIntervals,
-  getSelectionIntervalRange,
-  mergeSelectionIntervals,
+  getSelectedIntervalsForTimeRange,
   removeIntervalFromIntervals,
 } from '@/utils/typesUtils/selectionInterval';
 
@@ -17,30 +15,46 @@ export class PreferenceSelection {
 
   public intervalSize: number;
 
+  public userId: string;
+
   constructor(
     date: Date,
-    selectionRanges: SelectionInterval[],
-    intervalSize: number
+    selectionIntervals: SelectionInterval[],
+    intervalSize: number,
+    userId: string
   );
   constructor(
     date: Date,
     startTime: Time24,
     endTime: Time24,
-    intervalSize: number
+    intervalSize: number,
+    userId: string
   );
   constructor(...args: Array<any>) {
     this.date = args[0] as Date;
-    this.intervalSize = args[args.length - 1] as number;
+    this.intervalSize = args[args.length - 2] as number;
+    this.userId = args[args.length - 1] as string;
 
-    if (args.length === 3) {
+    // date, selectionIntervals, intervalSize, userId
+    if (args.length === 4) {
       this.selectionIntervals = args[1] as SelectionInterval[];
-    } else if (args.length === 4) {
+    }
+    // date, startTime, endTime, intervalSize, userId
+    else if (args.length === 5) {
       const startTime = args[1] as Time24;
       const endTime = args[2] as Time24;
       this.selectionIntervals = [
-        new SelectionInterval(this.date, startTime, endTime, this.intervalSize),
+        new SelectionInterval(
+          this.date,
+          startTime,
+          endTime,
+          this.intervalSize,
+          [this.userId]
+        ),
       ];
-    } else {
+    }
+    // Invalid arguments
+    else {
       throw new Error(
         `Invalid arguments passed to PreferenceSelection constructor: ${args}`
       );
@@ -51,14 +65,9 @@ export class PreferenceSelection {
     return this.selectionIntervals.length === 0;
   }
 
-  public getSelectionIntervalsStartTimes(): Time24[] {
-    return this.selectionIntervals.map((interval) => interval.startTime);
-  }
-
   /**
-   * Returns the selection intervals for the given time range. If those intervals
-   * are not selection in this preference selection, then those selection intervals
-   * will have a count of 0 and will return false for isSelected().
+   * Returns the selection intervals for the given time range, including the
+   * unselected intervals.
    * @param minTime The minimum time to get selection intervals for
    * @param maxTime The maximum time to get selection intervals for
    */
@@ -66,40 +75,31 @@ export class PreferenceSelection {
     minTime: Time24,
     maxTime: Time24
   ): SelectionInterval[] {
-    const blankSelectionIntervals = getSelectionIntervalRange(
-      this.date,
-      minTime,
-      maxTime,
-      this.intervalSize
-    );
-
-    return mergeSelectionIntervals(
-      blankSelectionIntervals,
+    return getSelectedIntervalsForTimeRange(
       this.selectionIntervals,
-      add
+      this.date,
+      this.intervalSize,
+      minTime,
+      maxTime
     );
   }
 
   private initSelectionInterval(
     startTime: Time24,
-    endTime: Time24
+    endTime: Time24,
+    userId?: string
   ): SelectionInterval {
     return new SelectionInterval(
       this.date,
       startTime,
       endTime,
-      this.intervalSize
+      this.intervalSize,
+      [userId || this.userId]
     );
   }
 
-  public addSelectionInterval(
-    startTime: Time24,
-    endTime: Time24,
-    mergeIntervalsWithDifferentCounts: boolean = true
-  ): void {
-    const newInterval = this.initSelectionInterval(startTime, endTime);
-
-    // If no selection ranges exist, add the new range and return
+  public addSelectionInterval(newInterval: SelectionInterval): void {
+    // If no selection intervals exist, add the new interval and return
     if (this.isEmpty()) {
       this.selectionIntervals.push(newInterval);
       return;
@@ -107,13 +107,22 @@ export class PreferenceSelection {
 
     this.selectionIntervals = addIntervalToIntervals(
       this.selectionIntervals,
-      newInterval,
-      mergeIntervalsWithDifferentCounts
+      newInterval
     );
   }
 
+  public addSelectionIntervalFromTimes(
+    startTime: Time24,
+    endTime: Time24,
+    userId?: string
+  ): void {
+    const newInterval = this.initSelectionInterval(startTime, endTime, userId);
+
+    this.addSelectionInterval(newInterval);
+  }
+
   public removeSelectionInterval(startTime: Time24, endTime: Time24): void {
-    // If no selection ranges exist, just return
+    // If no selection intervals exist, just return
     if (this.isEmpty()) {
       return;
     }
@@ -129,16 +138,16 @@ export class PreferenceSelection {
   public valueOf() {
     return {
       date: this.date,
-      selectionRanges: this.selectionIntervals,
+      selectionIntervals: this.selectionIntervals,
     };
   }
 
   public toString(): string {
     return JSON.stringify({
       date: formatDateToFriendlyString(this.date),
-      selectionRanges: this.selectionIntervals.map((range) => [
-        range.startTime.toString(),
-        range.endTime.toString(),
+      selectionIntervals: this.selectionIntervals.map((interval) => [
+        interval.startTime.toString(),
+        interval.endTime.toString(),
       ]),
     });
   }
@@ -147,17 +156,18 @@ export class PreferenceSelection {
     return new PreferenceSelection(
       this.date,
       [...this.selectionIntervals],
-      this.intervalSize
+      this.intervalSize,
+      this.userId
     );
   }
 
   public copyWithDate(date: Date): PreferenceSelection {
     const newSelection = new PreferenceSelection(
-      this.date,
-      [...this.selectionIntervals],
-      this.intervalSize
+      date,
+      this.selectionIntervals.map((interval) => interval.copyWithDate(date)),
+      this.intervalSize,
+      this.userId
     );
-    newSelection.date = date;
     return newSelection;
   }
 
@@ -169,12 +179,18 @@ export class PreferenceSelection {
       this.date,
       startTime,
       endTime,
-      this.intervalSize
+      this.intervalSize,
+      this.userId
     );
     return newSelection;
   }
 
   public copyAsEmpty(): PreferenceSelection {
-    return new PreferenceSelection(this.date, [], this.intervalSize);
+    return new PreferenceSelection(
+      this.date,
+      [],
+      this.intervalSize,
+      this.userId
+    );
   }
 }

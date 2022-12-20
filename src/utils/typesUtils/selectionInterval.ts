@@ -1,10 +1,9 @@
 import { isSameDay } from 'date-fns';
+import { uniq } from 'lodash';
 
 import { SelectionInterval } from '@/types/selectionInterval';
 import type { Time24 } from '@/types/time24';
 import { getTimeRange } from '@/types/time24';
-
-import { add } from '../math';
 
 /**
  * Returns the smallest interval size from the selection intervals
@@ -88,58 +87,40 @@ const getMaxTimeFromSelectionIntervals = (
 };
 
 /**
- * Merges two selection interval ranges into one by setting the count of the each interval
- * to be the result of the mergeCountFunction (e.g. add, subtract, max, etc.)
- * @param interval The first selection interval
- * @param otherInterval The second selection interval
- * @param mergeCountFunction The function to merge the count of the two intervals
+ * Merges two selection interval ranges into one by combining the user IDs.
+ * Does not require selection intervals to have same user IDs
+ * @param primaryInterval The selection interval that will be copied.
+ * @param otherInterval The selection interval whose id's will be added
  * @returns The merged selection interval
- * @throws Error if the selection intervals are not on the same day, have different start times,
- * or different interval sizes
+ * @throws Error if the selection intervals are not on the same day
  */
-export const mergeSelectionIntervalsCount = (
-  interval: SelectionInterval,
-  otherInterval: SelectionInterval,
-  mergeCountFunction: (count: number, otherCount: number) => number
+const mergeSelectionIntervalsUserIds = (
+  primaryInterval: SelectionInterval,
+  otherInterval: SelectionInterval
 ): SelectionInterval => {
-  if (!isSameDay(interval.date, otherInterval.date)) {
+  if (!isSameDay(primaryInterval.date, otherInterval.date)) {
     throw new Error(`Cannot merge selection intervals on different days: 
-    ${interval.date.toString()} and ${otherInterval.date.toString()}`);
-  }
-  if (!interval.startTime.equals(otherInterval.startTime)) {
-    throw new Error(
-      `Cannot merge selection intervals with different start times: 
-      ${interval.startTime.toString()} and ${otherInterval.startTime.toString()}`
-    );
-  }
-  if (interval.intervalSize !== otherInterval.intervalSize) {
-    throw new Error(
-      `Cannot merge selection intervals with different interval 
-      sizes: ${interval.intervalSize} and ${otherInterval.intervalSize}`
-    );
+    ${primaryInterval.date.toString()} and ${otherInterval.date.toString()}`);
   }
 
-  return new SelectionInterval(
-    interval.date,
-    interval.startTime,
-    interval.intervalSize,
-    mergeCountFunction(interval.count, otherInterval.count)
+  return primaryInterval.copyWithUserIds(
+    uniq([...primaryInterval.userIds, ...otherInterval.userIds])
   );
 };
 
 /**
- * Merges two chronologically adjacent selection intervals into one
+ * Merges two chronologically adjacent selection intervals into one.
+ * Requires that selection intervals have same user IDs.
  * @param firstInterval The first selection interval (earlier)
  * @param secondInterval The second selection interval (later)
  * @returns The merged selection interval
  * @throws Error if the selection intervals are not on the same day,
  * are not chronologically adjacent, have different interval sizes,
- * or have different counts (if allowDifferentCounts is false)
+ * or have different user IDs
  */
-export const mergeAdjacentSelectionIntervals = (
+const mergeAdjacentSelectionIntervals = (
   firstInterval: SelectionInterval,
-  secondInterval: SelectionInterval,
-  allowDifferentCounts = false
+  secondInterval: SelectionInterval
 ): SelectionInterval => {
   if (!isSameDay(firstInterval.date, secondInterval.date)) {
     throw new Error(`Cannot merge selection intervals on different days: 
@@ -157,11 +138,8 @@ export const mergeAdjacentSelectionIntervals = (
       sizes: ${firstInterval.intervalSize} and ${secondInterval.intervalSize}`
     );
   }
-  if (firstInterval.count !== secondInterval.count && !allowDifferentCounts) {
-    throw new Error(
-      `Cannot merge selection intervals with different counts: 
-      ${firstInterval.count} and ${secondInterval.count}`
-    );
+  if (!firstInterval.hasSameUserIds(secondInterval)) {
+    throw new Error('Cannot merge selection intervals with different user IDs');
   }
 
   return new SelectionInterval(
@@ -169,45 +147,18 @@ export const mergeAdjacentSelectionIntervals = (
     firstInterval.startTime,
     secondInterval.endTime,
     firstInterval.intervalSize,
-    firstInterval.count
+    firstInterval.userIds
   );
 };
 
 /**
- * Creates an array of selection intervals between a min and max time for a given date
- * that are not selected
- * @param date The date
- * @param minTime The min time
- * @param maxTime The max time
- * @param intervalSize The interval size in hours
- */
-export const getSelectionIntervalRange = (
-  date: Date,
-  minTime: Time24,
-  maxTime: Time24,
-  intervalSize: number
-) => {
-  const intervalsStartTimes = getTimeRange(minTime, maxTime, intervalSize);
-
-  const selectionIntervalRange: SelectionInterval[] = intervalsStartTimes.map(
-    (intervalStartTime) =>
-      new SelectionInterval(date, intervalStartTime, intervalSize, 0)
-  );
-
-  return selectionIntervalRange;
-};
-
-/**
- * Reduces the selection intervals into the minimum number of ranges.
+ * Reduces the selection intervals into the minimum number of selection intervals.
  * Presumes the selection intervals are ordered by start time.
- * @param selectionIntervals The selection ranges
- * @param allowDifferentCounts Whether to allow different counts in adjacent intervals.
- * Used when removing blank intervals only.
- * @returns A minified, ordered version of the selection ranges
+ * @param selectionIntervals The selection intervals
+ * @returns A minified version of the selection intervals
  */
 const reduceSelectionIntervals = (
-  selectionIntervals: SelectionInterval[],
-  allowDifferentCounts: boolean = false
+  selectionIntervals: SelectionInterval[]
 ): SelectionInterval[] => {
   if (selectionIntervals.length <= 1) return selectionIntervals;
 
@@ -218,24 +169,22 @@ const reduceSelectionIntervals = (
 
     // If no current selection interval, try and set it to next interval
     if (currentSelectionInterval === null) {
-      if (nextSelectionInterval.count > 0)
+      if (nextSelectionInterval.isSelected())
         currentSelectionInterval = nextSelectionInterval;
     }
-    // If next interval is blank, push current interval and reset
-    else if (nextSelectionInterval.count === 0) {
+    // If next interval is not selected, push current interval and reset
+    else if (!nextSelectionInterval.isSelected()) {
       reducedSelectionIntervals.push(currentSelectionInterval);
       currentSelectionInterval = null;
     }
-    // If next interval is adjacent and has same count, merge
+    // If next interval is adjacent and has same user ids, merge
     else if (
       currentSelectionInterval.isAdjacentTo(nextSelectionInterval) &&
-      (currentSelectionInterval.count === nextSelectionInterval.count ||
-        allowDifferentCounts)
+      currentSelectionInterval.hasSameUserIds(nextSelectionInterval)
     ) {
       currentSelectionInterval = mergeAdjacentSelectionIntervals(
         currentSelectionInterval,
-        nextSelectionInterval,
-        allowDifferentCounts
+        nextSelectionInterval
       );
     }
     // If next interval is not adjacent or has different count,
@@ -252,21 +201,40 @@ const reduceSelectionIntervals = (
 };
 
 /**
- * Merges two selection interval ranges into one by setting the count of the each interval
- * in the larger range to the max count of each interval pair.
- * @param firstIntervals The larger interval range
- * @param secondIntervals The smaller interval range
- * @param mergeCountFunction The function to use to merge the counts
- * @param mergeIntervalsWithDifferentCounts Whether to merge intervals with different counts.
- * Defaults to true.
- * Used when count does not matter, only whether intervals are included or not
- * @returns The merged interval
+ * Creates an array of selection intervals between a min and max time for a given date.
+ * Defaults to being not selected.
+ * @param date The date
+ * @param minTime The min time
+ * @param maxTime The max time
+ * @param intervalSize The interval size in hours
+ * @param userIds The user IDs. Defaults to empty.
  */
-export const mergeSelectionIntervals = (
+const getSelectionIntervalRange = (
+  date: Date,
+  minTime: Time24,
+  maxTime: Time24,
+  intervalSize: number,
+  userIds: string[] = []
+) => {
+  const intervalsStartTimes = getTimeRange(minTime, maxTime, intervalSize);
+
+  const selectionIntervalRange: SelectionInterval[] = intervalsStartTimes.map(
+    (intervalStartTime) =>
+      new SelectionInterval(date, intervalStartTime, intervalSize, userIds)
+  );
+
+  return selectionIntervalRange;
+};
+
+/**
+ * Merges two selection interval ranges into one
+ * @param firstIntervals The first interval range
+ * @param secondIntervals The second interval range
+ * @returns The merged interval range
+ */
+const mergeSelectionIntervals = (
   firstIntervals: SelectionInterval[],
-  secondIntervals: SelectionInterval[],
-  mergeCountFunction: (count: number, otherCount: number) => number,
-  mergeIntervalsWithDifferentCounts: boolean = true
+  secondIntervals: SelectionInterval[]
 ): SelectionInterval[] => {
   const date = getDateFromSelectionIntervals([
     ...firstIntervals,
@@ -296,12 +264,13 @@ export const mergeSelectionIntervals = (
   // Merge the first interval range into the blank interval range
   firstIntervals.forEach((interval) => {
     // Iterate over each interval in the blank interval range
-    // (which has min intervalSize) and merge the count of any
-    // blank interval that is in the first interval range
+    // (which has min intervalSize) and merge any blank
+    // interval that is in the first interval range
     maxPossibleSelectionIntervals.forEach((maxInterval, index) => {
       if (maxInterval.isEncompassedBy(interval)) {
-        maxPossibleSelectionIntervals[index] = maxInterval.copyWithCount(
-          mergeCountFunction(interval.count, maxInterval.count)
+        maxPossibleSelectionIntervals[index] = mergeSelectionIntervalsUserIds(
+          maxInterval,
+          interval
         );
       }
     });
@@ -310,28 +279,55 @@ export const mergeSelectionIntervals = (
   // Merge the first interval range into the blank interval range
   secondIntervals.forEach((interval) => {
     // Iterate over each interval in the blank interval range
-    // (which has min intervalSize) and merge the count of any
-    // blank interval that is in the second interval range
+    // (which has min intervalSize) and merge any blank
+    // interval that is in the first interval range
     maxPossibleSelectionIntervals.forEach((maxInterval, index) => {
       if (maxInterval.isEncompassedBy(interval)) {
-        maxPossibleSelectionIntervals[index] = maxInterval.copyWithCount(
-          mergeCountFunction(interval.count, maxInterval.count)
+        maxPossibleSelectionIntervals[index] = mergeSelectionIntervalsUserIds(
+          maxInterval,
+          interval
         );
       }
     });
   });
 
   const reducedSelectionIntervals = reduceSelectionIntervals(
-    maxPossibleSelectionIntervals,
-    mergeIntervalsWithDifferentCounts
+    maxPossibleSelectionIntervals
   );
 
   return reducedSelectionIntervals;
 };
 
 /**
+ * Returns an array of selection intervals between a min and max time for a given date.
+ * Sets the output selection intervals to be selected if they are in the
+ * input selection intervals.
+ * @param selectionIntervals The input selection intervals
+ * @param date The date
+ * @param intervalSize The interval size in hours
+ * @param minTime The min time
+ * @param maxTime The max time
+ * @returns The output selection intervals
+ */
+export const getSelectedIntervalsForTimeRange = (
+  selectionIntervals: SelectionInterval[],
+  date: Date,
+  intervalSize: number,
+  minTime: Time24,
+  maxTime: Time24
+): SelectionInterval[] => {
+  const blankSelectionIntervals = getSelectionIntervalRange(
+    date,
+    minTime,
+    maxTime,
+    intervalSize
+  );
+
+  return mergeSelectionIntervals(blankSelectionIntervals, selectionIntervals);
+};
+
+/**
  * Removes the selection interval from the selection intervals.
- * Sets the count of the selection interval to 0.
  * @param selectionIntervals The selection intervals
  * @param intervalToRemove The selection interval to remove
  * @returns The selection intervals with the selection interval removed
@@ -343,12 +339,12 @@ export const removeIntervalFromIntervals = (
   const newIntervals = [...selectionIntervals];
 
   newIntervals.forEach((interval, index) => {
+    // Remove existing interval if it is encompassed by the interval to remove
     if (
       intervalToRemove.endTime.isGreaterThan(interval.startTime) &&
       intervalToRemove.startTime.isLessThanOrEqual(interval.startTime)
     ) {
-      const intervalPointer = newIntervals?.[index];
-      if (intervalPointer) intervalPointer.count = 0;
+      newIntervals[index] = interval.copyWithUserIds([]);
     }
   });
 
@@ -359,18 +355,11 @@ export const removeIntervalFromIntervals = (
  * Adds the selection interval to the selection intervals.
  * @param selectionIntervals The selection intervals
  * @param intervalToAdd The selection interval to add
- * @param mergeIntervalsWithDifferentCounts Whether to allow different counts in adjacent intervals.
  * @returns
  */
 export const addIntervalToIntervals = (
   selectionIntervals: SelectionInterval[],
-  intervalToAdd: SelectionInterval,
-  mergeIntervalsWithDifferentCounts: boolean = true
+  intervalToAdd: SelectionInterval
 ): SelectionInterval[] => {
-  return mergeSelectionIntervals(
-    selectionIntervals,
-    [intervalToAdd],
-    add,
-    mergeIntervalsWithDifferentCounts
-  );
+  return mergeSelectionIntervals(selectionIntervals, [intervalToAdd]);
 };

@@ -65,7 +65,7 @@ const AvailabilityPicker = ({
         clickedSelectionEndTime
       );
     else
-      selectionCopy.addSelectionInterval(
+      selectionCopy.addSelectionIntervalFromTimes(
         clickedSelectionStartTime,
         clickedSelectionEndTime
       );
