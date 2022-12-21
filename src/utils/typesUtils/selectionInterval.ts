@@ -9,7 +9,7 @@ import { getTimeRange } from '@/types/time24';
  * Returns the smallest interval size from the selection intervals
  * @param selectionIntervals The selection intervals
  */
-const getMinIntervalSizeFromSelectionIntervals = (
+export const getMinIntervalSizeFromSelectionIntervals = (
   selectionIntervals: SelectionInterval[]
 ): number => {
   if (selectionIntervals.length === 0)
@@ -32,7 +32,7 @@ const getMinIntervalSizeFromSelectionIntervals = (
  * @param selectionIntervals
  * @returns The date
  */
-const getDateFromSelectionIntervals = (
+export const getDateFromSelectionIntervals = (
   selectionIntervals: SelectionInterval[]
 ): Date => {
   if (selectionIntervals.length === 0)
@@ -52,7 +52,7 @@ const getDateFromSelectionIntervals = (
  * Returns the smallest min time from the selection intervals
  * @param selectionIntervals The selection intervals
  */
-const getMinTimeFromSelectionIntervals = (
+export const getMinTimeFromSelectionIntervals = (
   selectionIntervals: SelectionInterval[]
 ): Time24 => {
   if (selectionIntervals.length === 0)
@@ -71,7 +71,7 @@ const getMinTimeFromSelectionIntervals = (
  * Returns the largest max time from the selection intervals
  * @param selectionIntervals The selection intervals
  */
-const getMaxTimeFromSelectionIntervals = (
+export const getMaxTimeFromSelectionIntervals = (
   selectionIntervals: SelectionInterval[]
 ): Time24 => {
   if (selectionIntervals.length === 0)
