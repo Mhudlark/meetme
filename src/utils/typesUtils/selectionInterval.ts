@@ -195,7 +195,8 @@ export const reduceSelectionIntervals = (
     }
   }
 
-  reducedSelectionIntervals.push(currentSelectionInterval);
+  if (currentSelectionInterval !== null)
+    reducedSelectionIntervals.push(currentSelectionInterval);
 
   return reducedSelectionIntervals as SelectionInterval[];
 };
