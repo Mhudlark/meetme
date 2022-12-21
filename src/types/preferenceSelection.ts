@@ -155,6 +155,7 @@ export class PreferenceSelection {
       selectionIntervals: this.selectionIntervals.map((interval) => [
         interval.startTime.toString(),
         interval.endTime.toString(),
+        interval.userIds.join(', '),
       ]),
     });
   }
