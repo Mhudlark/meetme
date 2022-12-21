@@ -4,6 +4,7 @@ import { Time24 } from '@/types/time24';
 import {
   getDateFromSelectionIntervals,
   getMinIntervalSizeFromSelectionIntervals,
+  reduceSelectionIntervals,
 } from '../selectionInterval';
 
 const mockDate = new Date();
