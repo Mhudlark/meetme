@@ -295,7 +295,12 @@ describe('Schedulor selection class', () => {
 
       preferenceSelection.removeSelectionInterval(intervalToRemove);
 
-      expect(preferenceSelection.selectionIntervals.length).toEqual(0);
+      const expectedIntervals: SelectionInterval[] = [];
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(
+        expectedIntervals.length
+      );
+      expect(preferenceSelection.selectionIntervals).toEqual(expectedIntervals);
     });
 
     it('remove interval that encompasses current selection range', () => {
@@ -316,10 +321,15 @@ describe('Schedulor selection class', () => {
 
       preferenceSelection.removeSelectionInterval(intervalToRemove);
 
-      expect(preferenceSelection.selectionIntervals.length).toEqual(0);
+      const expectedIntervals: SelectionInterval[] = [];
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(
+        expectedIntervals.length
+      );
+      expect(preferenceSelection.selectionIntervals).toEqual(expectedIntervals);
     });
 
-    it('remove interval that overlaps with start of current selection range', () => {
+    it('remove interval that overlaps with start part of current selection range', () => {
       const preferenceIntervalSize = 1;
       const preferenceSelection = new PreferenceSelection(
         mockDate,
@@ -337,17 +347,162 @@ describe('Schedulor selection class', () => {
 
       preferenceSelection.removeSelectionInterval(intervalToRemove);
 
-      const expectedInterval = mockSelectionInterval(
-        12,
-        16,
+      const expectedIntervals: SelectionInterval[] = [
+        mockSelectionInterval(12, 16, preferenceIntervalSize, [mockUserId]),
+      ];
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(
+        expectedIntervals.length
+      );
+      expect(preferenceSelection.selectionIntervals).toEqual(expectedIntervals);
+    });
+
+    it('remove interval that overlaps with end part of current selection range', () => {
+      const preferenceIntervalSize = 1;
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        Time24.fromNumber(10),
+        Time24.fromNumber(16),
         preferenceIntervalSize,
-        [mockUserId]
+        mockUserId
       );
 
-      expect(preferenceSelection.selectionIntervals.length).toEqual(1);
-      expect(preferenceSelection.selectionIntervals[0]).toEqual(
-        expectedInterval
+      const intervalToRemove = mockSelectionInterval(
+        14,
+        19,
+        preferenceIntervalSize
       );
+
+      preferenceSelection.removeSelectionInterval(intervalToRemove);
+
+      const expectedIntervals: SelectionInterval[] = [
+        mockSelectionInterval(10, 14, preferenceIntervalSize, [mockUserId]),
+      ];
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(
+        expectedIntervals.length
+      );
+      expect(preferenceSelection.selectionIntervals).toEqual(expectedIntervals);
+    });
+
+    it('remove interval that overlaps with start of current selection range', () => {
+      const preferenceIntervalSize = 1;
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        Time24.fromNumber(10),
+        Time24.fromNumber(16),
+        preferenceIntervalSize,
+        mockUserId
+      );
+
+      const intervalToRemove = mockSelectionInterval(
+        7,
+        10,
+        preferenceIntervalSize
+      );
+
+      preferenceSelection.removeSelectionInterval(intervalToRemove);
+
+      const expectedIntervals: SelectionInterval[] = [
+        mockSelectionInterval(10, 16, preferenceIntervalSize, [mockUserId]),
+      ];
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(
+        expectedIntervals.length
+      );
+      expect(preferenceSelection.selectionIntervals).toEqual(expectedIntervals);
+    });
+
+    it('remove interval that overlaps with end of current selection range', () => {
+      const preferenceIntervalSize = 1;
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        Time24.fromNumber(10),
+        Time24.fromNumber(16),
+        preferenceIntervalSize,
+        mockUserId
+      );
+
+      const intervalToRemove = mockSelectionInterval(
+        16,
+        20,
+        preferenceIntervalSize
+      );
+
+      preferenceSelection.removeSelectionInterval(intervalToRemove);
+
+      const expectedIntervals: SelectionInterval[] = [
+        mockSelectionInterval(10, 16, preferenceIntervalSize, [mockUserId]),
+      ];
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(
+        expectedIntervals.length
+      );
+      expect(preferenceSelection.selectionIntervals).toEqual(expectedIntervals);
+    });
+
+    it('remove interval that is encompassed by current selection range', () => {
+      const preferenceIntervalSize = 1;
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        Time24.fromNumber(10),
+        Time24.fromNumber(16),
+        preferenceIntervalSize,
+        mockUserId
+      );
+
+      const intervalToRemove = mockSelectionInterval(
+        12,
+        14,
+        preferenceIntervalSize
+      );
+
+      preferenceSelection.removeSelectionInterval(intervalToRemove);
+
+      const expectedIntervals: SelectionInterval[] = [
+        mockSelectionInterval(10, 12, preferenceIntervalSize, [mockUserId]),
+        mockSelectionInterval(14, 16, preferenceIntervalSize, [mockUserId]),
+      ];
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(
+        expectedIntervals.length
+      );
+      expect(preferenceSelection.selectionIntervals).toEqual(expectedIntervals);
+    });
+
+    it('remove interval that is encompassed by one of the current selection ranges', () => {
+      const preferenceIntervalSize = 1;
+
+      const initialIntervals = [
+        mockSelectionInterval(9, 16, preferenceIntervalSize, [mockUserId]),
+        mockSelectionInterval(18, 23, preferenceIntervalSize, [mockUserId]),
+      ];
+
+      const preferenceSelection = new PreferenceSelection(
+        mockDate,
+        initialIntervals,
+        preferenceIntervalSize,
+        mockUserId
+      );
+
+      const intervalToRemove = mockSelectionInterval(
+        10,
+        14,
+        preferenceIntervalSize
+      );
+
+      preferenceSelection.removeSelectionInterval(intervalToRemove);
+
+      const expectedIntervals: SelectionInterval[] = [
+        mockSelectionInterval(9, 10, preferenceIntervalSize, [mockUserId]),
+        mockSelectionInterval(14, 16, preferenceIntervalSize, [mockUserId]),
+        mockSelectionInterval(18, 23, preferenceIntervalSize, [mockUserId]),
+      ];
+
+      expect(preferenceSelection.selectionIntervals.length).toEqual(
+        expectedIntervals.length
+      );
+      expect(preferenceSelection.selectionIntervals).toEqual(expectedIntervals);
     });
   });
 });

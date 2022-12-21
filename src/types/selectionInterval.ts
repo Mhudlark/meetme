@@ -126,4 +126,14 @@ export class SelectionInterval {
       [...this.userIds]
     );
   }
+
+  public copyWithTimes(startTime: Time24, endTime: Time24): SelectionInterval {
+    return new SelectionInterval(
+      this.date,
+      startTime,
+      endTime,
+      this.intervalSize,
+      [...this.userIds]
+    );
+  }
 }

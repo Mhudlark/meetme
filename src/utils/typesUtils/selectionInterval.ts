@@ -343,11 +343,54 @@ export const removeIntervalFromIntervals = (
 
   newIntervals.forEach((interval, index) => {
     // Remove existing interval if it is encompassed by the interval to remove
+    // r.start <= i.start < i.end <= r.end
     if (
       intervalToRemove.startTime.isLessThanOrEqual(interval.startTime) &&
       intervalToRemove.endTime.isGreaterThan(interval.endTime)
     ) {
       newIntervals[index] = interval.copyWithUserIds([]);
+    }
+    // Edit interval if it is overlapped at the start by the interval to remove
+    // r.start <= i.start < r.end <= i.end
+    else if (
+      intervalToRemove.startTime.isLessThanOrEqual(interval.startTime) &&
+      intervalToRemove.endTime.isGreaterThan(interval.startTime) &&
+      intervalToRemove.endTime.isLessThanOrEqual(interval.endTime)
+    ) {
+      newIntervals[index] = interval.copyWithTimes(
+        intervalToRemove.endTime,
+        interval.endTime
+      );
+    }
+    // Edit interval if it is overlapped at the end by the interval to remove
+    // i.start < r.start < i.end <= r.end
+    else if (
+      intervalToRemove.startTime.isGreaterThan(interval.startTime) &&
+      intervalToRemove.startTime.isLessThanOrEqual(interval.endTime) &&
+      intervalToRemove.endTime.isGreaterThan(interval.endTime)
+    ) {
+      newIntervals[index] = interval.copyWithTimes(
+        interval.startTime,
+        intervalToRemove.startTime
+      );
+    }
+    // Edit interval if it is encompassed by the interval to remove
+    // i.start < r.start < r.end < i.end
+    else if (
+      intervalToRemove.startTime.isGreaterThan(interval.startTime) &&
+      intervalToRemove.endTime.isLessThanOrEqual(interval.endTime)
+    ) {
+      const firstInterval = interval.copyWithTimes(
+        interval.startTime,
+        intervalToRemove.startTime
+      );
+      const secondInterval = interval.copyWithTimes(
+        intervalToRemove.endTime,
+        interval.endTime
+      );
+
+      newIntervals[index] = firstInterval;
+      newIntervals.splice(index + 1, 0, secondInterval);
     }
   });
 
