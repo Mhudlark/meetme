@@ -2,11 +2,11 @@ import { Stack, Typography } from '@mui/material';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
 import { DbContext } from '@/context/dbContext';
-import { Time24 } from '@/types/time24';
+import type { PreferenceSelection } from '@/types/preferenceSelection';
 import type { User } from '@/types/user';
 import { formatDateToFriendlyString } from '@/utils/date';
-import type { Overlap } from '@/utils/preferences';
 import { getOverlapColour } from '@/utils/preferences';
+import { reduceSelectionIntervals } from '@/utils/typesUtils/selectionInterval';
 
 import CustomTooltip from '../Tooltip';
 import FilteredUserToggle from './filteredUserToggle';
@@ -16,15 +16,16 @@ export type FilteredUser = User & {
 };
 
 export interface PreferenceOverlapPreviewProps {
-  preferencesOverlap: Overlap | null;
+  overlappingPreferences: PreferenceSelection[] | null;
 }
 
 export default function PreferenceOverlapPreview({
-  preferencesOverlap,
+  overlappingPreferences,
 }: PreferenceOverlapPreviewProps) {
   const { meeting } = useContext(DbContext);
 
   const [filteredUsers, setFilteredUsers] = useState<FilteredUser[]>([]);
+  const numStandouts = 3;
 
   const toggleFilteredUser = (filteredUser: FilteredUser) => {
     const newFilteredUsers = filteredUsers.map((user) =>
@@ -58,33 +59,71 @@ export default function PreferenceOverlapPreview({
     setFilteredUsers(newFilteredUsers);
   }, [meeting]);
 
-  const filteredPreferencesOverlap = useMemo(() => {
-    if (!preferencesOverlap) return null;
+  const filteredOverlappingPreferences = useMemo(() => {
+    if (!overlappingPreferences) return null;
 
     const includedUsersIds = filteredUsers
       .filter((filteredUser) => filteredUser.included)
       .map((includedUser) => includedUser.userId);
 
     // Filter the overlap to only include the users that are selected
-    const filteredOverlap: Overlap = preferencesOverlap.map((row) =>
-      row.map((interval) => {
-        const filteredIntervalUsers = interval.availability.users.filter(
-          (intervalUser) => includedUsersIds.includes(intervalUser.userId)
-        );
+    const newFilteredOverlappingPreferences: PreferenceSelection[] =
+      overlappingPreferences.map((preferenceSelection) => {
+        const filteredSelectionIntervals =
+          preferenceSelection.selectionIntervals.map((selectionInterval) => {
+            const filteredIntervalUserIds = selectionInterval.userIds.filter(
+              (intervalUserId) => includedUsersIds.includes(intervalUserId)
+            );
 
-        return {
-          ...interval,
-          availability: {
-            ...interval.availability,
-            users: filteredIntervalUsers,
-            count: filteredIntervalUsers.length,
-          },
-        };
-      })
+            return selectionInterval.copyWithUserIds(filteredIntervalUserIds);
+          });
+
+        return preferenceSelection.copyWithSelectionIntervals(
+          filteredSelectionIntervals
+        );
+      });
+
+    return newFilteredOverlappingPreferences;
+  }, [filteredUsers, overlappingPreferences]);
+
+  const filteredStandoutIntervals = useMemo(() => {
+    if (!filteredOverlappingPreferences) return [];
+
+    const allFilteredIntervals = filteredOverlappingPreferences.flatMap(
+      (preferenceSelection) =>
+        reduceSelectionIntervals(preferenceSelection.selectionIntervals)
     );
 
-    return filteredOverlap;
-  }, [filteredUsers, preferencesOverlap]);
+    if (allFilteredIntervals.length <= 5) return [];
+
+    // const intervalSize = allFilteredIntervals?.[0]?.intervalSize as number;
+
+    const sortedFilteredIntervals = allFilteredIntervals.sort(
+      (a, b) => b.count() - a.count()
+    );
+
+    console.log('sortedFilteredIntervals', sortedFilteredIntervals);
+
+    return sortedFilteredIntervals.slice(0, numStandouts);
+
+    // const standoutIntervals: SelectionInterval[] = [];
+  }, [numStandouts, filteredOverlappingPreferences]);
+
+  // useConsoleLog(
+  //   filteredStandoutIntervals
+  //     ?.map(
+  //       (interval) => `
+  //     {
+  //       startDate: ${formatDateToFriendlyString(interval.startDate)}
+  //         ${Time24.fromDate(interval.startDate).toString()}
+  //       endDate: ${formatDateToFriendlyString(interval.endDate)}}
+  //         ${Time24.fromDate(interval.endDate).toString()}
+  //       count: ${interval.count}
+  //     }`
+  //     )
+  //     .toString(),
+  //   'filteredStandoutIntervals'
+  // );
 
   return (
     <Stack sx={{ gap: { xs: 3, sm: 4 }, width: '100%', height: '100%' }}>
@@ -98,6 +137,29 @@ export default function PreferenceOverlapPreview({
           />
         ))}
       </Stack>
+      {filteredStandoutIntervals &&
+        Array.isArray(filteredStandoutIntervals) &&
+        filteredStandoutIntervals.length > 0 &&
+        (filteredStandoutIntervals?.[0]?.count ?? 0) > 2 && (
+          <Stack sx={{ gap: 2 }}>
+            <Typography variant="h4">Standout times</Typography>
+            {filteredStandoutIntervals?.map((standoutInterval) => (
+              <Stack
+                key={standoutInterval.getStartDate().valueOf()}
+                sx={{ gap: 0.5 }}
+              >
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {formatDateToFriendlyString(standoutInterval.date)}
+                </Typography>
+                <Typography variant="body2">
+                  {standoutInterval.startTime.toString()}
+                  {' - '}
+                  {standoutInterval.endTime.toString()}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        )}
       <Stack
         sx={{
           borderRadius: 2,
@@ -107,31 +169,33 @@ export default function PreferenceOverlapPreview({
           overflow: 'auto',
         }}
       >
-        {filteredPreferencesOverlap?.map((row, rowIndex) => (
-          <Stack key={rowIndex} sx={{ gap: 1 }}>
-            {row?.[0]?.start && (
-              <Typography variant="body1">
-                {formatDateToFriendlyString(row[0].start)}
-              </Typography>
-            )}
-            <div
-              id="overlap day container"
-              className="
+        {filteredOverlappingPreferences?.map(
+          (preferenceSelection, prefIndex) => (
+            <Stack key={prefIndex} sx={{ gap: 1 }}>
+              {preferenceSelection?.date && (
+                <Typography variant="body1">
+                  {formatDateToFriendlyString(preferenceSelection.date)}
+                </Typography>
+              )}
+              <div
+                id="overlap day container"
+                className="
                 grid grid-cols-auto-fill-64
                 justify-start
                 gap-1
               "
-            >
-              {row?.map((interval, intervalIndex) => (
-                <CustomTooltip
-                  key={`${rowIndex}-${intervalIndex}`}
-                  title={interval.availability.users
-                    .map((user) => user.username)
-                    .join(', ')}
-                  placement="top"
-                >
-                  <div
-                    className={`
+              >
+                {preferenceSelection?.selectionIntervals.map(
+                  (interval, intervalIndex) => (
+                    <CustomTooltip
+                      key={`${prefIndex}-${intervalIndex}`}
+                      title={interval.userIds
+                        .map((userId) => userId)
+                        .join(', ')}
+                      placement="top"
+                    >
+                      <div
+                        className={`
                     flex
                     select-none
                     justify-center
@@ -140,19 +204,19 @@ export default function PreferenceOverlapPreview({
                     py-1
                     px-2
                 `}
-                    style={{
-                      backgroundColor: getOverlapColour(
-                        interval.availability.count
-                      ),
-                    }}
-                  >
-                    {new Time24(interval.start).toString()}
-                  </div>
-                </CustomTooltip>
-              ))}
-            </div>
-          </Stack>
-        ))}
+                        style={{
+                          backgroundColor: getOverlapColour(interval.count()),
+                        }}
+                      >
+                        {interval.startTime.toString()}
+                      </div>
+                    </CustomTooltip>
+                  )
+                )}
+              </div>
+            </Stack>
+          )
+        )}
       </Stack>
     </Stack>
   );

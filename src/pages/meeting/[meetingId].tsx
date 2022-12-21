@@ -24,7 +24,8 @@ const generateSelections = (
   startDate: Date,
   endDate: Date,
   minTime: Time24,
-  maxTime: Time24
+  maxTime: Time24,
+  userId: string
 ) => {
   const numDays = differenceInCalendarDays(endDate, startDate) + 1;
 
@@ -35,18 +36,12 @@ const generateSelections = (
       day,
       minTime,
       maxTime,
-      INTERVAL_SIZE
+      INTERVAL_SIZE,
+      userId
     );
     return selection;
   });
 };
-
-const defaultSelections = generateSelections(
-  new Date(),
-  addDays(new Date(), 1),
-  new Time24(0),
-  new Time24(24)
-);
 
 const Meeting = () => {
   const router = useRouter();
@@ -59,6 +54,7 @@ const Meeting = () => {
     updatePreferences,
     signOut,
     leaveMeeting,
+    user,
     meeting,
     preference,
     isSignedIn,
@@ -74,8 +70,9 @@ const Meeting = () => {
     useState(false);
 
   const [username, setUsername] = useState<string | null>(null);
-  const [selections, setSelections] =
-    useState<PreferenceSelection[]>(defaultSelections);
+  const [selections, setSelections] = useState<PreferenceSelection[] | null>(
+    null
+  );
 
   const isUsernameValid = useMemo(() => {
     return username !== null && validateUsername(username);
@@ -86,7 +83,7 @@ const Meeting = () => {
   const resetStates = () => {
     setUsername(null);
     setIsLoading(true);
-    setSelections(defaultSelections);
+    setSelections(null);
   };
 
   const onSignInClicked = async () => {
@@ -148,30 +145,30 @@ const Meeting = () => {
   // Update selections for existing users
   useEffect(() => {
     if (isExistingUser && preference) {
-      setSelections(preference.scheduleSelections);
+      setSelections(preference.selections);
     }
   }, [isExistingUser]);
 
   // Update selections for new users
   useEffect(() => {
-    if (meeting?.details && !preference && !isExistingUser) {
+    if (user && meeting?.details && !preference && !isExistingUser) {
       setSelections(
         generateSelections(
           meeting.details.startDate,
           meeting.details.endDate,
           new Time24(meeting.details.minTime),
-          new Time24(meeting.details.maxTime)
+          new Time24(meeting.details.maxTime),
+          user.userId
         )
       );
     }
   }, [meeting]);
 
   // Calculate preferences overlap
-  const preferencesOverlap = useMemo(() => {
+  const overlappingPreferences = useMemo(() => {
     if (meeting?.details && meeting?.preferences) {
       return calculateOverlappingPreferences(
         meeting.preferences,
-        meeting.users,
         meeting.details.startDate,
         meeting.details.endDate,
         new Time24(meeting.details.minTime),
@@ -184,7 +181,7 @@ const Meeting = () => {
 
   return (
     <>
-      {!isLoading && meeting?.details ? (
+      {!isLoading && meeting?.details && selections ? (
         <>
           <SignInModal
             isOpen={isSignInModalOpen}
@@ -252,9 +249,9 @@ const Meeting = () => {
             {meeting?.preferences &&
               Array.isArray(meeting.preferences) &&
               meeting.preferences.length > 0 &&
-              preferencesOverlap && (
+              overlappingPreferences && (
                 <PreferenceOverlapPreview
-                  preferencesOverlap={preferencesOverlap}
+                  overlappingPreferences={overlappingPreferences}
                 />
               )}
           </Stack>

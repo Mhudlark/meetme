@@ -193,4 +193,15 @@ export class PreferenceSelection {
       this.userId
     );
   }
+
+  public copyWithSelectionIntervals(
+    selectionIntervals: SelectionInterval[]
+  ): PreferenceSelection {
+    return new PreferenceSelection(
+      this.date,
+      selectionIntervals,
+      this.intervalSize,
+      this.userId
+    );
+  }
 }

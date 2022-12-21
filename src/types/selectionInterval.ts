@@ -1,5 +1,7 @@
 import { isSameDay } from 'date-fns';
 
+import { setDateTimeWithTime24 } from '@/utils/date';
+
 import type { Time24 } from './time24';
 
 export class SelectionInterval {
@@ -54,6 +56,14 @@ export class SelectionInterval {
     return this.userIds.length > 0;
   }
 
+  public count(): number {
+    return this.userIds.length;
+  }
+
+  public getStartDate(): Date {
+    return setDateTimeWithTime24(this.date, this.startTime);
+  }
+
   public isEncompassedBy(largerInterval: SelectionInterval): boolean {
     if (!isSameDay(this.date, largerInterval.date))
       throw new Error('Cannot compare selection intervals on different days');
@@ -87,6 +97,16 @@ export class SelectionInterval {
     )}`;
   }
 
+  public copy(): SelectionInterval {
+    return new SelectionInterval(
+      this.date,
+      this.startTime,
+      this.endTime,
+      this.intervalSize,
+      [...this.userIds]
+    );
+  }
+
   public copyWithUserIds(userIds: string[]): SelectionInterval {
     return new SelectionInterval(
       this.date,
@@ -103,7 +123,7 @@ export class SelectionInterval {
       this.startTime,
       this.endTime,
       this.intervalSize,
-      this.userIds
+      [...this.userIds]
     );
   }
 }

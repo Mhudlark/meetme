@@ -1,5 +1,5 @@
 import type { PreferenceSchema } from '@/backend/db/database/schemas/types';
-import { parseSelectionsString } from '@/utils/typesUtils/parse';
+import { parsePreferenceSelectionsString } from '@/utils/typesUtils/parse';
 
 import type { PreferenceSelection } from './preferenceSelection';
 
@@ -8,11 +8,11 @@ export class Preference {
     public preferenceId: string,
     public meetingId: string,
     public userId: string,
-    public scheduleSelections: PreferenceSelection[]
+    public selections: PreferenceSelection[]
   ) {}
 
   public toString(): string {
-    return JSON.stringify(this.scheduleSelections);
+    return JSON.stringify(this.selections);
   }
 
   public copyWithNewSelections(selections: PreferenceSelection[]): Preference {
@@ -28,7 +28,7 @@ export class Preference {
 export const createPreferenceFromPreferenceSchema = (
   schema: PreferenceSchema
 ): Preference => {
-  const selections = parseSelectionsString(schema.selections);
+  const selections = parsePreferenceSelectionsString(schema.selections);
 
   return new Preference(
     schema.id,

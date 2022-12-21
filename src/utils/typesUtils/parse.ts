@@ -2,8 +2,6 @@ import { PreferenceSelection } from '@/types/preferenceSelection';
 import { SelectionInterval } from '@/types/selectionInterval';
 import { Time24 } from '@/types/time24';
 
-import { INTERVAL_SIZE } from '../constants';
-
 type UnparsedTime24 = { value: number };
 
 const parseTime24 = (time24: UnparsedTime24): Time24 => {
@@ -15,6 +13,7 @@ type UnparsedSelectionInterval = {
   startTime: UnparsedTime24;
   endTime: UnparsedTime24;
   intervalSize: number;
+  userIds: string[];
 };
 
 export const parseSelectionIntervals = (
@@ -26,25 +25,37 @@ export const parseSelectionIntervals = (
         new Date(unparsedSelectionInterval.date),
         parseTime24(unparsedSelectionInterval.startTime),
         parseTime24(unparsedSelectionInterval.endTime),
-        unparsedSelectionInterval.intervalSize
+        unparsedSelectionInterval.intervalSize,
+        unparsedSelectionInterval.userIds
       )
   );
 };
 
-export const parsePreferenceSelection = (selection: {
+type UnparsedPreferenceSelection = {
   date: string;
-  selectionIntervalRanges: UnparsedSelectionInterval[];
-}): PreferenceSelection => {
-  const date = new Date(selection.date);
-
-  const parsedSelectionRanges = parseSelectionIntervals(
-    selection.selectionIntervalRanges
-  );
-
-  return new PreferenceSelection(date, parsedSelectionRanges, INTERVAL_SIZE);
+  selectionIntervals: UnparsedSelectionInterval[];
+  intervalSize: number;
+  userId: string;
 };
 
-export const parseSelectionsString = (
+export const parsePreferenceSelection = (
+  unparsedSelection: UnparsedPreferenceSelection
+): PreferenceSelection => {
+  const date = new Date(unparsedSelection.date);
+
+  const parsedSelectionIntervals = parseSelectionIntervals(
+    unparsedSelection.selectionIntervals
+  );
+
+  return new PreferenceSelection(
+    date,
+    parsedSelectionIntervals,
+    unparsedSelection.intervalSize,
+    unparsedSelection.userId
+  );
+};
+
+export const parsePreferenceSelectionsString = (
   selections: string
 ): PreferenceSelection[] => {
   return JSON.parse(selections).map(parsePreferenceSelection);

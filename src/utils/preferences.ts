@@ -1,12 +1,15 @@
-import { differenceInCalendarDays } from 'date-fns';
-import { range } from 'lodash';
+import { isSameDay } from 'date-fns';
 
 import type { Preference } from '@/types/preference';
-import { Time24 } from '@/types/time24';
+import { PreferenceSelection } from '@/types/preferenceSelection';
+import type { Time24 } from '@/types/time24';
 import type { User } from '@/types/user';
-import { getUserFromId } from '@/types/user';
 
-import { getDateRange, setDateTimeWithTime24 } from './date';
+import { getDateRange } from './date';
+import {
+  getSelectedIntervalsForTimeRange,
+  mergeSelectionIntervals,
+} from './typesUtils/selectionInterval';
 
 type Availability = {
   count: number;
@@ -69,107 +72,58 @@ export const calculateIntervalIndexFromTime = (
   return intervalIndex;
 };
 
-const createIntervals = (
-  startDate: Date,
-  endDate: Date,
-  minTime: Time24,
-  maxTime: Time24,
-  intervalSize: number
-): Overlap => {
-  const numIntervalsPerDay = calculateNumIntervalsBetweenTimes(
-    minTime,
-    maxTime,
-    intervalSize
-  );
-
-  // Generate intervals for entire range
-  const totalIntervals: Overlap = getDateRange(startDate, endDate, true).map(
-    (day) => {
-      // Generate intervals for each day
-      const dayIntervals: Day = range(numIntervalsPerDay).map(
-        (intervalIndex) => {
-          const time = minTime.valueOf() + intervalIndex * intervalSize;
-
-          const availability: Availability = {
-            count: 0,
-            users: [],
-          };
-
-          const interval: Interval = {
-            start: setDateTimeWithTime24(day, new Time24(time)),
-            availability,
-          };
-
-          return interval;
-        }
-      );
-
-      return dayIntervals;
-    }
-  );
-
-  return totalIntervals;
-};
-
 export const calculateOverlappingPreferences = (
   preferences: Preference[],
-  users: User[],
   startDate: Date,
   endDate: Date,
   minTime: Time24,
   maxTime: Time24,
   intervalSize: number
-) => {
-  const allIntervals = createIntervals(
-    startDate,
-    endDate,
-    minTime,
-    maxTime,
-    intervalSize
-  );
+): PreferenceSelection[] => {
+  const dateRange = getDateRange(startDate, endDate);
 
-  preferences.forEach((preference) => {
-    preference.scheduleSelections.forEach((selection) => {
-      const dayIndex = differenceInCalendarDays(selection.date, startDate);
-      const dayIntervals = allIntervals[dayIndex] as Day;
-      const numIntervalsInDay = dayIntervals.length;
+  const allPreferenceSelections = dateRange.map((date) => {
+    // Create a blank max intervals array for the given date
+    let blankMaxIntervals = getSelectedIntervalsForTimeRange(
+      [],
+      date,
+      intervalSize,
+      minTime,
+      maxTime
+    );
+    // Iterate over each preference
+    preferences.forEach((preference) => {
+      // Get the preference selections for the given date
+      preference.selections.forEach((selection) => {
+        if (!isSameDay(selection.date, date)) return;
 
-      selection.selectionIntervals.forEach(({ startTime, endTime }) => {
-        const startIntervalIndex = calculateIntervalIndexFromTime(
-          startTime,
-          minTime,
+        // Get the max intervals for the given date for time range
+        const selectionMaxIntervals = getSelectedIntervalsForTimeRange(
+          selection.selectionIntervals,
+          selection.date,
           intervalSize,
-          numIntervalsInDay
+          minTime,
+          maxTime
         );
 
-        const endIntervalIndex = calculateIntervalIndexFromTime(
-          endTime,
-          minTime,
-          intervalSize,
-          numIntervalsInDay
+        // Merge the max intervals for the given date
+        blankMaxIntervals = mergeSelectionIntervals(
+          blankMaxIntervals,
+          selectionMaxIntervals,
+          false
         );
-
-        // If the start and end interval indices are the same,
-        // then the selection is less than an interval
-        if (startIntervalIndex === endIntervalIndex) return;
-
-        for (
-          let intervalIndex = startIntervalIndex;
-          intervalIndex < endIntervalIndex;
-          intervalIndex += 1
-        ) {
-          const interval = dayIntervals[intervalIndex] as Interval;
-
-          const preferenceUser = getUserFromId(users, preference.userId);
-
-          interval.availability.count += 1;
-          interval.availability.users.push(preferenceUser);
-        }
       });
     });
+
+    return new PreferenceSelection(
+      date,
+      blankMaxIntervals,
+      intervalSize,
+      'overlap'
+    );
   });
 
-  return allIntervals;
+  return allPreferenceSelections;
 };
 
 const overlapColours = [

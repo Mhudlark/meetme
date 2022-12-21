@@ -157,7 +157,7 @@ const mergeAdjacentSelectionIntervals = (
  * @param selectionIntervals The selection intervals
  * @returns A minified version of the selection intervals
  */
-const reduceSelectionIntervals = (
+export const reduceSelectionIntervals = (
   selectionIntervals: SelectionInterval[]
 ): SelectionInterval[] => {
   if (selectionIntervals.length <= 1) return selectionIntervals;
@@ -215,7 +215,7 @@ const getSelectionIntervalRange = (
   maxTime: Time24,
   intervalSize: number,
   userIds: string[] = []
-) => {
+): SelectionInterval[] => {
   const intervalsStartTimes = getTimeRange(minTime, maxTime, intervalSize);
 
   const selectionIntervalRange: SelectionInterval[] = intervalsStartTimes.map(
@@ -232,9 +232,10 @@ const getSelectionIntervalRange = (
  * @param secondIntervals The second interval range
  * @returns The merged interval range
  */
-const mergeSelectionIntervals = (
+export const mergeSelectionIntervals = (
   firstIntervals: SelectionInterval[],
-  secondIntervals: SelectionInterval[]
+  secondIntervals: SelectionInterval[],
+  reduce: boolean = true
 ): SelectionInterval[] => {
   const date = getDateFromSelectionIntervals([
     ...firstIntervals,
@@ -291,10 +292,11 @@ const mergeSelectionIntervals = (
     });
   });
 
+  if (!reduce) return maxPossibleSelectionIntervals;
+
   const reducedSelectionIntervals = reduceSelectionIntervals(
     maxPossibleSelectionIntervals
   );
-
   return reducedSelectionIntervals;
 };
 
