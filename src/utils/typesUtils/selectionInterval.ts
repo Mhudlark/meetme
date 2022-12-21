@@ -160,7 +160,7 @@ const mergeAdjacentSelectionIntervals = (
 export const reduceSelectionIntervals = (
   selectionIntervals: SelectionInterval[]
 ): SelectionInterval[] => {
-  if (selectionIntervals.length <= 1) return selectionIntervals;
+  if (selectionIntervals.length === 0) return [];
 
   const reducedSelectionIntervals = [];
   let currentSelectionInterval: null | SelectionInterval = null;
@@ -344,14 +344,14 @@ export const removeIntervalFromIntervals = (
   newIntervals.forEach((interval, index) => {
     // Remove existing interval if it is encompassed by the interval to remove
     if (
-      intervalToRemove.endTime.isGreaterThan(interval.startTime) &&
-      intervalToRemove.startTime.isLessThanOrEqual(interval.startTime)
+      intervalToRemove.startTime.isLessThanOrEqual(interval.startTime) &&
+      intervalToRemove.endTime.isGreaterThan(interval.endTime)
     ) {
       newIntervals[index] = interval.copyWithUserIds([]);
     }
   });
 
-  return newIntervals;
+  return reduceSelectionIntervals(newIntervals);
 };
 
 /**

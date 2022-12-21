@@ -121,18 +121,25 @@ export class PreferenceSelection {
     this.addSelectionInterval(newInterval);
   }
 
-  public removeSelectionInterval(startTime: Time24, endTime: Time24): void {
+  public removeSelectionInterval(intervalToRemove: SelectionInterval): void {
     // If no selection intervals exist, just return
     if (this.isEmpty()) {
       return;
     }
 
-    const intervalToRemove = this.initSelectionInterval(startTime, endTime);
-
     this.selectionIntervals = removeIntervalFromIntervals(
       this.selectionIntervals,
       intervalToRemove
     );
+  }
+
+  public removeSelectionIntervalFromTimes(
+    startTime: Time24,
+    endTime: Time24
+  ): void {
+    const intervalToRemove = this.initSelectionInterval(startTime, endTime);
+
+    this.removeSelectionInterval(intervalToRemove);
   }
 
   public valueOf() {

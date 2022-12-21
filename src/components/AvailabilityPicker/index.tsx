@@ -60,7 +60,7 @@ const AvailabilityPicker = ({
     const selectionCopy = selection.copy();
 
     if (isCurrentlySelected)
-      selectionCopy.removeSelectionInterval(
+      selectionCopy.removeSelectionIntervalFromTimes(
         clickedSelectionStartTime,
         clickedSelectionEndTime
       );

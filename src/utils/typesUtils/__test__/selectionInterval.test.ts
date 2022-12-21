@@ -38,6 +38,16 @@ describe('selectionInterval utils', () => {
   });
 
   describe('reduceSelectionIntervals', () => {
+    it('Removes blank interval', () => {
+      const intervals = [
+        new SelectionInterval(mockDate, new Time24(10), new Time24(11), 1, []),
+      ];
+
+      const reducedIntervals = reduceSelectionIntervals(intervals);
+
+      expect(reducedIntervals.length).toEqual(0);
+    });
+
     it('Removes blank intervals', () => {
       const intervals = [
         new SelectionInterval(mockDate, new Time24(10), new Time24(11), 1, []),
