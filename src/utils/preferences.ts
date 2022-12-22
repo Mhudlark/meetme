@@ -18,7 +18,7 @@ export const calculateOverlappingPreferences = (
   maxTime: Time24,
   intervalSize: number
 ): PreferenceSelection[] => {
-  const dateRange = getDateRange(startDate, endDate);
+  const dateRange = getDateRange(startDate, endDate, true);
 
   const allPreferenceSelections = dateRange.map((date) => {
     // Create a blank max intervals array for the given date
@@ -68,7 +68,6 @@ const overlapColours = [
   '#ffffff',
   '#e8f2e5',
   '#d1e5cc',
-  '#bad8b3',
   '#a3cc9a',
   '#8cbf82',
   '#74b26a',
@@ -77,8 +76,11 @@ const overlapColours = [
   '#1a8b1f',
 ];
 
-export const getOverlapColour = (count: number) => {
-  if (count >= overlapColours.length)
+export const getOverlapColour = (count: number, maxUsers: number) => {
+  const index = Math.floor(
+    (count / Math.max(maxUsers, 1)) * overlapColours.length
+  );
+  if (index >= overlapColours.length)
     return overlapColours[overlapColours.length - 1];
-  return overlapColours[count];
+  return overlapColours[index];
 };

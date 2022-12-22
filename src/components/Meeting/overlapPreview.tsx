@@ -193,7 +193,10 @@ export default function PreferenceOverlapPreview({
                     px-2
                 `}
                         style={{
-                          backgroundColor: getOverlapColour(interval.count()),
+                          backgroundColor: getOverlapColour(
+                            interval.count(),
+                            meeting?.users.length ?? 0
+                          ),
                         }}
                       >
                         {interval.startTime.toString()}
