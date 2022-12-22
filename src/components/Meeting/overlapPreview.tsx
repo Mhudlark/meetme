@@ -7,6 +7,7 @@ import type { User } from '@/types/user';
 import { formatDateToFriendlyString } from '@/utils/date';
 import { getOverlapColour } from '@/utils/preferences';
 import { reduceSelectionIntervals } from '@/utils/typesUtils/selectionInterval';
+import { getUsersFromUserIds } from '@/utils/typesUtils/user';
 
 import CustomTooltip from '../Tooltip';
 import FilteredUserToggle from './filteredUserToggle';
@@ -109,22 +110,6 @@ export default function PreferenceOverlapPreview({
     // const standoutIntervals: SelectionInterval[] = [];
   }, [numStandouts, filteredOverlappingPreferences]);
 
-  // useConsoleLog(
-  //   filteredStandoutIntervals
-  //     ?.map(
-  //       (interval) => `
-  //     {
-  //       startDate: ${formatDateToFriendlyString(interval.startDate)}
-  //         ${Time24.fromDate(interval.startDate).toString()}
-  //       endDate: ${formatDateToFriendlyString(interval.endDate)}}
-  //         ${Time24.fromDate(interval.endDate).toString()}
-  //       count: ${interval.count}
-  //     }`
-  //     )
-  //     .toString(),
-  //   'filteredStandoutIntervals'
-  // );
-
   return (
     <Stack sx={{ gap: { xs: 3, sm: 4 }, width: '100%', height: '100%' }}>
       <Typography variant="h3">{`Everyone's preferences`}</Typography>
@@ -189,8 +174,11 @@ export default function PreferenceOverlapPreview({
                   (interval, intervalIndex) => (
                     <CustomTooltip
                       key={`${prefIndex}-${intervalIndex}`}
-                      title={interval.userIds
-                        .map((userId) => userId)
+                      title={getUsersFromUserIds(
+                        interval.userIds,
+                        meeting?.users ?? []
+                      )
+                        .map((user) => user.username)
                         .join(', ')}
                       placement="top"
                     >

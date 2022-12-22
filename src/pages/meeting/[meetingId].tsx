@@ -1,6 +1,4 @@
 import { Stack } from '@mui/material';
-import { addDays, differenceInCalendarDays } from 'date-fns';
-import { range } from 'lodash';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
@@ -16,6 +14,7 @@ import { DbContext } from '@/context/dbContext';
 import { PreferenceSelection } from '@/types/preferenceSelection';
 import { Time24 } from '@/types/time24';
 import { INTERVAL_SIZE } from '@/utils/constants';
+import { getDateRange } from '@/utils/date';
 import { paths } from '@/utils/paths';
 import { calculateOverlappingPreferences } from '@/utils/preferences';
 import { validateUsername } from '@/utils/validation';
@@ -27,13 +26,9 @@ const generateSelections = (
   maxTime: Time24,
   userId: string
 ) => {
-  const numDays = differenceInCalendarDays(endDate, startDate) + 1;
-
-  return range(0, numDays).map((i) => {
-    const day = addDays(startDate, i);
-
+  return getDateRange(startDate, endDate, true).map((date) => {
     const selection = new PreferenceSelection(
-      day,
+      date,
       minTime,
       maxTime,
       INTERVAL_SIZE,
@@ -58,7 +53,7 @@ const Meeting = () => {
     meeting,
     preference,
     isSignedIn,
-    isExistingUser,
+    hasUserEnteredPreferences,
   } = useContext(DbContext);
 
   const { dispatchErrorAlert } = useContext(UIAlertContext);
@@ -93,10 +88,9 @@ const Meeting = () => {
   };
 
   const onSubmitPreferencesClicked = async (
-    newSelections: PreferenceSelection[],
-    add: boolean = true
+    newSelections: PreferenceSelection[]
   ) => {
-    if (!username) {
+    if (!user) {
       setIsSubmitPreferencesModalOpen(false);
       dispatchErrorAlert('No user signed in');
       return;
@@ -107,12 +101,8 @@ const Meeting = () => {
       return;
     }
 
-    if (add) {
-      await addPreferences(
-        router.query.meetingId as string,
-        username,
-        newSelections
-      );
+    if (!hasUserEnteredPreferences) {
+      await addPreferences(router.query.meetingId as string, newSelections);
     } else {
       await updatePreferences(newSelections);
     }
@@ -127,9 +117,9 @@ const Meeting = () => {
   };
 
   const confirmLeaveMeeting = async () => {
-    if (!username) return;
+    if (!user) return;
 
-    await leaveMeeting(username);
+    await leaveMeeting();
     router.push(paths.home);
   };
 
@@ -144,14 +134,14 @@ const Meeting = () => {
 
   // Update selections for existing users
   useEffect(() => {
-    if (isExistingUser && preference) {
+    if (hasUserEnteredPreferences && preference) {
       setSelections(preference.selections);
     }
-  }, [isExistingUser]);
+  }, [hasUserEnteredPreferences]);
 
   // Update selections for new users
   useEffect(() => {
-    if (user && meeting?.details && !preference && !isExistingUser) {
+    if (user && meeting?.details && !preference && !hasUserEnteredPreferences) {
       setSelections(
         generateSelections(
           meeting.details.startDate,
@@ -181,80 +171,87 @@ const Meeting = () => {
 
   return (
     <>
-      {!isLoading && meeting?.details && selections ? (
+      {!isLoading ? (
         <>
-          <SignInModal
-            isOpen={isSignInModalOpen}
-            onClose={() => setIsSignInModalOpen(false)}
-            onUsernameChanged={setUsername}
-            onSignInClicked={onSignInClicked}
-            isUsernameValid={isUsernameValid}
-          />
-          <LeaveMeetingModal
-            isOpen={isLeaveMeetingModalOpen}
-            onClose={() => setIsLeaveMeetingModalOpen(false)}
-            onLeaveMeetingClicked={confirmLeaveMeeting}
-          />
-          <SchedulorModal
-            isOpen={isSubmitPreferencesModalOpen}
-            onClose={() => setIsSubmitPreferencesModalOpen(false)}
-            variant={!isExistingUser ? 'add' : 'update'}
-            meetingDetails={meeting.details}
-            selections={selections}
-            onSubmitPreferences={(newSelections) =>
-              onSubmitPreferencesClicked(newSelections, !isExistingUser)
-            }
-          />
-          <Stack sx={{ gap: 10, width: '100%', height: '100%' }}>
-            <Stack
-              sx={{
-                gap: 2,
-              }}
-            >
-              <MeetingDetails />
-              {isSignedIn && isUsernameValid && (
-                <Stack
-                  sx={{ gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}
-                >
-                  <CustomButton
-                    color="error"
-                    onClick={() => setIsLeaveMeetingModalOpen(true)}
-                  >
-                    Leave Meeting
-                  </CustomButton>
-                  <CustomButton color="warning" onClick={onSignOutClicked}>
-                    Sign out
-                  </CustomButton>
-                </Stack>
-              )}
-            </Stack>
-            {!isSignedIn && (
-              <>
-                <CustomButton onClick={() => setIsSignInModalOpen(true)}>
-                  Sign In
-                </CustomButton>
-              </>
-            )}
-            {isSignedIn && (
-              <>
-                <CustomButton
-                  onClick={() => setIsSubmitPreferencesModalOpen(true)}
-                >
-                  {isExistingUser
-                    ? 'Update your preferences'
-                    : 'Add your preferences'}
-                </CustomButton>
-              </>
-            )}
-            {meeting?.preferences &&
-              Array.isArray(meeting.preferences) &&
-              meeting.preferences.length > 0 &&
-              overlappingPreferences && (
-                <PreferenceOverlapPreview
-                  overlappingPreferences={overlappingPreferences}
+          {meeting?.details && (
+            <>
+              <SignInModal
+                isOpen={isSignInModalOpen}
+                onClose={() => setIsSignInModalOpen(false)}
+                onUsernameChanged={setUsername}
+                onSignInClicked={onSignInClicked}
+                isUsernameValid={isUsernameValid}
+              />
+              <LeaveMeetingModal
+                isOpen={isLeaveMeetingModalOpen}
+                onClose={() => setIsLeaveMeetingModalOpen(false)}
+                onLeaveMeetingClicked={confirmLeaveMeeting}
+              />
+              {selections && (
+                <SchedulorModal
+                  isOpen={isSubmitPreferencesModalOpen}
+                  onClose={() => setIsSubmitPreferencesModalOpen(false)}
+                  variant={!hasUserEnteredPreferences ? 'add' : 'update'}
+                  meetingDetails={meeting.details}
+                  selections={selections}
+                  onSubmitPreferences={onSubmitPreferencesClicked}
                 />
               )}
-          </Stack>
+              <Stack sx={{ gap: 10, width: '100%', height: '100%' }}>
+                <Stack
+                  sx={{
+                    gap: 2,
+                  }}
+                >
+                  <MeetingDetails />
+                  {isSignedIn && isUsernameValid && (
+                    <Stack
+                      sx={{
+                        gap: 2,
+                        flexDirection: { xs: 'column', sm: 'row' },
+                      }}
+                    >
+                      <CustomButton
+                        color="error"
+                        onClick={() => setIsLeaveMeetingModalOpen(true)}
+                      >
+                        Leave Meeting
+                      </CustomButton>
+                      <CustomButton color="warning" onClick={onSignOutClicked}>
+                        Sign out
+                      </CustomButton>
+                    </Stack>
+                  )}
+                </Stack>
+                {!isSignedIn && (
+                  <>
+                    <CustomButton onClick={() => setIsSignInModalOpen(true)}>
+                      Sign In
+                    </CustomButton>
+                  </>
+                )}
+                {isSignedIn && (
+                  <>
+                    <CustomButton
+                      onClick={() => setIsSubmitPreferencesModalOpen(true)}
+                    >
+                      {hasUserEnteredPreferences
+                        ? 'Update your preferences'
+                        : 'Add your preferences'}
+                    </CustomButton>
+                  </>
+                )}
+                {meeting?.preferences &&
+                  Array.isArray(meeting.preferences) &&
+                  meeting.preferences.length > 0 &&
+                  overlappingPreferences && (
+                    <PreferenceOverlapPreview
+                      overlappingPreferences={overlappingPreferences}
+                    />
+                  )}
+              </Stack>
+            </>
+          )}
         </>
       ) : (
         <LoadingScreen />

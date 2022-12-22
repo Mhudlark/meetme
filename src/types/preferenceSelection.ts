@@ -15,41 +15,43 @@ export class PreferenceSelection {
 
   public intervalSize: number;
 
-  public userId: string;
+  public userId: string | null;
 
   constructor(
     date: Date,
     selectionIntervals: SelectionInterval[],
     intervalSize: number,
-    userId: string
+    userId: string | null
   );
   constructor(
     date: Date,
     startTime: Time24,
     endTime: Time24,
     intervalSize: number,
-    userId: string
+    userId: string | null
   );
   constructor(...args: Array<any>) {
     this.date = args[0] as Date;
-    this.intervalSize = args[args.length - 2] as number;
-    this.userId = args[args.length - 1] as string;
 
     // date, selectionIntervals, intervalSize, userId
     if (args.length === 4) {
       this.selectionIntervals = args[1] as SelectionInterval[];
+      this.intervalSize = args[2] as number;
+      this.userId = args[3] as string | null;
     }
     // date, startTime, endTime, intervalSize, userId
     else if (args.length === 5) {
       const startTime = args[1] as Time24;
       const endTime = args[2] as Time24;
+      this.intervalSize = args[3] as number;
+      this.userId = args[4] as string | null;
       this.selectionIntervals = [
         new SelectionInterval(
           this.date,
           startTime,
           endTime,
           this.intervalSize,
-          [this.userId]
+          this.userId !== null ? [this.userId] : []
         ),
       ];
     }
@@ -89,12 +91,15 @@ export class PreferenceSelection {
     endTime: Time24,
     userId?: string
   ): SelectionInterval {
+    const thisUserIds = this.userId !== null ? [this.userId] : [];
+    const userIds = userId ? [userId] : thisUserIds;
+
     return new SelectionInterval(
       this.date,
       startTime,
       endTime,
       this.intervalSize,
-      [userId || this.userId]
+      userIds
     );
   }
 

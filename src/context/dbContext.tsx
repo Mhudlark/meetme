@@ -35,18 +35,17 @@ export type DbContextType = {
   signIn: (username: string) => Promise<void>;
   addPreferences: (
     meetingId: string,
-    username: string,
     selections: PreferenceSelection[]
   ) => Promise<void>;
   updatePreferences: (selections: PreferenceSelection[]) => Promise<void>;
   signOut: () => Promise<void>;
-  leaveMeeting: (username: string) => Promise<void>;
-  deleteMeeting: (meetingId: string) => Promise<void>;
+  leaveMeeting: () => Promise<void>;
+  deleteMeeting: () => Promise<void>;
   user: User | null;
   meeting: Meeting | null;
   preference: Preference | null;
   isSignedIn: boolean;
-  isExistingUser: boolean;
+  hasUserEnteredPreferences: boolean;
   isHost: boolean;
 };
 
@@ -54,16 +53,16 @@ const DbContextInitialValue: DbContextType = {
   createMeeting: (_) => Promise.resolve(''),
   getMeeting: (_) => Promise.resolve(),
   signIn: (_) => Promise.resolve(),
-  addPreferences: (_, __, ___) => Promise.resolve(),
+  addPreferences: (_, __) => Promise.resolve(),
   updatePreferences: (_) => Promise.resolve(),
   signOut: () => Promise.resolve(),
-  leaveMeeting: (_) => Promise.resolve(),
-  deleteMeeting: (_) => Promise.resolve(),
+  leaveMeeting: () => Promise.resolve(),
+  deleteMeeting: () => Promise.resolve(),
   user: null,
   meeting: null,
   preference: null,
   isSignedIn: false,
-  isExistingUser: false,
+  hasUserEnteredPreferences: false,
   isHost: false,
 };
 
@@ -80,7 +79,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
 
   // A user can be signed in locally without being in the database (yet)
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const isExistingUser = useMemo(() => !!preference, [preference]);
+  const hasUserEnteredPreferences = useMemo(() => !!preference, [preference]);
   const isHost = useMemo(() => {
     return isMeetingHost(meeting, user);
   }, [meeting, user]);
@@ -101,21 +100,29 @@ const DbProvider = ({ children }: DbProviderProps) => {
 
   const signIn = async (username: string) => {
     if (!meeting) throw new Error('Not in a meeting');
+    if (!username || !validateUsername(username))
+      throw new Error('Username is invalid');
 
     const existingUser = meeting.users.filter(
       (meetingUser) => meetingUser.username === username
     )?.[0];
 
+    // Existing user
     if (existingUser) {
+      setUser(existingUser as User);
+
       const existingUserPreference = meeting?.preferences.filter(
         (meetingPreference) => meetingPreference.userId === existingUser.userId
       )?.[0];
 
-      if (!existingUserPreference)
-        throw new Error('Existing user has no preferences');
+      if (existingUserPreference)
+        setPreference(existingUserPreference as Preference);
+    }
+    // New user
+    else {
+      const userInfo = await insertUserIntoDB(supabase, username, meeting.id);
 
-      setUser(existingUser as User);
-      setPreference(existingUserPreference as Preference);
+      setUser(createUserFromUserSchema(userInfo));
     }
 
     setIsSignedIn(true);
@@ -123,20 +130,14 @@ const DbProvider = ({ children }: DbProviderProps) => {
 
   const addPreferences = async (
     meetingId: string,
-    username: string,
     selections: PreferenceSelection[]
   ) => {
-    if (!username || !validateUsername(username))
-      throw new Error('Username is invalid');
-
-    const userInfo = await insertUserIntoDB(supabase, username, meetingId);
-
-    setUser(createUserFromUserSchema(userInfo));
+    if (!user) throw new Error('User is not signed in already');
 
     const preferenceInfo = await insertPreferenceIntoDB(
       supabase,
       meetingId,
-      userInfo.id,
+      user.userId,
       selections
     );
 
@@ -160,36 +161,32 @@ const DbProvider = ({ children }: DbProviderProps) => {
   const signOut = async () => {
     if (!meeting) throw new Error('User is not in a meeting');
 
-    setUser(null);
     setPreference(null);
+    setUser(null);
     setIsSignedIn(false);
   };
 
-  const leaveMeeting = async (username: string) => {
+  const leaveMeeting = async () => {
     if (!meeting) throw new Error('User is not in a meeting');
+    if (!user) throw new Error('User is not signed in already');
 
-    const existingUser = meeting.users.filter(
-      (meetingUser) => meetingUser.username === username
-    )?.[0];
-
-    if (existingUser) {
-      if (!user) throw new Error('User is not signed in already');
-      if (!preference) throw new Error('User has no existing preferences');
-
+    if (hasUserEnteredPreferences) {
       await deletePreferenceFromDB(supabase, meeting.id, user.userId);
-      await deleteUserFromDB(supabase, user.userId);
-
-      setUser(null);
       setPreference(null);
     }
+
+    await deleteUserFromDB(supabase, user.userId);
+    setUser(null);
     setMeeting(null);
     setIsSignedIn(false);
   };
 
-  const deleteMeeting = async (meetingId: string) => {
+  const deleteMeeting = async () => {
     if (!meeting) throw new Error('User is not in a meeting');
     if (!user) throw new Error('User is not signed in already');
     if (!isHost) throw new Error('User is not the host of the meeting');
+
+    const meetingId = meeting.id;
 
     // Delete preferences first because foreign key (userId, meetingId)
     await deleteAllPreferencesForMeetingFromDB(supabase, meetingId);
@@ -219,7 +216,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
         meeting,
         preference,
         isSignedIn,
-        isExistingUser,
+        hasUserEnteredPreferences,
         isHost,
       }}
     >

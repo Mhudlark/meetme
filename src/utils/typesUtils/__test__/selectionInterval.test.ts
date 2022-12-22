@@ -4,10 +4,27 @@ import { Time24 } from '@/types/time24';
 import {
   getDateFromSelectionIntervals,
   getMinIntervalSizeFromSelectionIntervals,
+  getSelectedIntervalsForTimeRange,
   reduceSelectionIntervals,
 } from '../selectionInterval';
 
 const mockDate = new Date();
+const mockUserId = 'mockUserId';
+
+const mockSelectionInterval = (
+  startTime: number,
+  endTime: number,
+  intervalSize: number = 1,
+  userIds: string[] = [mockUserId]
+) => {
+  return new SelectionInterval(
+    mockDate,
+    Time24.fromNumber(startTime),
+    Time24.fromNumber(endTime),
+    intervalSize,
+    userIds
+  );
+};
 
 describe('selectionInterval utils', () => {
   describe('getMinIntervalSizeFromSelectionIntervals', () => {
@@ -117,6 +134,33 @@ describe('selectionInterval utils', () => {
 
       expect(reducedIntervals.length).toEqual(3);
       expect(reducedIntervals?.[0]).toEqual(firstInterval);
+    });
+  });
+
+  describe('getSelectedIntervalsForTimeRange', () => {
+    it('Test', () => {
+      const selectedIntervals = [mockSelectionInterval(10, 14)];
+
+      const maxIntervals = getSelectedIntervalsForTimeRange(
+        selectedIntervals,
+        mockDate,
+        1,
+        Time24.fromNumber(9),
+        Time24.fromNumber(16)
+      );
+
+      const expectedIntervals: SelectionInterval[] = [
+        mockSelectionInterval(9, 10, 1, []),
+        mockSelectionInterval(10, 11),
+        mockSelectionInterval(11, 12),
+        mockSelectionInterval(12, 13),
+        mockSelectionInterval(13, 14),
+        mockSelectionInterval(14, 15, 1, []),
+        mockSelectionInterval(15, 16, 1, []),
+      ];
+
+      expect(maxIntervals.length).toEqual(expectedIntervals.length);
+      expect(maxIntervals).toEqual(expectedIntervals);
     });
   });
 });

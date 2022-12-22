@@ -326,7 +326,11 @@ export const getSelectedIntervalsForTimeRange = (
     intervalSize
   );
 
-  return mergeSelectionIntervals(blankSelectionIntervals, selectionIntervals);
+  return mergeSelectionIntervals(
+    blankSelectionIntervals,
+    selectionIntervals,
+    false
+  );
 };
 
 /**
