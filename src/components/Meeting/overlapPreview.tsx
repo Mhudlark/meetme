@@ -11,6 +11,7 @@ import { getUsersFromUserIds } from '@/utils/typesUtils/user';
 
 import CustomTooltip from '../Tooltip';
 import FilteredUserToggle from './filteredUserToggle';
+import NumStandoutsSelect from './numStandoutsSelect';
 
 export type FilteredUser = User & {
   included: boolean;
@@ -26,7 +27,7 @@ export default function PreferenceOverlapPreview({
   const { meeting } = useContext(DbContext);
 
   const [filteredUsers, setFilteredUsers] = useState<FilteredUser[]>([]);
-  const numStandouts = 3;
+  const [numStandouts, setNumStandouts] = useState(3);
 
   const toggleFilteredUser = (filteredUser: FilteredUser) => {
     const newFilteredUsers = filteredUsers.map((user) =>
@@ -97,21 +98,15 @@ export default function PreferenceOverlapPreview({
 
     if (allFilteredIntervals.length <= 5) return [];
 
-    // const intervalSize = allFilteredIntervals?.[0]?.intervalSize as number;
-
     const sortedFilteredIntervals = allFilteredIntervals.sort(
       (a, b) => b.count() - a.count()
     );
 
-    console.log('sortedFilteredIntervals', sortedFilteredIntervals);
-
     return sortedFilteredIntervals.slice(0, numStandouts);
-
-    // const standoutIntervals: SelectionInterval[] = [];
   }, [numStandouts, filteredOverlappingPreferences]);
 
   return (
-    <Stack sx={{ gap: { xs: 3, sm: 4 }, width: '100%', height: '100%' }}>
+    <Stack sx={{ gap: { xs: 4, sm: 4 }, width: '100%', height: '100%' }}>
       <Typography variant="h3">{`Everyone's preferences`}</Typography>
       <Stack sx={{ flexDirection: 'row', gap: 1 }}>
         {filteredUsers.map((filteredUser) => (
@@ -125,9 +120,18 @@ export default function PreferenceOverlapPreview({
       {filteredStandoutIntervals &&
         Array.isArray(filteredStandoutIntervals) &&
         filteredStandoutIntervals.length > 0 &&
-        (filteredStandoutIntervals?.[0]?.count ?? 0) > 2 && (
+        (filteredStandoutIntervals?.[0]?.count() ?? 0) > 1 && (
           <Stack sx={{ gap: 2 }}>
-            <Typography variant="h4">Standout times</Typography>
+            <Stack
+              sx={{
+                flexDirection: 'row',
+                gap: 4,
+                alignItems: 'center',
+              }}
+            >
+              <Typography variant="h4">Standout times</Typography>
+              <NumStandoutsSelect onChange={setNumStandouts} />
+            </Stack>
             {filteredStandoutIntervals?.map((standoutInterval) => (
               <Stack
                 key={standoutInterval.getStartDate().valueOf()}
