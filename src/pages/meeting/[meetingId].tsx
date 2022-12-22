@@ -114,6 +114,7 @@ const Meeting = () => {
 
     await signOut();
     resetStates();
+    setIsSignInModalOpen(true);
   };
 
   const confirmLeaveMeeting = async () => {
@@ -218,7 +219,7 @@ const Meeting = () => {
                         Leave Meeting
                       </CustomButton>
                       <CustomButton color="warning" onClick={onSignOutClicked}>
-                        Sign out
+                        Join as a different user
                       </CustomButton>
                     </Stack>
                   )}
@@ -226,7 +227,7 @@ const Meeting = () => {
                 {!isSignedIn && (
                   <>
                     <CustomButton onClick={() => setIsSignInModalOpen(true)}>
-                      Sign In
+                      Join the meeting
                     </CustomButton>
                   </>
                 )}

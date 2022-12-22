@@ -108,7 +108,7 @@ export default function PreferenceOverlapPreview({
   return (
     <Stack sx={{ gap: { xs: 4, sm: 4 }, width: '100%', height: '100%' }}>
       <Typography variant="h3">{`Everyone's preferences`}</Typography>
-      <Stack sx={{ flexDirection: 'row', gap: 1 }}>
+      <Stack sx={{ flexDirection: 'row', gap: 1, flexWrap: 'wrap' }}>
         {filteredUsers.map((filteredUser) => (
           <FilteredUserToggle
             key={filteredUser.userId}
