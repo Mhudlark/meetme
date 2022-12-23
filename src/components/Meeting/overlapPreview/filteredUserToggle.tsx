@@ -1,7 +1,7 @@
 import { AddCircle, CheckCircle } from '@mui/icons-material';
 import { useMemo } from 'react';
 
-import type { FilteredUser } from './overlapPreview';
+import type { FilteredUser } from '.';
 
 const baseFilteredUserToggleClassName = `
   flex items-center gap-1.5

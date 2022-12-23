@@ -4,14 +4,12 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { DbContext } from '@/context/dbContext';
 import type { PreferenceSelection } from '@/types/preferenceSelection';
 import type { User } from '@/types/user';
-import { formatDateToFriendlyString } from '@/utils/date';
-import { getOverlapColour } from '@/utils/preferences';
 import { reduceSelectionIntervals } from '@/utils/typesUtils/selectionInterval';
-import { getUsersFromUserIds } from '@/utils/typesUtils/user';
 
-import CustomTooltip from '../Tooltip';
+import FilteredOverlapPreview from './filteredOverlapPreview';
 import FilteredUserToggle from './filteredUserToggle';
 import NumStandoutsSelect from './numStandoutsSelect';
+import StandoutInterval from './standoutInterval';
 
 export type FilteredUser = User & {
   included: boolean;
@@ -39,6 +37,7 @@ export default function PreferenceOverlapPreview({
     setFilteredUsers(newFilteredUsers);
   };
 
+  // Calculate the users that can be filtered
   useEffect(() => {
     if (!meeting?.users) return;
 
@@ -46,8 +45,15 @@ export default function PreferenceOverlapPreview({
       (filteredUser) => filteredUser.userId
     );
 
+    const usersWithPreferences = meeting.preferences.map(
+      (preference) => preference.userId
+    );
+    const meetingUsersWithPreferences = meeting.users.filter((meetingUser) =>
+      usersWithPreferences.includes(meetingUser.userId)
+    );
+
     const additionalFilteredUsers: FilteredUser[] =
-      meeting.users
+      meetingUsersWithPreferences
         .filter(
           (meetingUser) => !currentFilteredUserIds.includes(meetingUser.userId)
         )
@@ -61,6 +67,7 @@ export default function PreferenceOverlapPreview({
     setFilteredUsers(newFilteredUsers);
   }, [meeting]);
 
+  // Calculate the filtered overlapping preferences from the selected users
   const filteredOverlappingPreferences = useMemo(() => {
     if (!overlappingPreferences) return null;
 
@@ -88,6 +95,7 @@ export default function PreferenceOverlapPreview({
     return newFilteredOverlappingPreferences;
   }, [filteredUsers, overlappingPreferences]);
 
+  // Calculate the standout intervals from the filtered overlapping preferences
   const filteredStandoutIntervals = useMemo(() => {
     if (!filteredOverlappingPreferences) return [];
 
@@ -106,111 +114,47 @@ export default function PreferenceOverlapPreview({
   }, [numStandouts, filteredOverlappingPreferences]);
 
   return (
-    <Stack sx={{ gap: { xs: 4, sm: 4 }, width: '100%', height: '100%' }}>
-      <Typography variant="h3">{`Everyone's preferences`}</Typography>
-      <Stack sx={{ flexDirection: 'row', gap: 1, flexWrap: 'wrap' }}>
-        {filteredUsers.map((filteredUser) => (
-          <FilteredUserToggle
-            key={filteredUser.userId}
-            filteredUser={filteredUser}
-            toggleFilteredUser={toggleFilteredUser}
-          />
-        ))}
-      </Stack>
+    <Stack sx={{ gap: 6, width: '100%', height: '100%' }}>
       {filteredStandoutIntervals &&
         Array.isArray(filteredStandoutIntervals) &&
         filteredStandoutIntervals.length > 0 &&
         (filteredStandoutIntervals?.[0]?.count() ?? 0) > 1 && (
-          <Stack sx={{ gap: 2 }}>
+          <Stack sx={{ gap: 4 }}>
             <Stack
               sx={{
                 flexDirection: 'row',
-                gap: 4,
+                gap: 6,
                 alignItems: 'center',
               }}
             >
-              <Typography variant="h4">Standout times</Typography>
+              <Typography variant="h3">Best times</Typography>
               <NumStandoutsSelect onChange={setNumStandouts} />
             </Stack>
-            {filteredStandoutIntervals?.map((standoutInterval) => (
-              <Stack
-                key={standoutInterval.getStartDate().valueOf()}
-                sx={{ gap: 0.5 }}
-              >
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                  {formatDateToFriendlyString(standoutInterval.date)}
-                </Typography>
-                <Typography variant="body2">
-                  {standoutInterval.startTime.toString()}
-                  {' - '}
-                  {standoutInterval.endTime.toString()}
-                </Typography>
-              </Stack>
-            ))}
+            <Stack sx={{ gap: 2 }}>
+              {filteredStandoutIntervals?.map((standoutInterval) => (
+                <StandoutInterval
+                  key={standoutInterval.getStartDate().valueOf()}
+                  standoutInterval={standoutInterval}
+                />
+              ))}
+            </Stack>
           </Stack>
         )}
-      <Stack
-        sx={{
-          borderRadius: 2,
-          gap: 3,
-          width: '100%',
-          height: '100%',
-          overflow: 'auto',
-        }}
-      >
-        {filteredOverlappingPreferences?.map(
-          (preferenceSelection, prefIndex) => (
-            <Stack key={prefIndex} sx={{ gap: 1 }}>
-              {preferenceSelection?.date && (
-                <Typography variant="body1">
-                  {formatDateToFriendlyString(preferenceSelection.date)}
-                </Typography>
-              )}
-              <div
-                id="overlap day container"
-                className="
-                grid grid-cols-auto-fill-64
-                justify-start
-                gap-1
-              "
-              >
-                {preferenceSelection?.selectionIntervals.map(
-                  (interval, intervalIndex) => (
-                    <CustomTooltip
-                      key={`${prefIndex}-${intervalIndex}`}
-                      title={getUsersFromUserIds(
-                        interval.userIds,
-                        meeting?.users ?? []
-                      )
-                        .map((user) => user.username)
-                        .join(', ')}
-                      placement="top"
-                    >
-                      <div
-                        className={`
-                    flex
-                    select-none
-                    justify-center
-                    rounded-md
-                    border-2 border-gray-900
-                    py-1
-                    px-2
-                `}
-                        style={{
-                          backgroundColor: getOverlapColour(
-                            interval.count(),
-                            meeting?.users.length ?? 0
-                          ),
-                        }}
-                      >
-                        {interval.startTime.toString()}
-                      </div>
-                    </CustomTooltip>
-                  )
-                )}
-              </div>
-            </Stack>
-          )
+      <Stack sx={{ gap: 4, width: '100%', height: '100%' }}>
+        <Typography variant="h3">{`Everyone's preferences`}</Typography>
+        <Stack sx={{ flexDirection: 'row', gap: 1, flexWrap: 'wrap' }}>
+          {filteredUsers.map((filteredUser) => (
+            <FilteredUserToggle
+              key={filteredUser.userId}
+              filteredUser={filteredUser}
+              toggleFilteredUser={toggleFilteredUser}
+            />
+          ))}
+        </Stack>
+        {filteredOverlappingPreferences && (
+          <FilteredOverlapPreview
+            filteredOverlappingPreferences={filteredOverlappingPreferences}
+          />
         )}
       </Stack>
     </Stack>
