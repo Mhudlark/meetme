@@ -140,6 +140,12 @@ const Meeting = () => {
     }
   }, [hasUserEnteredPreferences]);
 
+  useEffect(() => {
+    if (isSignedIn && !hasUserEnteredPreferences) {
+      setIsSubmitPreferencesModalOpen(true);
+    }
+  }, [isSignedIn, hasUserEnteredPreferences]);
+
   // Update selections for new users
   useEffect(() => {
     if (user && meeting?.details && !preference && !hasUserEnteredPreferences) {
@@ -205,7 +211,7 @@ const Meeting = () => {
                   }}
                 >
                   <MeetingDetails />
-                  {isSignedIn && isUsernameValid && (
+                  {isSignedIn && (
                     <Stack
                       sx={{
                         gap: 2,
