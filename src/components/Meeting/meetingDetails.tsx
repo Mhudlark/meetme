@@ -14,7 +14,7 @@ const MeetingDetails = () => {
   return (
     <Stack sx={{ gap: 2 }}>
       <Typography variant="h2">{meeting?.details.name}</Typography>
-      <CustomButton onClick={copyLinkToClipboard}>
+      <CustomButton color="info" onClick={copyLinkToClipboard}>
         Copy meeting link
       </CustomButton>
     </Stack>

@@ -12,10 +12,12 @@ import GridSchedulor from '../Schedulor/GridSchedulor';
 
 const variantInfos = {
   add: {
-    submitButtonLabel: 'Add your preferences',
+    modalTitle: 'Add your preferences',
+    submitButtonLabel: 'Add',
   },
   update: {
-    submitButtonLabel: 'Update your preferences',
+    modalTitle: 'Update your preferences',
+    submitButtonLabel: 'Update',
   },
 };
 
@@ -85,7 +87,7 @@ const SchedulorModal = ({
           gap: 4,
         }}
       >
-        <Typography variant="h2">Pick your preferences</Typography>
+        <Typography variant="h2">{variantInfo.modalTitle}</Typography>
         <GridSchedulor
           selections={localSelections}
           onChange={onSelectionsChanged}
@@ -95,9 +97,28 @@ const SchedulorModal = ({
           maxTime={Time24.fromNumber(meetingDetails.maxTime)}
           intervalSize={INTERVAL_SIZE}
         />
-        <CustomButton onClick={onSubmitSelectionsClicked}>
-          {haveSelectionsChanged ? variantInfo.submitButtonLabel : 'Cancel'}
-        </CustomButton>
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: 1,
+          }}
+        >
+          <CustomButton
+            color="secondary"
+            onClick={onClose}
+            style={{ width: 'min(100%, 400px)' }}
+          >
+            {'Cancel'}
+          </CustomButton>
+          <CustomButton
+            disabled={!haveSelectionsChanged}
+            onClick={onSubmitSelectionsClicked}
+            style={{ width: 'min(100%, 400px)' }}
+          >
+            {variantInfo.submitButtonLabel}
+          </CustomButton>
+        </Stack>
       </Stack>
     </CustomModal>
   );

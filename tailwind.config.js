@@ -22,6 +22,9 @@ module.exports = {
         'rose-gray': {
           50: '#f0eef0',
         },
+        apple: {
+          blue: '#147df5',
+        },
         background: {
           DEFAULT: '#fff1f2',
         },

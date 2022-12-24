@@ -35,7 +35,7 @@ const DatePicker = ({
 
   return (
     <>
-      <CustomButton onClick={() => setIsModalOpen(true)}>
+      <CustomButton color="info" onClick={() => setIsModalOpen(true)}>
         {formatDateToFriendlyString(selected)}
       </CustomButton>
       <Modal

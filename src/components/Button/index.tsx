@@ -11,10 +11,18 @@ const baseButtonClassName = `
   focus:outline-offset-4
   focus:outline-gray-900
   border-2
+  drop-shadow-md
 `;
 
 const getButtonClassName = (
-  color: 'primary' | 'secondary' | 'error' | 'warning' | 'success' | undefined,
+  color:
+    | 'primary'
+    | 'secondary'
+    | 'info'
+    | 'error'
+    | 'warning'
+    | 'success'
+    | undefined,
   disabled?: boolean
 ) => {
   if (disabled) {
@@ -31,15 +39,22 @@ const getButtonClassName = (
     case 'primary':
       return `
       ${baseButtonClassName}
-      bg-gray-900 hover:bg-white
-      text-white hover:text-gray-900
-      border-gray-900
+      bg-sky-600 hover:bg-white
+      text-white hover:text-sky-600
+      border-sky-600
       `;
     case 'secondary':
       return `
       ${baseButtonClassName}
       bg-white hover:bg-gray-900 
       text-gray-900 hover:text-white
+      border-gray-900
+      `;
+    case 'info':
+      return `
+      ${baseButtonClassName}
+      bg-gray-900 hover:bg-white
+      text-white hover:text-gray-900
       border-gray-900
       `;
     case 'error':
@@ -69,7 +84,7 @@ const getButtonClassName = (
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  color?: 'primary' | 'secondary' | 'error' | 'warning' | 'success';
+  color?: 'primary' | 'secondary' | 'info' | 'error' | 'warning' | 'success';
   isLoading?: boolean;
   style?: CSSProperties;
 }
