@@ -59,6 +59,11 @@ export default function GridSchedulor({
   };
 
   const copyPreviousDaySelection = (day: Date) => {
+    if (selections.length < 2)
+      throw new Error(
+        'Selections must have at least 2 elements in order to copy previous day selection'
+      );
+
     const newSelections = selections.map((selection, index) => {
       if (index > 0 && isSameDay(selection.date, day)) {
         const previousSelection = selections[index - 1] as PreferenceSelection;
@@ -124,7 +129,7 @@ export default function GridSchedulor({
           </Stack>
           <AvailabilityPicker
             onChange={(newDates) => handleChange(day, newDates)}
-            selection={selections?.[index] as PreferenceSelection}
+            selection={selections?.[index]!}
             minTime={minTime}
             maxTime={maxTime}
             intervalSize={intervalSize}

@@ -1,8 +1,6 @@
-export enum AlertType {
-  ERROR = 'error',
-  INFO = 'info',
-  SUCCESS = 'success',
-}
+import type { AlertColor } from '@mui/material';
+
+export type AlertType = AlertColor;
 
 export class UIAlert {
   constructor(

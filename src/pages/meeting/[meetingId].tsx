@@ -102,7 +102,7 @@ const Meeting = () => {
     }
 
     if (!hasUserEnteredPreferences) {
-      await addPreferences(router.query.meetingId as string, newSelections);
+      await addPreferences(meetingId, newSelections);
     } else {
       await updatePreferences(newSelections);
     }

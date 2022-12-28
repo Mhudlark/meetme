@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { createContext, useState } from 'react';
 
-import { AlertType, UIAlert } from '@/types/uiAlert';
+import type { AlertType } from '@/types/uiAlert';
+import { UIAlert } from '@/types/uiAlert';
 
 export type UIAlertContextType = {
   alert: UIAlert;
@@ -11,7 +12,7 @@ export type UIAlertContextType = {
 };
 
 const UIAlertContextInitialValue: UIAlertContextType = {
-  alert: new UIAlert(AlertType.ERROR, '', false),
+  alert: new UIAlert('error', '', false),
   dispatchAlert: (_, __, ___) => {},
   dispatchErrorAlert: (_, __) => {},
   closeAlert: () => {},
@@ -27,7 +28,7 @@ const UIAlertProvider = ({ children }: UIAlertProviderProps) => {
   const [alert, setAlert] = useState<UIAlert>(UIAlertContextInitialValue.alert);
 
   const dispatchErrorAlert = (message: string, open: boolean = true) => {
-    const newAlert = new UIAlert(AlertType.ERROR, message, open);
+    const newAlert = new UIAlert('error', message, open);
     setAlert(newAlert);
   };
 

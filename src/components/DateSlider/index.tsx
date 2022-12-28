@@ -50,19 +50,25 @@ export default function DateSlider({
   }, [value]);
 
   const handleChange = (newTimeVals: number[]) => {
-    const startDate = new Date(value[0] as Date);
-    const startTimeNum = newTimeVals[0] as number;
+    if (newTimeVals.length < 2)
+      throw new Error('Range slider on change value must have 2 elements');
+
+    const startDate = new Date(value[0]!);
+    const startTimeNum = newTimeVals[0]!;
     const newStartDate = setDateTimeWithTime24(
       startDate,
       new Time24(startTimeNum)
     );
 
-    const endDate = new Date(value[1] as Date);
-    const endTimeNum = newTimeVals[1] as number;
+    const endDate = new Date(value[1]!);
+    const endTimeNum = newTimeVals[1]!;
     const newEndDate = setDateTimeWithTime24(endDate, new Time24(endTimeNum));
 
     onChange([newStartDate, newEndDate]);
   };
+
+  if (value.length < 2)
+    throw new Error('Date slider value must have 2 elements');
 
   return (
     <>
@@ -72,9 +78,7 @@ export default function DateSlider({
           marks={marks}
           value={sliderValue}
           onChange={handleChange}
-          ariaLabel={`${formatDateToFriendlyString(
-            value[0] as Date
-          )} range slider`}
+          ariaLabel={`${formatDateToFriendlyString(value[0]!)} range slider`}
           ariaValueFormat={formatTimeValue}
         />
       )}

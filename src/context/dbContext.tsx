@@ -109,14 +109,13 @@ const DbProvider = ({ children }: DbProviderProps) => {
 
     // Existing user
     if (existingUser) {
-      setUser(existingUser as User);
+      setUser(existingUser);
 
       const existingUserPreference = meeting?.preferences.filter(
         (meetingPreference) => meetingPreference.userId === existingUser.userId
       )?.[0];
 
-      if (existingUserPreference)
-        setPreference(existingUserPreference as Preference);
+      if (existingUserPreference) setPreference(existingUserPreference);
     }
     // New user
     else {

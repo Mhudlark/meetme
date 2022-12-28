@@ -38,7 +38,7 @@ export const getDateFromSelectionIntervals = (
   if (selectionIntervals.length === 0)
     throw new Error('The selection intervals array is empty');
 
-  const date = selectionIntervals?.[0]?.date as Date;
+  const date = selectionIntervals?.[0]?.date!;
 
   selectionIntervals.forEach((selectionInterval) => {
     if (!isSameDay(date, selectionInterval.date))
@@ -165,7 +165,7 @@ export const reduceSelectionIntervals = (
   const reducedSelectionIntervals = [];
   let currentSelectionInterval: null | SelectionInterval = null;
   for (let i = 0; i < selectionIntervals.length; i += 1) {
-    const nextSelectionInterval = selectionIntervals[i] as SelectionInterval;
+    const nextSelectionInterval = selectionIntervals[i]!;
 
     // If no current selection interval, try and set it to next interval
     if (currentSelectionInterval === null) {
@@ -198,7 +198,7 @@ export const reduceSelectionIntervals = (
   if (currentSelectionInterval !== null)
     reducedSelectionIntervals.push(currentSelectionInterval);
 
-  return reducedSelectionIntervals as SelectionInterval[];
+  return reducedSelectionIntervals!;
 };
 
 /**

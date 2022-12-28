@@ -1,5 +1,5 @@
 import { getHours, getMinutes, isDate } from 'date-fns';
-import { range } from 'lodash';
+import { isNumber, range } from 'lodash';
 
 const isNumberValidTime24 = (num: number): boolean => {
   if (num < 0 || num > 24)
@@ -46,23 +46,26 @@ export class Time24 {
   constructor(time24: string);
   constructor(hours: number, minutes: number);
   constructor(...args: Array<any>) {
+    // time24
     if (args.length === 1 && typeof args[0] === 'number') {
-      const num = args[0] as number;
+      const num = args[0]!;
       isNumberValidTime24(num);
       this.value = num;
-    } else if (args.length === 1 && isDate(args[0])) {
-      const date = args[0] as Date;
+    }
+    // time
+    else if (args.length === 1 && isDate(args[0])) {
+      const date = args[0]!;
       this.value = parseDateToTime24Number(date);
-    } else if (args.length === 1 && typeof args[0] === 'string') {
-      const str = args[0] as string;
+    }
+    // time24
+    else if (args.length === 1 && typeof args[0] === 'string') {
+      const str = args[0]!;
       this.value = parseStringToTime24Number(str);
-    } else if (
-      args.length === 2 &&
-      typeof args[0] === 'number' &&
-      typeof args[1] === 'number'
-    ) {
-      const hours = args[0] as number;
-      const minutes = args[1] as number;
+    }
+    // hours, minutes
+    else if (args.length === 2 && isNumber(args[0]) && isNumber(args[1])) {
+      const hours = args[0]!;
+      const minutes = args[1]!;
       this.value = parseHoursMinsToTime24Number(hours, minutes);
     }
   }

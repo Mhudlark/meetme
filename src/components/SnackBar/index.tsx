@@ -1,4 +1,3 @@
-import type { AlertColor } from '@mui/material';
 import { Alert, Snackbar } from '@mui/material';
 import { useContext } from 'react';
 
@@ -25,7 +24,7 @@ const SnackBar = () => {
       {alert.open ? (
         <Alert
           onClose={closeSnackBar}
-          severity={alert.type as AlertColor}
+          severity={alert.type}
           variant="filled"
           sx={{ width: '100%', minWidth: '160px' }}
         >

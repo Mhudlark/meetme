@@ -23,7 +23,7 @@ const DatePicker = ({
   onChange,
 }: DatePickerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selected, setSelected] = useState<Date>(defaultValue as Date);
+  const [selected, setSelected] = useState<Date>(defaultValue!);
 
   const handleChange = (newDate?: Date) => {
     if (newDate) {

@@ -29,20 +29,20 @@ export class SelectionInterval {
     userIds: string[]
   );
   constructor(...args: Array<any>) {
-    this.date = args[0] as Date;
-    this.startTime = args[1] as Time24;
+    this.date = args[0]!;
+    this.startTime = args[1]!;
 
     // date, startTime, intervalSize, userIds
     if (args.length === 4 && typeof args[2] === 'number') {
-      this.endTime = this.startTime.addTime(args[2] as number);
-      this.intervalSize = args[2] as number;
-      this.userIds = args[3] as string[];
+      this.endTime = this.startTime.addTime(args[2]!);
+      this.intervalSize = args[2]!;
+      this.userIds = args[3]!;
     }
     // date, startTime, endTime, intervalSize, userIds
     else if (args.length === 5) {
-      this.endTime = args[2] as Time24;
-      this.intervalSize = args[3] as number;
-      this.userIds = args[4] as string[];
+      this.endTime = args[2]!;
+      this.intervalSize = args[3]!;
+      this.userIds = args[4]!;
     }
     // Invalid arguments
     else {

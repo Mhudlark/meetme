@@ -30,8 +30,8 @@ export default function RangeSlider({
     if (!(Array.isArray(newValue) && newValue.length >= 2)) return;
 
     // Current values
-    const lowerCurrentValue = value?.[0] as number;
-    const upperCurrentValue = value?.[1] as number;
+    const lowerCurrentValue = value?.[0]!;
+    const upperCurrentValue = value?.[1]!;
 
     // New values
     const newValues = newValue as number[];
@@ -57,6 +57,12 @@ export default function RangeSlider({
     onChange(newRange);
   };
 
+  if (value.length < 2)
+    throw new Error('Range slider value must have 2 elements');
+
+  if (marks.length === 0)
+    throw new Error('Range slider marks must have 2 elements');
+
   return (
     <Slider
       value={value}
@@ -68,8 +74,8 @@ export default function RangeSlider({
       getAriaLabel={() => ariaLabel ?? 'Range slider'}
       getAriaValueText={ariaValueFormat}
       valueLabelFormat={ariaValueFormat}
-      min={marks[0]?.value as number}
-      max={marks[marks.length - 1]?.value as number}
+      min={marks[0]?.value!}
+      max={marks[marks.length - 1]?.value!}
     />
   );
 }

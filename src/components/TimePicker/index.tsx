@@ -9,11 +9,11 @@ interface TimeOption {
 }
 
 const timeOptions = getTimeRange(new Time24(0), new Time24(24), 0.5, true).map(
-  (time: Time24) => {
+  (time: Time24): TimeOption => {
     return {
       value: time.valueOf(),
       label: time.toUnpaddedString(),
-    } as TimeOption;
+    };
   }
 );
 

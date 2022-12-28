@@ -31,20 +31,20 @@ export class PreferenceSelection {
     userId: string | null
   );
   constructor(...args: Array<any>) {
-    this.date = args[0] as Date;
+    this.date = args[0]!;
 
     // date, selectionIntervals, intervalSize, userId
     if (args.length === 4) {
-      this.selectionIntervals = args[1] as SelectionInterval[];
-      this.intervalSize = args[2] as number;
-      this.userId = args[3] as string | null;
+      this.selectionIntervals = args[1]!;
+      this.intervalSize = args[2]!;
+      this.userId = args[3]!;
     }
     // date, startTime, endTime, intervalSize, userId
     else if (args.length === 5) {
-      const startTime = args[1] as Time24;
-      const endTime = args[2] as Time24;
-      this.intervalSize = args[3] as number;
-      this.userId = args[4] as string | null;
+      const startTime = args[1]!;
+      const endTime = args[2]!;
+      this.intervalSize = args[3]!;
+      this.userId = args[4]!;
       this.selectionIntervals = [
         new SelectionInterval(
           this.date,
