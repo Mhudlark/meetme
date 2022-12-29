@@ -115,10 +115,7 @@ const CustomButton = ({
             flexDirection: 'row',
             alignContent: 'center',
             justifyContent: 'center',
-            width:
-              typeof props?.children === 'string'
-                ? `${props.children.length * 8.4}px`
-                : '60px',
+            width: '100%',
             height: '24px',
           }}
         >

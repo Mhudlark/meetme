@@ -1,11 +1,13 @@
 import type { MeetingDetails } from '@/types/meeting';
 import { getArrElement } from '@/utils/array';
+import { INTERVAL_SIZE } from '@/utils/constants';
 
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
-import { meetingsSchema } from '../schemas/meetings';
 import type { BaseMeetingSchema } from '../schemas/types';
+
+export type InsertMeetingSchema = Omit<BaseMeetingSchema, 'id' | 'created_at'>;
 
 /**
  * Insert a new meeting into the DB
@@ -17,18 +19,20 @@ export const insertMeetingIntoDB = async (
   meetingDetails: MeetingDetails
 ): Promise<BaseMeetingSchema> => {
   try {
+    const meetingInsert: InsertMeetingSchema = {
+      code: meetingDetails.code,
+      name: meetingDetails.name,
+      description: meetingDetails.description,
+      start_date: meetingDetails.startDate,
+      end_date: meetingDetails.endDate,
+      min_time: meetingDetails.minTime.toString(),
+      max_time: meetingDetails.maxTime.toString(),
+      interval_size: INTERVAL_SIZE,
+    };
+
     const { data, error } = await supabase
       .from(dbConfig.channels.meetings.channel)
-      .insert([
-        {
-          [meetingsSchema.name]: meetingDetails.name,
-          [meetingsSchema.description]: meetingDetails.description,
-          [meetingsSchema.start_date]: meetingDetails.startDate,
-          [meetingsSchema.end_date]: meetingDetails.endDate,
-          [meetingsSchema.min_time]: meetingDetails.minTime,
-          [meetingsSchema.max_time]: meetingDetails.maxTime,
-        },
-      ])
+      .insert([meetingInsert])
       .select();
 
     checkSupabaseErrorResponse(error);

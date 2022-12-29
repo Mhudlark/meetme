@@ -4,8 +4,12 @@ import { getArrElement } from '@/utils/array';
 import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
-import { preferencesSchema } from '../schemas/preferences';
 import type { PreferenceSchema } from '../schemas/types';
+
+export type InsertPreferenceSchema = Omit<
+  PreferenceSchema,
+  'id' | 'created_at'
+>;
 
 /**
  * Insert a new user preference / selection into the DB
@@ -21,15 +25,15 @@ export const insertPreferenceIntoDB = async (
   selections: PreferenceSelection[]
 ): Promise<PreferenceSchema> => {
   try {
+    const preferenceInsert: InsertPreferenceSchema = {
+      meeting_id: meetingId,
+      user_id: userId,
+      selections: JSON.stringify(selections),
+    };
+
     const { data, error } = await supabase
       .from(dbConfig.channels.preferences.channel)
-      .insert([
-        {
-          [preferencesSchema.meeting_id]: meetingId,
-          [preferencesSchema.user_id]: userId,
-          [preferencesSchema.selections]: JSON.stringify(selections),
-        },
-      ])
+      .insert([preferenceInsert])
       .select();
 
     checkSupabaseErrorResponse(error);

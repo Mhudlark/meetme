@@ -3,15 +3,22 @@ import '@fontsource/poppins/';
 
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
+import { customColors } from './colors';
+
 const theme = responsiveFontSizes(
   createTheme({
+    palette: {
+      info: {
+        main: customColors.gray[900],
+      },
+    },
     typography: {
       fontFamily: ['Poppins', 'sans-serif'].join(','),
       h1: {
-        fontSize: '24px',
-        lineHeight: 36 / 18,
+        fontSize: '58px',
+        lineHeight: 58 / 44,
         margin: 0,
-        fontWeight: 500,
+        fontWeight: 700,
       },
       h2: {
         fontSize: '38px',

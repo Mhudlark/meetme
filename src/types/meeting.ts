@@ -10,6 +10,18 @@ import { createPreferenceFromPreferenceSchema } from './preference';
 import type { User } from './user';
 import { createUserFromUserSchema } from './user';
 
+export type MeetingDetails = {
+  code: string;
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  minTime: number;
+  maxTime: number;
+};
+
+export type PartialMeetingDetails = Omit<MeetingDetails, 'code'>;
+
 export class Meeting {
   constructor(
     public id: string,
@@ -22,8 +34,9 @@ export class Meeting {
 export const createMeetingFromMeetingSchema = (
   schema: MeetingSchema
 ): Meeting => {
-  const meetingDetails = {
+  const meetingDetails: MeetingDetails = {
     name: schema.name,
+    code: schema.code,
     description: schema.description,
     startDate: new Date(schema.start_date),
     endDate: new Date(schema.end_date),
@@ -44,8 +57,9 @@ export const createMeetingFromMeetingSchema = (
 export const createMeetingFromBaseMeetingSchema = (
   schema: BaseMeetingSchema
 ): Meeting => {
-  const meetingDetails = {
+  const meetingDetails: MeetingDetails = {
     name: schema.name,
+    code: schema.code,
     description: schema.description,
     startDate: new Date(schema.start_date),
     endDate: new Date(schema.end_date),
@@ -54,15 +68,6 @@ export const createMeetingFromBaseMeetingSchema = (
   };
 
   return new Meeting(schema.id, meetingDetails, [], []);
-};
-
-export type MeetingDetails = {
-  name: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
-  minTime: number;
-  maxTime: number;
 };
 
 export const isMeetingHost = (meeting: Meeting | null, user: User | null) => {

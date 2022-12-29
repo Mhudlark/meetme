@@ -30,6 +30,14 @@ const CustomModal = ({
       onClose={onClose}
       aria-labelledby={ariaLabelledBy}
       aria-describedby={ariaDescribedBy}
+      slotProps={{
+        backdrop: {
+          style: {
+            backgroundColor: customColors.gray[900],
+            opacity: 0.88,
+          },
+        },
+      }}
     >
       <Box
         sx={{

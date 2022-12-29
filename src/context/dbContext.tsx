@@ -3,8 +3,6 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
 import { deleteMeetingFromDB } from '@/backend/db/database/meeting/delete';
-import { insertMeetingIntoDB } from '@/backend/db/database/meeting/insert';
-import { selectMeetingFromDB } from '@/backend/db/database/meeting/select';
 import {
   deleteAllPreferencesForMeetingFromDB,
   deletePreferenceFromDB,
@@ -16,12 +14,9 @@ import {
   deleteUserFromDB,
 } from '@/backend/db/database/user/delete';
 import { insertUserIntoDB } from '@/backend/db/database/user/insert';
-import type { Meeting, MeetingDetails } from '@/types/meeting';
-import {
-  createMeetingFromBaseMeetingSchema,
-  createMeetingFromMeetingSchema,
-  isMeetingHost,
-} from '@/types/meeting';
+import meetingUtils from '@/backend/meeting/utils';
+import type { Meeting, PartialMeetingDetails } from '@/types/meeting';
+import { isMeetingHost } from '@/types/meeting';
 import type { Preference } from '@/types/preference';
 import { createPreferenceFromPreferenceSchema } from '@/types/preference';
 import type { PreferenceSelection } from '@/types/preferenceSelection';
@@ -30,8 +25,9 @@ import { createUserFromUserSchema } from '@/types/user';
 import { validateUsername } from '@/utils/validation';
 
 export type DbContextType = {
-  createMeeting: (meetingDetails: MeetingDetails) => Promise<string>;
+  createMeeting: (meetingDetails: PartialMeetingDetails) => Promise<string>;
   getMeeting: (meetingId: string) => Promise<void>;
+  joinMeeting: (meetingCode: string) => Promise<string>;
   signIn: (username: string) => Promise<void>;
   addPreferences: (
     meetingId: string,
@@ -52,6 +48,7 @@ export type DbContextType = {
 const DbContextInitialValue: DbContextType = {
   createMeeting: (_) => Promise.resolve(''),
   getMeeting: (_) => Promise.resolve(),
+  joinMeeting: (_) => Promise.resolve(''),
   signIn: (_) => Promise.resolve(),
   addPreferences: (_, __) => Promise.resolve(),
   updatePreferences: (_) => Promise.resolve(),
@@ -77,25 +74,33 @@ const DbProvider = ({ children }: DbProviderProps) => {
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [preference, setPreference] = useState<Preference | null>(null);
 
-  // A user can be signed in locally without being in the database (yet)
   const [isSignedIn, setIsSignedIn] = useState(false);
   const hasUserEnteredPreferences = useMemo(() => !!preference, [preference]);
   const isHost = useMemo(() => {
     return isMeetingHost(meeting, user);
   }, [meeting, user]);
 
-  const createMeeting = async (meetingDetails: MeetingDetails) => {
-    const baseMeetingInfo = await insertMeetingIntoDB(supabase, meetingDetails);
+  const createMeeting = async (meetingDetails: PartialMeetingDetails) => {
+    const newMeeting = await meetingUtils.createMeeting(
+      supabase,
+      meetingDetails
+    );
 
-    setMeeting(createMeetingFromBaseMeetingSchema(baseMeetingInfo));
+    setMeeting(newMeeting);
 
-    return baseMeetingInfo.id;
+    return newMeeting.id;
   };
 
   const getMeeting = async (meetingId: string) => {
-    const meetingInfo = await selectMeetingFromDB(supabase, meetingId);
+    const newMeeting = await meetingUtils.getMeeting(supabase, meetingId);
 
-    setMeeting(createMeetingFromMeetingSchema(meetingInfo));
+    setMeeting(newMeeting);
+  };
+
+  const joinMeeting = async (meetingCode: string): Promise<string> => {
+    const newMeeting = await meetingUtils.joinMeeting(supabase, meetingCode);
+
+    return newMeeting.id;
   };
 
   const signIn = async (username: string) => {
@@ -205,6 +210,7 @@ const DbProvider = ({ children }: DbProviderProps) => {
       value={{
         createMeeting,
         getMeeting,
+        joinMeeting,
         signIn,
         addPreferences,
         updatePreferences,

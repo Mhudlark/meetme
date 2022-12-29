@@ -4,7 +4,8 @@ import { dbConfig } from '../../dbConfig';
 import type { Supabase } from '../../types';
 import { checkSupabaseErrorResponse } from '../error';
 import type { UserSchema } from '../schemas/types';
-import { usersSchema } from '../schemas/users';
+
+export type InsertUserSchema = Omit<UserSchema, 'id' | 'created_at'>;
 
 /**
  * Insert a new user into the DB
@@ -18,14 +19,14 @@ export const insertUserIntoDB = async (
   meetingId: string
 ): Promise<UserSchema> => {
   try {
+    const userInsert: InsertUserSchema = {
+      username,
+      meeting_id: meetingId,
+    };
+
     const { data, error } = await supabase
       .from(dbConfig.channels.users.channel)
-      .insert([
-        {
-          [usersSchema.username]: username,
-          [usersSchema.meeting_id]: meetingId,
-        },
-      ])
+      .insert([userInsert])
       .select();
 
     checkSupabaseErrorResponse(error);
